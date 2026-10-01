@@ -251,6 +251,20 @@ def cue_jingle():
         })
 
 
+CUT_BEAT = 7.5  # là où se trouvait la coupure avant le drop
+
+
+def cue_jingle_coupe():
+    """Le jingle continu, arrêté net au temps 7,5 : la musique se termine sur la coupure."""
+    cue = cue_jingle()
+    for name, notes in cue["tracks"].items():
+        cue["tracks"][name] = [(s, min(d, CUT_BEAT - s), p, v) for s, d, p, v in notes if s < CUT_BEAT]
+    cue.update(name="jingle-coupe", title="Ville et Engagement (trap) - jingle coupe",
+               length=CUT_BEAT * gen.BEAT, fade=0.008,
+               markers=[(0, "Ville et Engagement"), (6, "Reponse cloche"), (CUT_BEAT, "Coupure")])
+    return cue
+
+
 def mute_envelope(nsamp, a, b, depth=0.02, ramp=0.008):
     """Coupe tout entre les temps a et b (fondus de 8 ms) : le « silence » avant le drop."""
     t = np.arange(nsamp) / SR
@@ -263,7 +277,7 @@ def mute_envelope(nsamp, a, b, depth=0.02, ramp=0.008):
 def main():
     for d in ("midi", "stems", "maquettes"):
         os.makedirs(os.path.join(HERE, d), exist_ok=True)
-    for i, build in enumerate((cue_logo, cue_jingle), 1):
+    for i, build in enumerate((cue_logo, cue_jingle, cue_jingle_coupe), 1):
         cue = gen.dedupe(build())
         words, vowels = syllable_map([x for x in cue["tracks"][VOICE] if x[2] >= note("C4")])
         cb.CURRENT_VOWELS.clear()
