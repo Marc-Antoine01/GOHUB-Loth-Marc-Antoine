@@ -2,13 +2,14 @@
 
 Habillage sonore pop, **120 BPM**, **ré mineur**, en 4/4. L'ambiance se veut sérieuse mais conviviale :
 un mode mineur et un registre grave pour le poids de l'engagement, une pulsation régulière pour le
-dynamisme de la ville. Il se décline en trois versions bâties sur le même motif.
+dynamisme de la ville. Il se décline en quatre versions bâties sur le même motif.
 
 | Fichier | Durée | Rôle |
 |---|---|---|
 | `01_jingle_120bpm_Dm` | 8,6 s | Logo sonore principal (générique de début) |
 | `02_virgule_120bpm_Dm` | 3,0 s | Virgule, pour la transition entre deux séquences |
 | `03_outro_120bpm_Dm` | 15,0 s | Outro de fin d'épisode, qui peut passer sous les crédits |
+| `04_jingle-court_120bpm_Dm` | 5,0 s | Logo sonore court (réseaux sociaux, extraits, pubs) |
 
 ## Contenu
 
@@ -31,6 +32,7 @@ médium (ré 3 – ré 4 en notation française) garde le sérieux.
   Le motif revient ensuite et se lance par deux doubles croches (la – do) vers le **ré** final, qui est
   frappé court sur ré mineur (add9). La résolution s'appuie sur une frappe de grosse caisse, de tom basse
   et de cymbale.
+- **Jingle court** : le motif une seule fois (Dm → C), lancé par la – do vers le ré final, qui résonne jusqu'à 5 s.
 - **Virgule** : la cellule ré – fa – la, puis la – do en doubles croches, et frappe du ré final (Bb → C → Dm).
 - **Outro** : il démarre plus léger, sans caisse claire, pour laisser de la place à la voix. Viennent
   ensuite le motif, une réponse qui monte vers le do, et un dernier rappel du motif. Une montée sur

@@ -6,10 +6,11 @@ Une seule partition (ci-dessous) sert à produire :
   - les stems audio WAV par instrument (pour la multipiste d'Adobe Audition) ;
   - les maquettes mixées (WAV 24 bits + MP3).
 
-Trois déclinaisons, toutes à 120 BPM en ré mineur, sur le même motif :
+Quatre déclinaisons, toutes à 120 BPM en ré mineur, sur le même motif :
   - jingle  : logo sonore principal (8,6 s)
   - virgule : transition courte (3,0 s)
   - outro   : fin d'épisode (15,0 s)
+  - court   : logo sonore court (5,0 s)
 
 Dépendances : numpy, scipy, mido, pyloudnorm, ffmpeg (pour le MP3).
 Usage : python3 generate.py
@@ -220,6 +221,25 @@ def cue_virgule():
             "Arpege Synth": arpeggio(changes, 66),
             "Piano Accords": piano_part(changes + final, 84),
             "Cordes Graves": strings(changes + final, 70),
+            "Basse Synth": bass_line(changes + final),
+            "Batterie": drums,
+        })
+
+
+def cue_court():
+    changes = [(0, "Dm", 2), (2, "C", 2)]
+    final = [(4, "Dm9", 5)]
+    lead = motif(0, 102, "climb") + [n(4, 1.5, "D5", 116)]
+    drums = impact(0, 2, 106) + groove(0) + build_roll(3, 1, 70, 116) + impact(4, 5)
+    return dict(
+        name="jingle-court", title="Logo sonore court", length=5.0, fade=0.6,
+        markers=[(0, "Motif"), (4, "Final")],
+        tracks={
+            "Melodie - Piano": piano_melody(lead),
+            "Choeur Ouh": choir(lead),
+            "Arpege Synth": arpeggio(changes),
+            "Piano Accords": piano_part(changes + final),
+            "Cordes Graves": strings(changes + final),
             "Basse Synth": bass_line(changes + final),
             "Batterie": drums,
         })
@@ -575,7 +595,7 @@ def render_cue(cue):
 def main():
     for d in ("midi", "stems", "maquettes"):
         os.makedirs(os.path.join(OUT, d), exist_ok=True)
-    for i, build in enumerate((cue_jingle, cue_virgule, cue_outro), 1):
+    for i, build in enumerate((cue_jingle, cue_virgule, cue_outro, cue_court), 1):
         cue = dedupe(build())
         base = f"{i:02d}_{cue['name']}_{BPM}bpm_{KEY}"
         write_midi(cue, os.path.join(OUT, "midi", base + ".mid"))
