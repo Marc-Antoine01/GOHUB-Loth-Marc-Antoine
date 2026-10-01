@@ -36,12 +36,13 @@ notation française). La ligne monte, comme une ville en mouvement, mais elle re
 
 | # | Piste | Canal | Son General MIDI | Rôle |
 |---|---|---|---|---|
-| 1 | Mélodie – Synth Lead | 1 | 81 Square Lead | le motif, son clair et lumineux (onde pulsée, filtre ouvert, octave aiguë) |
-| 2 | Arpège Synth | 2 | 82 Saw Lead | arpège en croches, en retrait : la pulsation urbaine |
-| 3 | Piano | 3 | 1 Acoustic Grand | accords en croches régulières + octave grave |
-| 4 | Cordes Graves | 4 | 49 String Ensemble | assise harmonique, registre grave |
-| 5 | Basse Synth | 5 | 39 Synth Bass 1 | croches pulsées sur la fondamentale |
-| 6 | Batterie | 10 | kit GM | kick, caisse claire + clap, charleston, toms, crash |
+| 1 | Mélodie – Piano | 1 | 1 Acoustic Grand | le motif, doublé à l'octave supérieure |
+| 2 | Chœur Ouh | 6 | 54 Voice Oohs | le motif chanté « ouh » : voix aiguës à l'unisson, voix graves à l'octave inférieure |
+| 3 | Arpège Synth | 2 | 82 Saw Lead | arpège en croches, en retrait : la pulsation urbaine |
+| 4 | Piano Accords | 3 | 1 Acoustic Grand | accords en croches régulières + octave grave |
+| 5 | Cordes Graves | 4 | 49 String Ensemble | assise harmonique, registre grave |
+| 6 | Basse Synth | 5 | 39 Synth Bass 1 | croches pulsées sur la fondamentale |
+| 7 | Batterie | 10 | kit GM | kick, caisse claire + clap, charleston, toms, crash |
 
 Les MIDI contiennent aussi le tempo (120 BPM), la mesure, la tonalité, des **marqueurs** (Motif, Réponse,
 Final…) et le volume et le panoramique de chaque piste.
@@ -53,7 +54,7 @@ Final…) et le volume et le panoramique de chaque piste.
 
 **Option A : les stems (recommandée)**
 1. *Fichier › Nouveau › Session multipiste…*, à 48 000 Hz.
-2. Faites glisser les 6 WAV de `stems/<déclinaison>/` sur 6 pistes, tous calés à **0:00.000**.
+2. Faites glisser les 7 WAV de `stems/<déclinaison>/` sur 7 pistes, tous calés à **0:00.000**.
 3. Ajustez le niveau, l'égalisation et les effets de chaque piste. Vous pouvez aussi couper une piste,
    par exemple la mélodie pour obtenir un fond sous la voix.
 4. Utilisez *Multipiste › Mixer la session vers un nouveau fichier* pour l'export.

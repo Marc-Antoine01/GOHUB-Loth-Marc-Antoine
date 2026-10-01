@@ -54,9 +54,10 @@ CHORDS = {
 
 # Pistes : nom, canal MIDI, programme General MIDI, volume (CC7), pan (CC10)
 TRACKS = [
-    ("Melodie - Synth Lead", 0, 80, 100, 64),
+    ("Melodie - Piano", 0, 0, 100, 58),
+    ("Choeur Ouh", 5, 53, 92, 70),
     ("Arpege Synth", 1, 81, 76, 88),
-    ("Piano", 2, 0, 92, 48),
+    ("Piano Accords", 2, 0, 88, 44),
     ("Cordes Graves", 3, 48, 80, 76),
     ("Basse Synth", 4, 38, 100, 64),
     ("Batterie", 9, 0, 105, 64),
@@ -83,6 +84,20 @@ def answer(t0, vel=96):
     return [n(t0, .5, "F4", vel), n(t0 + .5, .5, "D4", vel - 8),
             n(t0 + 1, 1, "F4", vel), n(t0 + 2, .5, "G4", vel - 4),
             n(t0 + 2.5, .5, "F4", vel - 8), n(t0 + 3, 1, "E4", vel)]
+
+
+def transpose(notes, semitones, vel_scale=1.0):
+    return [(s, d, p + semitones, int(v * vel_scale)) for s, d, p, v in notes]
+
+
+def piano_melody(lead):
+    """Mélodie au piano, doublée à l'octave supérieure (main droite en octaves)."""
+    return lead + transpose(lead, 12, 0.72)
+
+
+def choir(lead):
+    """Chœur « ouh » : voix aiguës à l'unisson de la mélodie, voix graves à l'octave inférieure."""
+    return transpose(lead, 0, 0.92) + transpose(lead, -12, 0.8)
 
 
 def piano_part(changes, vel=80):
@@ -168,9 +183,10 @@ def cue_jingle():
         name="jingle", title="Logo sonore", length=8.6, fade=0.6,
         markers=[(0, "Motif"), (4, "Reponse"), (8, "Motif (montee)"), (12, "Final")],
         tracks={
-            "Melodie - Synth Lead": lead,
+            "Melodie - Piano": piano_melody(lead),
+            "Choeur Ouh": choir(lead),
             "Arpege Synth": arpeggio(changes),
-            "Piano": piano_part(changes + final),
+            "Piano Accords": piano_part(changes + final),
             "Cordes Graves": strings(changes + final),
             "Basse Synth": bass_line(changes + final),
             "Batterie": drums,
@@ -188,9 +204,10 @@ def cue_virgule():
         name="virgule", title="Virgule", length=3.0, fade=0.5,
         markers=[(0, "Motif"), (2, "Resolution")],
         tracks={
-            "Melodie - Synth Lead": lead,
+            "Melodie - Piano": piano_melody(lead),
+            "Choeur Ouh": choir(lead),
             "Arpege Synth": arpeggio(changes, 66),
-            "Piano": piano_part(changes + final, 84),
+            "Piano Accords": piano_part(changes + final, 84),
             "Cordes Graves": strings(changes + final, 70),
             "Basse Synth": bass_line(changes + final),
             "Batterie": drums,
@@ -218,9 +235,10 @@ def cue_outro():
         name="outro", title="Outro", length=15.0, fade=1.2,
         markers=[(0, "Motif (leger)"), (8, "Motif (plein)"), (16, "Motif (rappel)"), (20, "Montee"), (24, "Final")],
         tracks={
-            "Melodie - Synth Lead": lead,
+            "Melodie - Piano": piano_melody(lead),
+            "Choeur Ouh": choir(lead),
             "Arpege Synth": arpeggio(changes),
-            "Piano": piano_part(changes[:8], 70) + piano_part(changes[8:] + final, 84),
+            "Piano Accords": piano_part(changes[:8], 70) + piano_part(changes[8:] + final, 84),
             "Cordes Graves": strings(changes + final, 68),
             "Basse Synth": bass_line(changes + final),
             "Batterie": drums,
@@ -295,24 +313,31 @@ def lowpass_weight(k, freq, fc, order=2):
     return 1.0 / np.sqrt(1 + (k * freq / fc) ** (2 * order))
 
 
-def inst_lead(p, dur, vel):
-    """Synthé lumineux : onde pulsée claire, filtre ouvert, couche d'octave aiguë pour l'air, sans vibrato."""
+def inst_choir(p, dur, vel):
+    """Chœur « ouh » par synthèse de formants : 4 voix légèrement décalées, réparties en stéréo."""
     f = hz(p)
-    total = dur + 0.45
+    total = dur + 0.35
     t = np.arange(int(total * SR)) / SR
-    fc = 4200 + 4000 * np.exp(-t / 0.08)  # attaque brillante, puis son clair et stable
-    duty = 0.3
-    out = 0
-    for det in (-0.002, 0.002):  # léger élargissement stéréo, sans effet « chorus » rétro
+    # formants de la voyelle [u] (« ou ») : fréquence, largeur de bande, gain
+    formants = [(330, 90, 1.0), (780, 110, 0.45), (2450, 160, 0.08)]
+    out = np.zeros((len(t), 2))
+    for i, (det, panv, rate) in enumerate([(-0.004, -0.6, 5.1), (0.003, 0.6, 5.5), (-0.001, -0.2, 4.8), (0.005, 0.25, 5.8)]):
+        vib = 0.003 * np.sin(2 * np.pi * rate * t + i * 1.7) * np.clip(t / 0.25, 0, 1)
         ff = f * (1 + det)
-        phase = 2 * np.pi * ff * t
-        for k in range(1, 48):
-            if k * ff > SR * 0.45:
+        phase = 2 * np.pi * np.cumsum(ff * (1 + vib)) / SR
+        voice = np.zeros_like(t)
+        for k in range(1, 40):
+            fk = k * ff
+            if fk > 4500:
                 break
-            out = out + np.sin(np.pi * k * duty) / k * lowpass_weight(k, ff, fc) * np.sin(k * phase)
-    air = np.sin(4 * np.pi * f * t) + 0.3 * np.sin(8 * np.pi * f * t)  # octave et double octave aiguës
-    out = out / 2 + 0.22 * air * np.exp(-t / 0.6)
-    return out * adsr(len(t), dur, 0.004, 0.18, 0.72, 0.4)
+            gain = sum(g / np.sqrt(1 + ((fk - fc) / (bw / 2)) ** 2) for fc, bw, g in formants)
+            voice += gain / k ** 0.7 * np.sin(k * phase)
+        breath = band(noise(len(t)), 250, 1200) * 0.015
+        voice = (voice + breath) * adsr(len(t), dur, 0.06 + 0.01 * i, 0.4, 0.85, 0.3)
+        theta = (panv + 1) * np.pi / 4
+        out[:, 0] += voice * np.cos(theta)
+        out[:, 1] += voice * np.sin(theta)
+    return out / 4
 
 
 def inst_arp(p, dur, vel):
@@ -329,21 +354,26 @@ def inst_arp(p, dur, vel):
     return out * np.exp(-t / 0.2) * np.clip(t / 0.002, 0, 1)
 
 
-def inst_piano(p, dur, vel):
+def inst_piano(p, dur, vel, bright_base=0.45, decay=0.9):
     f = hz(p)
     total = dur + 0.4
     t = np.arange(int(total * SR)) / SR
-    bright = 0.45 + 0.4 * vel / 127
+    bright = bright_base + 0.4 * vel / 127
     out = np.zeros_like(t)
     for k in range(1, 16):
         fk = f * k * np.sqrt(1 + 0.0004 * k * k)
         if fk > SR * 0.45:
             break
-        out += (bright ** k) / k ** 1.1 * np.sin(2 * np.pi * fk * t) * np.exp(-t * (0.9 + 0.5 * k))
+        out += (bright ** k) / k ** 1.1 * np.sin(2 * np.pi * fk * t) * np.exp(-t * (decay + 0.5 * k))
     hammer = sosfilt(butter(2, [600, 4000], "bandpass", fs=SR, output="sos"),
                      RNG.standard_normal(len(t))) * np.exp(-t * 120) * 0.1
     env = np.clip(t / 0.003, 0, 1) * np.where(t > dur, np.exp(-(t - dur) / 0.08), 1)
     return (out + hammer) * env
+
+
+def inst_piano_melody(p, dur, vel):
+    """Piano plus brillant et plus long en résonance, pour porter la mélodie."""
+    return inst_piano(p, dur + 0.25, vel, bright_base=0.55, decay=0.5)
 
 
 def inst_strings(p, dur, vel):
@@ -423,9 +453,10 @@ def inst_drum(p, dur, vel):
 
 # Réglages de mix par piste : instrument, gain, pan (-1..1), envoi réverbe
 MIX = {
-    "Melodie - Synth Lead": (inst_lead, 0.30, 0.0, 0.30),
+    "Melodie - Piano": (inst_piano_melody, 0.17, -0.1, 0.30),
+    "Choeur Ouh": (inst_choir, 0.36, 0.0, 0.45),
     "Arpege Synth": (inst_arp, 0.29, 0.4, 0.35),
-    "Piano": (inst_piano, 0.19, -0.3, 0.22),
+    "Piano Accords": (inst_piano, 0.15, -0.3, 0.22),
     "Cordes Graves": (inst_strings, 0.16, 0.25, 0.45),
     "Basse Synth": (inst_bass, 0.14, 0.0, 0.0),
     "Batterie": (inst_drum, 0.33, 0.0, 0.12),
@@ -455,8 +486,11 @@ def render_track(name, notes, total_s):
         theta = (tp + 1) * np.pi / 4
         i0 = int(round(s * BEAT * SR))
         i1 = min(i0 + len(x), len(buf))
-        buf[i0:i1, 0] += x[: i1 - i0] * np.cos(theta)
-        buf[i0:i1, 1] += x[: i1 - i0] * np.sin(theta)
+        if x.ndim == 2:  # instrument déjà en stéréo (chœur)
+            buf[i0:i1] += x[: i1 - i0]
+        else:
+            buf[i0:i1, 0] += x[: i1 - i0] * np.cos(theta)
+            buf[i0:i1, 1] += x[: i1 - i0] * np.sin(theta)
     if send:
         wet = np.stack([fftconvolve(buf[:, c], IR[:, c])[: len(buf)] for c in range(2)], axis=1)
         buf = buf + wet * send * 0.25
