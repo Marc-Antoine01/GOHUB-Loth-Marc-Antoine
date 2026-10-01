@@ -1,14 +1,14 @@
 # Logo sonore du podcast : engagement citoyen des élus et agents de mairie
 
-Habillage sonore pop, **100 BPM**, **ré mineur**, en 4/4. L'ambiance se veut sérieuse mais conviviale :
+Habillage sonore pop, **120 BPM**, **ré mineur**, en 4/4. L'ambiance se veut sérieuse mais conviviale :
 un mode mineur et un registre grave pour le poids de l'engagement, une pulsation régulière pour le
 dynamisme de la ville. Il se décline en trois versions bâties sur le même motif.
 
 | Fichier | Durée | Rôle |
 |---|---|---|
-| `01_jingle_100bpm_Dm` | 9,8 s | Logo sonore principal (générique de début) |
-| `02_virgule_100bpm_Dm` | 3,0 s | Virgule, pour la transition entre deux séquences |
-| `03_outro_100bpm_Dm` | 15,0 s | Outro de fin d'épisode, qui peut passer sous les crédits |
+| `01_jingle_120bpm_Dm` | 8,6 s | Logo sonore principal (générique de début) |
+| `02_virgule_120bpm_Dm` | 3,0 s | Virgule, pour la transition entre deux séquences |
+| `03_outro_120bpm_Dm` | 15,0 s | Outro de fin d'épisode, qui peut passer sous les crédits |
 
 ## Contenu
 
@@ -29,8 +29,8 @@ notation française). La ligne monte, comme une ville en mouvement, mais elle re
   sans être triste. La résolution s'appuie sur une frappe de grosse caisse, de tom basse et de cymbale.
 - **Virgule** : le motif tient en deux temps (la – ré – fa – la) sur Bb → C, puis frappe le ré final.
 - **Outro** : il démarre plus léger, sans caisse claire, pour laisser de la place à la voix. Le motif
-  revient ensuite en entier, avec une variation qui monte vers le do. Un roulement de caisse claire et
-  de toms sur Gm → Asus4 → A mène au ré final, qui s'éteint en fondu.
+  revient ensuite en entier, avec une variation qui monte vers le do, puis il est rappelé une dernière fois.
+  Un roulement de caisse claire et de toms sur Gm → Asus4 → A mène au ré final, qui s'éteint en fondu.
 
 ## Pistes (MIDI et stems)
 
@@ -43,7 +43,7 @@ notation française). La ligne monte, comme une ville en mouvement, mais elle re
 | 5 | Basse Synth | 5 | 39 Synth Bass 1 | croches pulsées sur la fondamentale |
 | 6 | Batterie | 10 | kit GM | kick, caisse claire + clap, charleston, toms, crash |
 
-Les MIDI contiennent aussi le tempo (100 BPM), la mesure, la tonalité, des **marqueurs** (Motif, Réponse,
+Les MIDI contiennent aussi le tempo (120 BPM), la mesure, la tonalité, des **marqueurs** (Motif, Réponse,
 Final…) et le volume et le panoramique de chaque piste.
 
 ## Utilisation dans Adobe Audition

@@ -6,8 +6,8 @@ Une seule partition (ci-dessous) sert à produire :
   - les stems audio WAV par instrument (pour la multipiste d'Adobe Audition) ;
   - les maquettes mixées (WAV 24 bits + MP3).
 
-Trois déclinaisons, toutes à 100 BPM en ré mineur, sur le même motif :
-  - jingle  : logo sonore principal (9,8 s)
+Trois déclinaisons, toutes à 120 BPM en ré mineur, sur le même motif :
+  - jingle  : logo sonore principal (8,6 s)
   - virgule : transition courte (3,0 s)
   - outro   : fin d'épisode (15,0 s)
 
@@ -24,8 +24,8 @@ import numpy as np
 import pyloudnorm
 from scipy.signal import butter, fftconvolve, sosfilt
 
-BPM = 100
-BEAT = 60.0 / BPM  # 0,6 s
+BPM = 120
+BEAT = 60.0 / BPM  # 0,5 s
 SR = 48000
 PPQ = 480
 KEY = "Dm"
@@ -165,7 +165,7 @@ def cue_jingle():
     lead = motif(0) + answer(4) + motif(8, 104, end=("G4", .5)) + [n(11.5, .5, "A4", 104), n(12, 4, "D5", 112)]
     drums = impact(0, 2, 108) + groove(0) + groove(4) + groove(8) + build_roll(11, 1, 70, 116) + impact(12)
     return dict(
-        name="jingle", title="Logo sonore", length=9.8, fade=0.6,
+        name="jingle", title="Logo sonore", length=8.6, fade=0.6,
         markers=[(0, "Motif"), (4, "Reponse"), (8, "Motif (montee)"), (12, "Final")],
         tracks={
             "Melodie - Synth Lead": lead,
@@ -179,11 +179,11 @@ def cue_jingle():
 
 def cue_virgule():
     changes = [(0, "Bb", 1), (1, "C", 1)]
-    final = [(2, "Dm9", 2.5)]
+    final = [(2, "Dm9", 3.5)]
     lead = [n(0, .5, "A3", 96), n(.5, .5, "D4", 100), n(1, .5, "F4", 104),
-            n(1.5, .5, "A4", 108), n(2, 2.5, "D5", 112)]
+            n(1.5, .5, "A4", 108), n(2, 3.5, "D5", 112)]
     drums = [n(0, .25, KICK, 110), n(1, .25, KICK, 100)] + [n(i * .25, .2, HAT, 64 if i % 2 == 0 else 40) for i in range(4)]
-    drums += build_roll(1, 1, 64, 112) + impact(2, 2.5)
+    drums += build_roll(1, 1, 64, 112) + impact(2, 3.5)
     return dict(
         name="virgule", title="Virgule", length=3.0, fade=0.5,
         markers=[(0, "Motif"), (2, "Resolution")],
@@ -200,21 +200,23 @@ def cue_virgule():
 def cue_outro():
     changes = [(0, "Dm", 2), (2, "C", 2), (4, "Bb", 2), (6, "C", 2),
                (8, "Dm", 2), (10, "C", 2), (12, "Bb", 2), (14, "C", 2),
-               (16, "Gm", 2), (18, "Asus4", 1), (19, "A", 1)]
-    final = [(20, "Dm9", 4)]
+               (16, "Dm", 2), (18, "C", 2),
+               (20, "Gm", 2), (22, "Asus4", 1), (23, "A", 1)]
+    final = [(24, "Dm9", 4)]
     lead = motif(0, 88) + answer(4, 86) + motif(8, 102) + [
         n(12, .5, "F4", 100), n(12.5, .5, "G4", 94), n(13, 1, "A4", 100),
         n(14, .5, "G4", 96), n(14.5, .5, "A4", 100), n(15, 1, "C5", 106),
-        n(16, .5, "Bb4", 100), n(16.5, .5, "A4", 94), n(17, 1, "G4", 98),
-        n(18, .5, "A3", 96), n(18.5, .5, "D4", 100), n(19, .5, "E4", 104), n(19.5, .5, "A4", 108),
-        n(20, 4, "D5", 112)]
-    drums = groove(0, full=False) + groove(4, full=False) + impact(8, 2, 104) + groove(8) + groove(12)
-    drums += [n(16, .25, KICK, 110), n(17, .25, SNARE, 100), n(17, .25, CLAP, 80), n(17.5, .25, KICK, 96)]
-    drums += [n(16 + i * .25, .2, HAT, 66 if i % 2 == 0 else 42) for i in range(8)]
-    drums += build_roll(18, 2, 52, 120) + impact(20)
+    ] + motif(16, 106) + [
+        n(20, .5, "Bb4", 100), n(20.5, .5, "A4", 94), n(21, 1, "G4", 98),
+        n(22, .5, "A3", 96), n(22.5, .5, "D4", 100), n(23, .5, "E4", 104), n(23.5, .5, "A4", 108),
+        n(24, 4, "D5", 112)]
+    drums = groove(0, full=False) + groove(4, full=False) + impact(8, 2, 104) + groove(8) + groove(12) + groove(16)
+    drums += [n(20, .25, KICK, 110), n(21, .25, SNARE, 100), n(21, .25, CLAP, 80), n(21.5, .25, KICK, 96)]
+    drums += [n(20 + i * .25, .2, HAT, 66 if i % 2 == 0 else 42) for i in range(8)]
+    drums += build_roll(22, 2, 52, 120) + impact(24)
     return dict(
         name="outro", title="Outro", length=15.0, fade=1.2,
-        markers=[(0, "Motif (leger)"), (8, "Motif (plein)"), (16, "Montee"), (20, "Final")],
+        markers=[(0, "Motif (leger)"), (8, "Motif (plein)"), (16, "Motif (rappel)"), (20, "Montee"), (24, "Final")],
         tracks={
             "Melodie - Synth Lead": lead,
             "Arpege Synth": arpeggio(changes),
@@ -524,7 +526,7 @@ def main():
         os.makedirs(os.path.join(OUT, d), exist_ok=True)
     for i, build in enumerate((cue_jingle, cue_virgule, cue_outro), 1):
         cue = dedupe(build())
-        base = f"{i:02d}_{cue['name']}_100bpm_{KEY}"
+        base = f"{i:02d}_{cue['name']}_{BPM}bpm_{KEY}"
         write_midi(cue, os.path.join(OUT, "midi", base + ".mid"))
         mix, stems, lufs, peak = render_cue(cue)
         sdir = os.path.join(OUT, "stems", base)
