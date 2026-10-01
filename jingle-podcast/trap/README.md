@@ -6,8 +6,8 @@ la cloche de mairie, le coup de tampon et les applaudissements de groupe sont co
 | Fichier | Durée | Déroulé |
 |---|---|---|
 | `01_VilleEtEngagement_trap_logo_140bpm_Fm` | 5,0 s | Le nom chanté sur des roulements de charleston, puis la cloche et le 808 |
-| `02_VilleEtEngagement_trap_jingle_140bpm_Fm` | 8,6 s | Groove continu : le nom, la réponse de la cloche, le nom (plus dense), la réponse, puis la cloche finale |
-| `03_VilleEtEngagement_trap_jingle-coupe_140bpm_Fm` | 3,6 s | Le nom chanté sur le groove, qui s'éteint **en fondu** après « GE-MENT », avant la réponse de la cloche (temps 6) |
+| `02_VilleEtEngagement_trap_jingle_140bpm_Fm` | 8,6 s | Groove continu : le nom, puis le nom (plus dense), puis la cloche finale |
+| `03_VilleEtEngagement_trap_jingle-coupe_140bpm_Fm` | 3,6 s | Le nom chanté sur le groove, qui s'éteint **en fondu** juste après « GE-MENT » (temps 6) |
 
 ## Ce qui en fait de la trap
 
@@ -17,7 +17,7 @@ la cloche de mairie, le coup de tampon et les applaudissements de groupe sont co
 - **Charleston en roulements** : croches, doubles croches, triolets et quadruples croches, qui accélèrent avant les temps forts.
 - **Fa mineur** sur la grille épique Db – Eb – Fm (VI – VII – i). Le ton est grave et déterminé.
 - **Mélodie de cloche trap** : un son métallique et brillant (synthèse FM) qui double la voix une octave
-  plus haut. Elle répond au nom par une petite phrase (lab – sol – fa…).
+  plus haut.
 - **Une montée sans coupure** : le 808 et la batterie jouent dès la première mesure. La densité augmente
   par paliers (mains, tampon, roulements de charleston de plus en plus serrés) jusqu'à la cloche finale.
 

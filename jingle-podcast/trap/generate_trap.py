@@ -212,9 +212,6 @@ def cue_logo():
 def cue_jingle():
     # Groove continu du début à la fin : la densité monte par paliers, sans coupure, jusqu'à la cloche finale.
     lead = name_motif(0, 98, ment=2) + name_motif(8, 106, ment=2)
-    bell_answer_1 = [n(6, .5, "Ab5", 96), n(6.5, .5, "G5", 90), n(7, .25, "F5", 92), n(7.25, .25, "G5", 96)]
-    bell_answer_2 = [n(14, .5, "Ab5", 100), n(14.5, .5, "G5", 94), n(15, .5, "E5", 98),
-                     n(15.5, .25, "G5", 100), n(15.75, .25, "E5", 104)]
     changes = [(0, "Db", 2), (2, "Eb", 2), (4, "Fm", 4),
                (8, "Db", 2), (10, "Eb", 2), (12, "Fm", 2), (14, "C", 2)]
     final = [(16, "Fm", 4)]
@@ -239,11 +236,10 @@ def cue_jingle():
             n(16, 4, "F2", 124)]
     return dict(
         name="jingle", title="Ville et Engagement (trap) - jingle", length=8.6, fade=0.9,
-        markers=[(0, "Ville et Engagement"), (6, "Reponse cloche"), (8, "Ville et Engagement (2)"),
-                 (14, "Reponse cloche (2)"), (16, "Cloche + 808")],
+        markers=[(0, "Ville et Engagement"), (8, "Ville et Engagement (2)"), (16, "Cloche + 808")],
         tracks={
             VOICE: cb.voices(lead),
-            BELL_TRAP: gen.transpose(lead, 12, 0.8) + bell_answer_1 + bell_answer_2,
+            BELL_TRAP: gen.transpose(lead, 12, 0.8),
             PAD: gen.strings(changes + final, 66),
             B808: bass,
             TOWN_BELL: [n(16, 4, "F4", 122), n(18, 3, "F4", 86)],
@@ -251,11 +247,11 @@ def cue_jingle():
         })
 
 
-CUT_BEAT = 6  # juste avant la réponse de la cloche (lab – sol – fa – sol)
+CUT_BEAT = 6  # juste après « GE-MENT »
 
 
 def cue_jingle_coupe():
-    """Le jingle continu, qui s'éteint en fondu après « GE-MENT », avant la réponse de la cloche (temps 6)."""
+    """Le jingle continu, qui s'éteint en fondu juste après « GE-MENT » (temps 6)."""
     cue = cue_jingle()
     for name, notes in cue["tracks"].items():
         # plus aucune note ne démarre après la coupure ; celles en cours résonnent naturellement
