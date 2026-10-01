@@ -74,16 +74,27 @@ def n(start, dur, pitch, vel):
 # --------------------------------------------------------------------------
 # Motif : montée la – ré – fa, puis mi – fa – LA ; la « signature » du podcast
 # --------------------------------------------------------------------------
-def motif(t0, vel=100, end=("A4", 1)):
-    return [n(t0, .5, "A3", vel - 8), n(t0 + .5, .5, "D4", vel - 4),
-            n(t0 + 1, 1, "F4", vel), n(t0 + 2, .5, "E4", vel - 10),
-            n(t0 + 2.5, .5, "F4", vel - 6), n(t0 + 3, end[1], end[0], vel + 6)]
+def phrase(t0, vel, cells):
+    """cells : (décalage en temps, durée, note, écart de vélocité)."""
+    return [n(t0 + o, d, p, vel + dv) for o, d, p, dv in cells]
+
+
+def motif(t0, vel=100, ending="push"):
+    """Le motif : deux cellules rythmiques identiques (croche, double, croche pointée), notes détachées.
+    ré – fa – LA, puis sol – mi – SOL, et une anticipation sur le contretemps du 4e temps."""
+    cells = [(0, .3, "D4", -6), (.5, .3, "F4", -4), (.75, .6, "A4", 4), (1.5, .3, "A4", -8),
+             (2, .3, "G4", -4), (2.5, .3, "E4", -8), (2.75, .6, "G4", 2)]
+    if ending == "push":
+        cells.append((3.5, .9, "A4", 6))
+    else:  # « climb » : deux doubles croches qui lancent la résolution
+        cells += [(3.5, .25, "A4", 2), (3.75, .25, "C5", 6)]
+    return phrase(t0, vel, cells)
 
 
 def answer(t0, vel=96):
-    return [n(t0, .5, "F4", vel), n(t0 + .5, .5, "D4", vel - 8),
-            n(t0 + 1, 1, "F4", vel), n(t0 + 2, .5, "G4", vel - 4),
-            n(t0 + 2.5, .5, "F4", vel - 8), n(t0 + 3, 1, "E4", vel)]
+    """La réponse : même rythme, ligne qui redescend vers le do pour relancer le motif."""
+    return phrase(t0, vel, [(.5, .3, "F4", 0), (.75, .6, "D4", -6), (1.5, .3, "F4", -2),
+                            (2, .3, "G4", 0), (2.5, .3, "F4", -6), (2.75, .6, "E4", 2), (3.5, .4, "C4", -6)])
 
 
 def transpose(notes, semitones, vel_scale=1.0):
@@ -177,7 +188,7 @@ def dedupe(cue):
 def cue_jingle():
     changes = [(0, "Dm", 2), (2, "C", 2), (4, "Bb", 2), (6, "C", 2), (8, "Dm", 2), (10, "C", 2)]
     final = [(12, "Dm9", 4)]
-    lead = motif(0) + answer(4) + motif(8, 104, end=("G4", .5)) + [n(11.5, .5, "A4", 104), n(12, 4, "D5", 112)]
+    lead = motif(0) + answer(4) + motif(8, 104, "climb") + [n(12, 1.5, "D5", 116)]
     drums = impact(0, 2, 108) + groove(0) + groove(4) + groove(8) + build_roll(11, 1, 70, 116) + impact(12)
     return dict(
         name="jingle", title="Logo sonore", length=8.6, fade=0.6,
@@ -196,8 +207,8 @@ def cue_jingle():
 def cue_virgule():
     changes = [(0, "Bb", 1), (1, "C", 1)]
     final = [(2, "Dm9", 3.5)]
-    lead = [n(0, .5, "A3", 96), n(.5, .5, "D4", 100), n(1, .5, "F4", 104),
-            n(1.5, .5, "A4", 108), n(2, 3.5, "D5", 112)]
+    lead = phrase(0, 100, [(0, .3, "D4", -6), (.5, .3, "F4", -4), (.75, .5, "A4", 4),
+                           (1.5, .25, "A4", 2), (1.75, .25, "C5", 6), (2, 1.5, "D5", 14)])
     drums = [n(0, .25, KICK, 110), n(1, .25, KICK, 100)] + [n(i * .25, .2, HAT, 64 if i % 2 == 0 else 40) for i in range(4)]
     drums += build_roll(1, 1, 64, 112) + impact(2, 3.5)
     return dict(
@@ -220,13 +231,13 @@ def cue_outro():
                (16, "Dm", 2), (18, "C", 2),
                (20, "Gm", 2), (22, "Asus4", 1), (23, "A", 1)]
     final = [(24, "Dm9", 4)]
-    lead = motif(0, 88) + answer(4, 86) + motif(8, 102) + [
-        n(12, .5, "F4", 100), n(12.5, .5, "G4", 94), n(13, 1, "A4", 100),
-        n(14, .5, "G4", 96), n(14.5, .5, "A4", 100), n(15, 1, "C5", 106),
-    ] + motif(16, 106) + [
-        n(20, .5, "Bb4", 100), n(20.5, .5, "A4", 94), n(21, 1, "G4", 98),
-        n(22, .5, "A3", 96), n(22.5, .5, "D4", 100), n(23, .5, "E4", 104), n(23.5, .5, "A4", 108),
-        n(24, 4, "D5", 112)]
+    lead = motif(0, 88) + answer(4, 86) + motif(8, 102) + phrase(12, 100, [
+        (.5, .3, "F4", 0), (.75, .6, "D4", -6), (1.5, .3, "F4", -2),
+        (2, .3, "G4", 0), (2.5, .3, "A4", 0), (2.75, .6, "Bb4", 4), (3.5, .4, "C5", 6)])
+    lead += motif(16, 106) + phrase(20, 104, [
+        (0, .3, "G4", -4), (.5, .3, "Bb4", -2), (.75, .6, "D5", 6), (1.5, .3, "D5", -4),
+        (2, .3, "D4", -6), (2.5, .3, "E4", -4), (2.75, .6, "A4", 4), (3.5, .25, "A4", 2), (3.75, .25, "C#5", 8)])
+    lead += [n(24, 1.5, "D5", 116)]
     drums = groove(0, full=False) + groove(4, full=False) + impact(8, 2, 104) + groove(8) + groove(12) + groove(16)
     drums += [n(20, .25, KICK, 110), n(21, .25, SNARE, 100), n(21, .25, CLAP, 80), n(21.5, .25, KICK, 96)]
     drums += [n(20 + i * .25, .2, HAT, 66 if i % 2 == 0 else 42) for i in range(8)]

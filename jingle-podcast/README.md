@@ -21,16 +21,20 @@ generate.py  la partition et le moteur de rendu ; relancer pour tout regénérer
 
 ## Le motif
 
-Le motif est une montée **la – ré – fa … mi – fa – LA**, dans le médium-grave (du la 2 au ré 4 en
-notation française). La ligne monte, comme une ville en mouvement, mais elle reste posée et facile à retenir.
+Le motif est rythmique et détaché, à l'opposé d'une ballade. Il se compose de deux cellules identiques
+(croche, double croche, croche pointée) : **ré – fa – LA** puis **sol – mi – SOL**, suivies d'une
+anticipation sur le contretemps du 4e temps, qui relance la mesure suivante. La montée ré – fa – la
+reste la signature du podcast. Les notes répétées et les syncopes donnent l'énergie, et le registre
+médium (ré 3 – ré 4 en notation française) garde le sérieux.
 
-- **Jingle** : la grille Dm – C – Bb – C, un enchaînement pop en mineur, porte le motif, sa réponse,
-  puis le motif qui monte (sol – la). Il se résout sur **ré mineur (add9)**, un accord ouvert : grave
-  sans être triste. La résolution s'appuie sur une frappe de grosse caisse, de tom basse et de cymbale.
-- **Virgule** : le motif tient en deux temps (la – ré – fa – la) sur Bb → C, puis frappe le ré final.
-- **Outro** : il démarre plus léger, sans caisse claire, pour laisser de la place à la voix. Le motif
-  revient ensuite en entier, avec une variation qui monte vers le do, puis il est rappelé une dernière fois.
-  Un roulement de caisse claire et de toms sur Gm → Asus4 → A mène au ré final, qui s'éteint en fondu.
+- **Jingle** : sur la grille Dm – C – Bb – C, on entend le motif, puis la réponse, qui redescend vers le do.
+  Le motif revient ensuite et se lance par deux doubles croches (la – do) vers le **ré** final, qui est
+  frappé court sur ré mineur (add9). La résolution s'appuie sur une frappe de grosse caisse, de tom basse
+  et de cymbale.
+- **Virgule** : la cellule ré – fa – la, puis la – do en doubles croches, et frappe du ré final (Bb → C → Dm).
+- **Outro** : il démarre plus léger, sans caisse claire, pour laisser de la place à la voix. Viennent
+  ensuite le motif, une réponse qui monte vers le do, et un dernier rappel du motif. Une montée sur
+  Gm → Asus4 → A, avec un roulement de caisse claire et de toms, mène au ré final, qui s'éteint en fondu.
 
 ## Pistes (MIDI et stems)
 
