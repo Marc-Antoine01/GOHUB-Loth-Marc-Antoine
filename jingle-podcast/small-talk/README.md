@@ -12,24 +12,25 @@ Aucune musique existante n'est reprise. Il n'y a **ni cloche, ni percussion mét
 
 ## La mélodie (nouvelle)
 
-Elle est **sifflée** : c'est humain, léger, et ça évoque quelqu'un de détendu qui discute. Ses sept
-notes, bavardes, suivent le rythme du titre dit vite :
+Elle est **sifflée** : c'est humain, léger, et ça évoque quelqu'un de détendu qui discute. Elle est
+**liée et posée** : peu de doubles croches, des notes qui durent jusqu'à la suivante, des appuis sur les
+temps et des intervalles serrés. Ses sept notes suivent le rythme du titre :
 
 ```
 Vil – le – et – en – GA – ge – MENT
-do    la   do   ré   FA   mi   do
+la    do   do   ré   FA   mi   DO
 ```
 
-Une **réponse** (sib – la – sol… mi – sol – sib – do – MI) relance vers le motif. Dans le jingle, la
-seconde réponse **monte jusqu'au sol** et retombe sur le fa final.
+Une **réponse** (sib – la – sol… sib – do – mi) relance doucement vers le motif. Dans le jingle, la
+seconde réponse **monte** (sib – ré – FA…) vers le fa final, tenu.
 
 ## Le groove
 
-- **118 BPM**, funk léger, avec un peu de **swing** sur les doubles croches.
+- **118 BPM**, funk léger, avec un soupçon de **swing**.
 - Grille jazz-pop **Fmaj7 – Dm7 – Gm7 – C7**, puis un accord final **F6/9**, court et pétillant.
 - **Guitare funky** : accords secs sur les contretemps, grattés étouffés autour.
 - **Clavinet** : petites frappes syncopées.
-- **Basse funky** : fondamentale, octave qui saute, quinte, et **approche chromatique** vers l'accord suivant.
+- **Basse funky** : fondamentale, quinte, et **approche chromatique** vers l'accord suivant (sans saut d'octave).
 - **Batterie sèche + claquements de doigts** sur 2 et 4, **shaker** en doubles croches.
 
 ## Pistes (MIDI et stems)
