@@ -36,8 +36,8 @@ notation française). La ligne monte, comme une ville en mouvement, mais elle re
 
 | # | Piste | Canal | Son General MIDI | Rôle |
 |---|---|---|---|---|
-| 1 | Mélodie – Synth Lead | 1 | 82 Saw Lead | le motif, son chaud et filtré |
-| 2 | Arpège Synth | 2 | 81 Square Lead | arpège en croches, en retrait : la pulsation urbaine |
+| 1 | Mélodie – Synth Lead | 1 | 81 Square Lead | le motif, son clair et lumineux (onde pulsée, filtre ouvert, octave aiguë) |
+| 2 | Arpège Synth | 2 | 82 Saw Lead | arpège en croches, en retrait : la pulsation urbaine |
 | 3 | Piano | 3 | 1 Acoustic Grand | accords en croches régulières + octave grave |
 | 4 | Cordes Graves | 4 | 49 String Ensemble | assise harmonique, registre grave |
 | 5 | Basse Synth | 5 | 39 Synth Bass 1 | croches pulsées sur la fondamentale |

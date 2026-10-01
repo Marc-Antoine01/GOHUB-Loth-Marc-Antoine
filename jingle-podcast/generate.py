@@ -54,8 +54,8 @@ CHORDS = {
 
 # Pistes : nom, canal MIDI, programme General MIDI, volume (CC7), pan (CC10)
 TRACKS = [
-    ("Melodie - Synth Lead", 0, 81, 100, 64),
-    ("Arpege Synth", 1, 80, 76, 88),
+    ("Melodie - Synth Lead", 0, 80, 100, 64),
+    ("Arpege Synth", 1, 81, 76, 88),
     ("Piano", 2, 0, 92, 48),
     ("Cordes Graves", 3, 48, 80, 76),
     ("Basse Synth", 4, 38, 100, 64),
@@ -296,17 +296,23 @@ def lowpass_weight(k, freq, fc, order=2):
 
 
 def inst_lead(p, dur, vel):
-    """Synthé chaud : trois dents de scie légèrement désaccordées, filtre assez fermé."""
+    """Synthé lumineux : onde pulsée claire, filtre ouvert, couche d'octave aiguë pour l'air, sans vibrato."""
     f = hz(p)
-    total = dur + 0.4
+    total = dur + 0.45
     t = np.arange(int(total * SR)) / SR
-    vib = 0.0025 * np.sin(2 * np.pi * 5.2 * t) * np.clip((t - 0.3) / 0.3, 0, 1)
+    fc = 4200 + 4000 * np.exp(-t / 0.08)  # attaque brillante, puis son clair et stable
+    duty = 0.3
     out = 0
-    for det in (-0.005, 0.0, 0.006):
+    for det in (-0.002, 0.002):  # léger élargissement stéréo, sans effet « chorus » rétro
         ff = f * (1 + det)
-        out = out + additive(ff, t, lambda k: (1 / k) * lowpass_weight(k, ff, 1900), 40, vib)
-    out = out + 0.5 * np.sin(np.pi * np.cumsum(np.full_like(t, f)) / SR)  # octave grave, pour l'assise
-    return out * adsr(len(t), dur, 0.014, 0.3, 0.8, 0.35) / 3
+        phase = 2 * np.pi * ff * t
+        for k in range(1, 48):
+            if k * ff > SR * 0.45:
+                break
+            out = out + np.sin(np.pi * k * duty) / k * lowpass_weight(k, ff, fc) * np.sin(k * phase)
+    air = np.sin(4 * np.pi * f * t) + 0.3 * np.sin(8 * np.pi * f * t)  # octave et double octave aiguës
+    out = out / 2 + 0.22 * air * np.exp(-t / 0.6)
+    return out * adsr(len(t), dur, 0.004, 0.18, 0.72, 0.4)
 
 
 def inst_arp(p, dur, vel):
@@ -417,7 +423,7 @@ def inst_drum(p, dur, vel):
 
 # Réglages de mix par piste : instrument, gain, pan (-1..1), envoi réverbe
 MIX = {
-    "Melodie - Synth Lead": (inst_lead, 0.30, 0.0, 0.25),
+    "Melodie - Synth Lead": (inst_lead, 0.30, 0.0, 0.30),
     "Arpege Synth": (inst_arp, 0.29, 0.4, 0.35),
     "Piano": (inst_piano, 0.19, -0.3, 0.22),
     "Cordes Graves": (inst_strings, 0.16, 0.25, 0.45),
