@@ -7,7 +7,7 @@ la cloche de mairie, le coup de tampon et les applaudissements de groupe sont co
 |---|---|---|
 | `01_VilleEtEngagement_trap_logo_140bpm_Fm` | 5,0 s | Le nom chanté sur des roulements de charleston, puis la cloche et le 808 |
 | `02_VilleEtEngagement_trap_jingle_140bpm_Fm` | 8,6 s | Groove continu : le nom, la réponse de la cloche, le nom (plus dense), la réponse, puis la cloche finale |
-| `03_VilleEtEngagement_trap_jingle-coupe_140bpm_Fm` | 3,2 s | Le début du jingle (le nom, puis la réponse de la cloche), **arrêté net** au temps 7,5, là où se trouvait la coupure |
+| `03_VilleEtEngagement_trap_jingle-coupe_140bpm_Fm` | 4,2 s | Le début du jingle (le nom, puis la réponse de la cloche), qui s'éteint **en fondu** à l'endroit de l'ancienne coupure (temps 7,5) |
 
 ## Ce qui en fait de la trap
 

@@ -255,13 +255,14 @@ CUT_BEAT = 7.5  # là où se trouvait la coupure avant le drop
 
 
 def cue_jingle_coupe():
-    """Le jingle continu, arrêté net au temps 7,5 : la musique se termine sur la coupure."""
+    """Le jingle continu, qui s'éteint en fondu à l'endroit de l'ancienne coupure (temps 7,5)."""
     cue = cue_jingle()
     for name, notes in cue["tracks"].items():
-        cue["tracks"][name] = [(s, min(d, CUT_BEAT - s), p, v) for s, d, p, v in notes if s < CUT_BEAT]
-    cue.update(name="jingle-coupe", title="Ville et Engagement (trap) - jingle coupe",
-               length=CUT_BEAT * gen.BEAT, fade=0.008,
-               markers=[(0, "Ville et Engagement"), (6, "Reponse cloche"), (CUT_BEAT, "Coupure")])
+        # plus aucune note ne démarre après la coupure ; celles en cours résonnent naturellement
+        cue["tracks"][name] = [x for x in notes if x[0] < CUT_BEAT]
+    cue.update(name="jingle-coupe", title="Ville et Engagement (trap) - jingle court en fondu",
+               length=CUT_BEAT * gen.BEAT + 1.0, fade=1.2,
+               markers=[(0, "Ville et Engagement"), (6, "Reponse cloche"), (CUT_BEAT, "Fondu")])
     return cue
 
 
