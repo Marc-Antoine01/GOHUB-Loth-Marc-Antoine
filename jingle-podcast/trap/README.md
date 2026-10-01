@@ -6,7 +6,7 @@ la cloche de mairie, le coup de tampon et les applaudissements de groupe sont co
 | Fichier | Durée | Déroulé |
 |---|---|---|
 | `01_VilleEtEngagement_trap_logo_140bpm_Fm` | 5,0 s | Le nom chanté sur des roulements de charleston, puis la cloche et le 808 |
-| `02_VilleEtEngagement_trap_jingle_140bpm_Fm` | 8,6 s | Intro, montée, **silence**, drop, réponse de la cloche, cloche finale |
+| `02_VilleEtEngagement_trap_jingle_140bpm_Fm` | 8,6 s | Groove continu : le nom, la réponse de la cloche, le nom (plus dense), la réponse, puis la cloche finale |
 
 ## Ce qui en fait de la trap
 
@@ -17,8 +17,8 @@ la cloche de mairie, le coup de tampon et les applaudissements de groupe sont co
 - **Fa mineur** sur la grille épique Db – Eb – Fm (VI – VII – i). Le ton est grave et déterminé.
 - **Mélodie de cloche trap** : un son métallique et brillant (synthèse FM) qui double la voix une octave
   plus haut. Elle répond au nom par une petite phrase (lab – sol – fa…).
-- **La montée, puis le silence avant le drop** : un souffle qui monte, puis une coupure nette d'un
-  demi-temps avant que tout retombe.
+- **Une montée sans coupure** : le 808 et la batterie jouent dès la première mesure. La densité augmente
+  par paliers (mains, tampon, roulements de charleston de plus en plus serrés) jusqu'à la cloche finale.
 
 ## Le motif
 
@@ -40,10 +40,7 @@ La cloche de mairie frappe toujours la tonique (fa) pour conclure.
 | 3 | Nappe sombre | 3 | 90 Warm Pad |
 | 4 | 808 | 4 | 39 Synth Bass 1 (à remplacer par un vrai 808, avec glide/portamento) |
 | 5 | Cloche de mairie | 5 | 15 Tubular Bells |
-| 6 | Batterie Trap – Tampon – Mains | 10 | kick 36, caisse claire 38, **tampon 37**, **mains 39**, charleston 42/46, **montée 55** |
-
-Le silence avant le drop est déjà appliqué dans les stems et la maquette. Dans le MIDI, aucune note ne
-joue à cet endroit.
+| 6 | Batterie Trap – Tampon – Mains | 10 | kick 36, caisse claire 38, **tampon 37**, **mains 39**, charleston 42/46 |
 
 ## Limites de la maquette
 

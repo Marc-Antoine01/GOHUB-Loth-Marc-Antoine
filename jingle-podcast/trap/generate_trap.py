@@ -210,34 +210,37 @@ def cue_logo():
 
 
 def cue_jingle():
-    # 0–8 : intro (voix + cloche, pas de 808), montée puis silence ; 8–16 : drop ; 16 : cloche finale
-    lead = name_motif(0, 96, ment=2) + name_motif(8, 106, ment=2)
+    # Groove continu du début à la fin : la densité monte par paliers, sans coupure, jusqu'à la cloche finale.
+    lead = name_motif(0, 98, ment=2) + name_motif(8, 106, ment=2)
     bell_answer_1 = [n(6, .5, "Ab5", 96), n(6.5, .5, "G5", 90), n(7, .25, "F5", 92), n(7.25, .25, "G5", 96)]
     bell_answer_2 = [n(14, .5, "Ab5", 100), n(14.5, .5, "G5", 94), n(15, .5, "E5", 98),
                      n(15.5, .25, "G5", 100), n(15.75, .25, "E5", 104)]
-    changes = [(0, "Db", 2), (2, "Eb", 2), (4, "Fm", 3.5),
+    changes = [(0, "Db", 2), (2, "Eb", 2), (4, "Fm", 4),
                (8, "Db", 2), (10, "Eb", 2), (12, "Fm", 2), (14, "C", 2)]
     final = [(16, "Fm", 4)]
 
-    drums = hats(0, 4, .5, 44, accent=False)                       # intro : charleston discret
-    drums += [n(4, .25, KICK, 100), n(4, .25, TAMPON, 104), n(4, 3.5, RISER, 100)]
-    drums += hats(4, 6, .5, 56) + hats(6, 7, .25, 60, 80) + hats(7, 7.5, .125, 80, 110)
-    # 7,5–8 : silence avant le drop
-    drums += [n(8, .25, KICK, 124), n(9.75, .25, KICK, 104)] + snare(10)
+    # 0–8 : groove posé (kick, caisse claire, charleston en croches), relance en doubles croches vers la mesure 3
+    drums = [n(0, .25, KICK, 112), n(1.5, .25, KICK, 92), n(2, .25, SNARE, 100)]
+    drums += [n(4, .25, KICK, 112), n(4, .25, TAMPON, 100), n(5.75, .25, KICK, 94), n(6, .25, SNARE, 104)]
+    drums += hats(0, 3.5, .5, 52) + hats(3.5, 4, .25, 56, 70)
+    drums += hats(4, 6, .5, 56) + hats(6, 7, .25, 60, 76) + hats(7, 8, 1 / 6, 66, 96)
+    # 8–16 : même groove, plus dense (mains, tampon, roulements)
+    drums += [n(8, .25, KICK, 120), n(9.75, .25, KICK, 104)] + snare(10)
     drums += hats(8, 10, .5) + hats(10, 11, .25) + hats(11, 11.5, 1 / 6, 64, 92) + hats(11.5, 12, .5)
     drums += [n(11.5, .25, TAMPON, 100)]
     drums += [n(12, .25, KICK, 120), n(13.5, .25, KICK, 100), n(13.5, .5, OHAT, 76)] + snare(14)
     drums += hats(12, 13.5, .5) + hats(14, 15, .25) + hats(15, 15.5, .125, 70, 100) + hats(15.5, 16, 1 / 6, 84, 112)
     drums += final_hit(16)
 
-    bass = [n(4, 2, "F2", 104),
+    bass = [n(0, 1.5, "Db2", 104), n(1.5, .5, "Db2", 92), n(2, 2, "Eb2", 104),
+            n(4, 1.75, "F2", 108), n(5.75, .25, "F2", 96), n(6, 2, "F2", 104),
             n(8, 1.5, "Db2", 118), n(9.75, .25, "Db2", 100), n(10, 1.5, "Eb2", 116), n(11.5, .5, "Eb2", 104),
             n(12, 1.5, "F2", 118), n(13.5, .5, "F2", 100), n(14, 1.5, "C2", 116), n(15.5, .5, "E2", 108),
             n(16, 4, "F2", 124)]
     return dict(
         name="jingle", title="Ville et Engagement (trap) - jingle", length=8.6, fade=0.9,
-        mute=[(7.5, 8)],  # coupure nette avant le drop
-        markers=[(0, "Intro"), (4, "Montee"), (8, "Drop"), (14, "Reponse cloche"), (16, "Cloche + 808")],
+        markers=[(0, "Ville et Engagement"), (6, "Reponse cloche"), (8, "Ville et Engagement (2)"),
+                 (14, "Reponse cloche (2)"), (16, "Cloche + 808")],
         tracks={
             VOICE: cb.voices(lead),
             BELL_TRAP: gen.transpose(lead, 12, 0.8) + bell_answer_1 + bell_answer_2,
