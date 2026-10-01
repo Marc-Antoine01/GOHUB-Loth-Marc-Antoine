@@ -1,13 +1,14 @@
 # Logo sonore du podcast : engagement citoyen des élus et agents de mairie
 
-Habillage sonore pop, **100 BPM**, **ré majeur**, en 4/4. L'ambiance se veut sérieuse mais conviviale.
-Il se décline en trois versions bâties sur le même motif.
+Habillage sonore pop, **100 BPM**, **ré mineur**, en 4/4. L'ambiance se veut sérieuse mais conviviale :
+un mode mineur et un registre grave pour le poids de l'engagement, une pulsation régulière pour le
+dynamisme de la ville. Il se décline en trois versions bâties sur le même motif.
 
 | Fichier | Durée | Rôle |
 |---|---|---|
-| `01_jingle_100bpm_Dmaj` | 9,8 s | Logo sonore principal (générique de début) |
-| `02_virgule_100bpm_Dmaj` | 3,0 s | Virgule, pour la transition entre deux séquences |
-| `03_outro_100bpm_Dmaj` | 15,0 s | Outro de fin d'épisode, qui peut passer sous les crédits |
+| `01_jingle_100bpm_Dm` | 9,8 s | Logo sonore principal (générique de début) |
+| `02_virgule_100bpm_Dm` | 3,0 s | Virgule, pour la transition entre deux séquences |
+| `03_outro_100bpm_Dm` | 15,0 s | Outro de fin d'épisode, qui peut passer sous les crédits |
 
 ## Contenu
 
@@ -20,27 +21,27 @@ generate.py  la partition et le moteur de rendu ; relancer pour tout regénérer
 
 ## Le motif
 
-Le motif est une montée **la – ré – fa# … mi – fa# – LA**, qui part de la quinte et s'élève vers la tierce
-puis la quinte aiguë. C'est la signature du podcast : la ligne monte, comme une ville en mouvement,
-et reste simple à chanter, comme des élus accessibles.
+Le motif est une montée **la – ré – fa … mi – fa – LA**, dans le médium-grave (du la 2 au ré 4 en
+notation française). La ligne monte, comme une ville en mouvement, mais elle reste posée et facile à retenir.
 
-- **Jingle** : la grille pop I–V–vi–IV (D – A – Bm – G) porte le motif, sa réponse, puis le motif qui
-  monte jusqu'au do#. Il se résout sur le **ré aigu** avec une cymbale et une cascade de glockenspiel.
-- **Virgule** : le motif tient en deux temps (la – ré – fa# – la) sur G → A, puis frappe le ré final.
+- **Jingle** : la grille Dm – C – Bb – C, un enchaînement pop en mineur, porte le motif, sa réponse,
+  puis le motif qui monte (sol – la). Il se résout sur **ré mineur (add9)**, un accord ouvert : grave
+  sans être triste. La résolution s'appuie sur une frappe de grosse caisse, de tom basse et de cymbale.
+- **Virgule** : le motif tient en deux temps (la – ré – fa – la) sur Bb → C, puis frappe le ré final.
 - **Outro** : il démarre plus léger, sans caisse claire, pour laisser de la place à la voix. Le motif
-  revient ensuite en entier, avec une variation qui monte vers le si. Un roulement sur Em7 → Asus4 → A
-  mène au ré final, qui s'éteint en fondu.
+  revient ensuite en entier, avec une variation qui monte vers le do. Un roulement de caisse claire et
+  de toms sur Gm → Asus4 → A mène au ré final, qui s'éteint en fondu.
 
 ## Pistes (MIDI et stems)
 
 | # | Piste | Canal | Son General MIDI | Rôle |
 |---|---|---|---|---|
-| 1 | Mélodie – Synth Lead | 1 | 81 Square Lead | le motif |
-| 2 | Glockenspiel | 2 | 10 Glockenspiel | doublure à l'octave, l'« étincelle » |
-| 3 | Piano Pop | 3 | 1 Acoustic Grand | accords syncopés |
-| 4 | Nappe Cordes | 4 | 49 String Ensemble | liant harmonique |
-| 5 | Basse Synth | 5 | 39 Synth Bass 1 | croches pulsées avec saut d'octave |
-| 6 | Batterie | 10 | kit GM | kick, caisse claire + clap, charleston, crash |
+| 1 | Mélodie – Synth Lead | 1 | 82 Saw Lead | le motif, son chaud et filtré |
+| 2 | Arpège Synth | 2 | 81 Square Lead | arpège en croches, en retrait : la pulsation urbaine |
+| 3 | Piano | 3 | 1 Acoustic Grand | accords en croches régulières + octave grave |
+| 4 | Cordes Graves | 4 | 49 String Ensemble | assise harmonique, registre grave |
+| 5 | Basse Synth | 5 | 39 Synth Bass 1 | croches pulsées sur la fondamentale |
+| 6 | Batterie | 10 | kit GM | kick, caisse claire + clap, charleston, toms, crash |
 
 Les MIDI contiennent aussi le tempo (100 BPM), la mesure, la tonalité, des **marqueurs** (Motif, Réponse,
 Final…) et le volume et le panoramique de chaque piste.

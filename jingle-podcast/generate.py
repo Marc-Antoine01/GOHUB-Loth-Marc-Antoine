@@ -6,7 +6,7 @@ Une seule partition (ci-dessous) sert à produire :
   - les stems audio WAV par instrument (pour la multipiste d'Adobe Audition) ;
   - les maquettes mixées (WAV 24 bits + MP3).
 
-Trois déclinaisons, toutes à 100 BPM en ré majeur, sur le même motif :
+Trois déclinaisons, toutes à 100 BPM en ré mineur, sur le même motif :
   - jingle  : logo sonore principal (9,8 s)
   - virgule : transition courte (3,0 s)
   - outro   : fin d'épisode (15,0 s)
@@ -16,6 +16,7 @@ Usage : python3 generate.py
 """
 
 import os
+import re
 import subprocess
 
 import mido
@@ -27,117 +28,121 @@ BPM = 100
 BEAT = 60.0 / BPM  # 0,6 s
 SR = 48000
 PPQ = 480
+KEY = "Dm"
 OUT = os.path.dirname(os.path.abspath(__file__))
 RNG = np.random.default_rng(2026)
 
-# Notes MIDI utiles
-N = {
-    "E1": 28, "G1": 31, "A1": 33, "B1": 35, "D2": 38, "E2": 40,
-    "D4": 62, "E4": 64, "F#4": 66, "G4": 67, "A4": 69, "B4": 71, "C#5": 73,
-    "D5": 74, "E5": 76, "F#5": 78, "G5": 79, "A5": 81, "B5": 83, "C#6": 85,
-    "D6": 86, "F#6": 90, "A6": 93, "D7": 98,
-}
+_STEPS = {"C": 0, "D": 2, "E": 4, "F": 5, "G": 7, "A": 9, "B": 11}
 
-# Accords (voicing piano/pad, fondamentale basse)
+
+def note(name):
+    """« Bb2 », « C#4 »… -> numéro MIDI (C4 = 60)."""
+    letter, acc, octave = re.fullmatch(r"([A-G])([#b]?)(-?\d)", name).groups()
+    return 12 * (int(octave) + 1) + _STEPS[letter] + {"#": 1, "b": -1, "": 0}[acc]
+
+
+# Accords : main droite du piano, cordes graves, fondamentale de la basse, motif d'arpège
 CHORDS = {
-    "D": (["D4", "F#4", "A4", "D5"], "D2"),
-    "A": (["C#5", "E4", "A4", "E5"], "A1"),
-    "Asus4": (["D4", "E4", "A4", "D5"], "A1"),
-    "Bm": (["D4", "F#4", "B4", "D5"], "B1"),
-    "G": (["D4", "G4", "B4", "D5"], "G1"),
-    "Em7": (["E4", "G4", "B4", "D5"], "E2"),
+    "Dm": (["A3", "D4", "F4"], ["D3", "A3", "F4"], "D2", ["A4", "D5", "F5", "D5"]),
+    "C": (["G3", "C4", "E4"], ["C3", "G3", "E4"], "C2", ["G4", "C5", "E5", "C5"]),
+    "Bb": (["F3", "Bb3", "D4"], ["Bb2", "F3", "D4"], "Bb1", ["F4", "Bb4", "D5", "Bb4"]),
+    "Gm": (["G3", "Bb3", "D4"], ["G2", "D3", "Bb3"], "G1", ["G4", "Bb4", "D5", "Bb4"]),
+    "Asus4": (["A3", "D4", "E4"], ["A2", "E3", "D4"], "A1", ["A4", "D5", "E5", "D5"]),
+    "A": (["A3", "C#4", "E4"], ["A2", "E3", "C#4"], "A1", ["A4", "C#5", "E5", "C#5"]),
+    "Dm9": (["F3", "A3", "D4", "E4"], ["D3", "A3", "F4"], "D2", ["A4", "D5", "E5", "F5"]),
 }
 
 # Pistes : nom, canal MIDI, programme General MIDI, volume (CC7), pan (CC10)
 TRACKS = [
-    ("Melodie - Synth Lead", 0, 80, 100, 64),
-    ("Glockenspiel", 1, 9, 80, 84),
-    ("Piano Pop", 2, 0, 92, 50),
-    ("Nappe Cordes", 3, 48, 72, 78),
+    ("Melodie - Synth Lead", 0, 81, 100, 64),
+    ("Arpege Synth", 1, 80, 76, 88),
+    ("Piano", 2, 0, 92, 48),
+    ("Cordes Graves", 3, 48, 80, 76),
     ("Basse Synth", 4, 38, 100, 64),
     ("Batterie", 9, 0, 105, 64),
 ]
 
 # Batterie (General MIDI)
-KICK, SNARE, CLAP, HAT, OHAT, CRASH = 36, 38, 39, 42, 46, 49
+KICK, SNARE, CLAP, HAT, CRASH, FLOOR_TOM, LOW_TOM = 36, 38, 39, 42, 49, 41, 45
 
 
-def n(start, dur, note, vel):
-    return (float(start), float(dur), N[note] if isinstance(note, str) else note, vel)
+def n(start, dur, pitch, vel):
+    return (float(start), float(dur), note(pitch) if isinstance(pitch, str) else pitch, int(vel))
 
 
 # --------------------------------------------------------------------------
-# Motif : montée A4-D5-F#5 puis réponse E5-F#5-A5 ; la « signature » du podcast
+# Motif : montée la – ré – fa, puis mi – fa – LA ; la « signature » du podcast
 # --------------------------------------------------------------------------
-def motif(t0, vel=100, end=("A5", 1)):
-    return [n(t0, .5, "A4", vel - 8), n(t0 + .5, .5, "D5", vel - 4),
-            n(t0 + 1, 1, "F#5", vel), n(t0 + 2, .5, "E5", vel - 10),
-            n(t0 + 2.5, .5, "F#5", vel - 6), n(t0 + 3, end[1], end[0], vel + 6)]
+def motif(t0, vel=100, end=("A4", 1)):
+    return [n(t0, .5, "A3", vel - 8), n(t0 + .5, .5, "D4", vel - 4),
+            n(t0 + 1, 1, "F4", vel), n(t0 + 2, .5, "E4", vel - 10),
+            n(t0 + 2.5, .5, "F4", vel - 6), n(t0 + 3, end[1], end[0], vel + 6)]
 
 
 def answer(t0, vel=96):
-    return [n(t0, .5, "F#5", vel), n(t0 + .5, .5, "D5", vel - 8),
-            n(t0 + 1, 1, "F#5", vel), n(t0 + 2, .5, "G5", vel - 4),
-            n(t0 + 2.5, .5, "F#5", vel - 8), n(t0 + 3, 1, "E5", vel)]
+    return [n(t0, .5, "F4", vel), n(t0 + .5, .5, "D4", vel - 8),
+            n(t0 + 1, 1, "F4", vel), n(t0 + 2, .5, "G4", vel - 4),
+            n(t0 + 2.5, .5, "F4", vel - 8), n(t0 + 3, 1, "E4", vel)]
 
 
-def octave_up(notes, vel_scale=0.8):
-    return [(s, d, p + 12, int(v * vel_scale)) for s, d, p, v in notes]
-
-
-def piano_comp(changes, vel=84):
-    """Stabs pop syncopés (0 / 0,75 / 1,5 temps) pour chaque accord de 2 temps."""
+def piano_part(changes, vel=80):
+    """Croches régulières à la main droite (pulsation), octave de basse à la main gauche."""
     out = []
     for start, name, length in changes:
-        voicing, _ = CHORDS[name]
-        hits = [(0, .7, vel), (.75, .6, vel - 14), (1.5, .45, vel - 8)] if length == 2 else [(0, length, vel)]
-        for off, dur, v in hits:
-            out += [n(start + off, dur, p, v) for p in voicing]
+        rh, _, root, _ = CHORDS[name]
+        r = note(root)
+        out += [n(start, length, r, vel - 6), n(start, length, r + 12, vel - 12)]
+        steps = int(length * 2) if length <= 2 else 1
+        for i in range(steps):
+            dur = .45 if length <= 2 else length
+            v = vel - (0 if i % 2 == 0 else 18) - (6 if i % 4 == 2 else 0)
+            out += [n(start + i * .5, dur, p, v) for p in rh]
     return out
 
 
-def pad(changes, vel=70):
-    out = []
-    for start, name, length in changes:
-        out += [n(start, length, p, vel) for p in CHORDS[name][0][:3]]
-    return out
+def strings(changes, vel=72):
+    return [n(s, l, p, vel) for s, name, l in changes for p in CHORDS[name][1]]
 
 
 def bass_line(changes, vel=100):
     out = []
     for start, name, length in changes:
-        root = N[CHORDS[name][1]]
-        if length == 2:
-            pattern = [(0, root, vel), (.5, root, vel - 18), (1, root + 12, vel - 6), (1.5, root, vel - 14)]
-            out += [n(start + o, .45, p, v) for o, p, v in pattern]
-        elif length == 1:
-            out += [n(start, .45, root, vel), n(start + .5, .45, root, vel - 16)]
+        root = note(CHORDS[name][2])
+        if length <= 2:
+            out += [n(start + i * .5, .42, root, vel - (0 if i % 2 == 0 else 20)) for i in range(int(length * 2))]
         else:
-            out.append(n(start, length, root, vel))
+            out.append(n(start, length, root, vel + 8))
     return out
 
 
-def groove(bar_start, full=True, open_hat=True):
-    """Un temps fort pop : kick 1 / 2,5 / 3, clap+caisse claire 2 et 4, hats en croches."""
-    d = [n(bar_start, .25, KICK, 112), n(bar_start + 1.5, .25, KICK, 92), n(bar_start + 2, .25, KICK, 108)]
+def arpeggio(changes, vel=70):
+    out = []
+    for start, name, length in changes:
+        pat = CHORDS[name][3]
+        out += [n(start + i * .5, .4, pat[i % 4], vel - (0 if i % 2 == 0 else 12)) for i in range(int(length * 2))]
+    return out
+
+
+def groove(bar_start, full=True):
+    """Kick 1 / 2,5 / 3, caisse claire + clap sur 2 et 4, charleston en doubles croches discrètes."""
+    d = [n(bar_start, .25, KICK, 112), n(bar_start + 1.5, .25, KICK, 90), n(bar_start + 2, .25, KICK, 108)]
     if full:
         d += [n(bar_start + 1, .25, SNARE, 104), n(bar_start + 3, .25, SNARE, 108),
-              n(bar_start + 1, .25, CLAP, 96), n(bar_start + 3, .25, CLAP, 100)]
-    for i in range(8):
-        if open_hat and i == 7:
-            d.append(n(bar_start + 3.5, .5, OHAT, 78))
-        else:
-            d.append(n(bar_start + i * .5, .25, HAT, 76 if i % 2 else 58))
+              n(bar_start + 1, .25, CLAP, 80), n(bar_start + 3, .25, CLAP, 84)]
+    d += [n(bar_start + i * .25, .2, HAT, 72 if i % 2 == 0 else 46) for i in range(16)]
     return d
 
 
-def snare_roll(start, beats, v0=60, v1=118):
+def build_roll(start, beats, v0=56, v1=118):
+    """Roulement caisse claire en doubles croches + toms graves en croches."""
     steps = int(beats * 4)
-    return [n(start + i * .25, .25, SNARE, int(v0 + (v1 - v0) * i / max(steps - 1, 1))) for i in range(steps)]
+    d = [n(start + i * .25, .25, SNARE, v0 + (v1 - v0) * i / max(steps - 1, 1)) for i in range(steps)]
+    d += [n(start + i * .5, .5, LOW_TOM if i % 2 == 0 else FLOOR_TOM, 90 + 6 * i) for i in range(int(beats * 2))]
+    return d
 
 
-def sparkle(t0, vel=88):
-    return [n(t0 + i * .25, 3 - i * .25, p, vel - i * 4) for i, p in enumerate(["D6", "F#6", "A6", "D7"])]
+def impact(t, length=4, vel=120):
+    return [n(t, .25, KICK, vel), n(t, 1, FLOOR_TOM, vel - 10), n(t, length, CRASH, vel - 6)]
 
 
 # --------------------------------------------------------------------------
@@ -155,72 +160,67 @@ def dedupe(cue):
 
 
 def cue_jingle():
-    changes = [(0, "D", 2), (2, "A", 2), (4, "Bm", 2), (6, "G", 2), (8, "D", 2), (10, "A", 2)]
-    final = [(12, "D", 4)]
-    lead = motif(0) + answer(4) + motif(8, 104, end=("A5", .5)) + [n(11.5, .5, "C#6", 104), n(12, 4, "D6", 112)]
-    drums = groove(0) + groove(4) + groove(8, open_hat=False)
-    drums += snare_roll(11, 1, 70, 116)[:]
-    drums += [n(0, 2, CRASH, 100), n(12, 4, CRASH, 118), n(12, .25, KICK, 120), n(12, .25, CLAP, 90)]
+    changes = [(0, "Dm", 2), (2, "C", 2), (4, "Bb", 2), (6, "C", 2), (8, "Dm", 2), (10, "C", 2)]
+    final = [(12, "Dm9", 4)]
+    lead = motif(0) + answer(4) + motif(8, 104, end=("G4", .5)) + [n(11.5, .5, "A4", 104), n(12, 4, "D5", 112)]
+    drums = impact(0, 2, 108) + groove(0) + groove(4) + groove(8) + build_roll(11, 1, 70, 116) + impact(12)
     return dict(
         name="jingle", title="Logo sonore", length=9.8, fade=0.6,
         markers=[(0, "Motif"), (4, "Reponse"), (8, "Motif (montee)"), (12, "Final")],
         tracks={
             "Melodie - Synth Lead": lead,
-            "Glockenspiel": octave_up(motif(0) + motif(8, end=("A5", .5)), .7) + sparkle(12),
-            "Piano Pop": piano_comp(changes + final),
-            "Nappe Cordes": pad(changes + final),
-            "Basse Synth": bass_line(changes) + [n(12, 4, "D2", 112)],
+            "Arpege Synth": arpeggio(changes),
+            "Piano": piano_part(changes + final),
+            "Cordes Graves": strings(changes + final),
+            "Basse Synth": bass_line(changes + final),
             "Batterie": drums,
         })
 
 
 def cue_virgule():
-    lead = [n(0, .5, "A4", 96), n(.5, .5, "D5", 100), n(1, .5, "F#5", 104),
-            n(1.5, .5, "A5", 108), n(2, 2.5, "D6", 112)]
-    changes = [(0, "G", 1), (1, "A", 1), (2, "D", 2.5)]
-    drums = [n(0, .25, KICK, 110), n(0, .25, HAT, 70), n(.5, .25, HAT, 60), n(1, .25, KICK, 100)]
-    drums += snare_roll(1, 1, 64, 112)
-    drums += [n(2, .25, KICK, 120), n(2, .25, CLAP, 96), n(2, 2.5, CRASH, 112)]
+    changes = [(0, "Bb", 1), (1, "C", 1)]
+    final = [(2, "Dm9", 2.5)]
+    lead = [n(0, .5, "A3", 96), n(.5, .5, "D4", 100), n(1, .5, "F4", 104),
+            n(1.5, .5, "A4", 108), n(2, 2.5, "D5", 112)]
+    drums = [n(0, .25, KICK, 110), n(1, .25, KICK, 100)] + [n(i * .25, .2, HAT, 64 if i % 2 == 0 else 40) for i in range(4)]
+    drums += build_roll(1, 1, 64, 112) + impact(2, 2.5)
     return dict(
         name="virgule", title="Virgule", length=3.0, fade=0.5,
         markers=[(0, "Motif"), (2, "Resolution")],
         tracks={
             "Melodie - Synth Lead": lead,
-            "Glockenspiel": octave_up(lead[:4], .7) + sparkle(2, 84),
-            "Piano Pop": [n(s, l if l < 2 else 2.5, p, 88) for s, name, l in changes for p in CHORDS[name][0]],
-            "Nappe Cordes": pad(changes, 66),
-            "Basse Synth": [n(0, .45, "G1", 104), n(.5, .45, "G1", 88), n(1, .45, "A1", 104),
-                            n(1.5, .45, "A1", 92), n(2, 2.5, "D2", 112)],
+            "Arpege Synth": arpeggio(changes, 66),
+            "Piano": piano_part(changes + final, 84),
+            "Cordes Graves": strings(changes + final, 70),
+            "Basse Synth": bass_line(changes + final),
             "Batterie": drums,
         })
 
 
 def cue_outro():
-    changes = [(0, "D", 2), (2, "A", 2), (4, "Bm", 2), (6, "G", 2),
-               (8, "D", 2), (10, "A", 2), (12, "Bm", 2), (14, "G", 2),
-               (16, "Em7", 2), (18, "Asus4", 1), (19, "A", 1)]
-    final = [(20, "D", 4)]
+    changes = [(0, "Dm", 2), (2, "C", 2), (4, "Bb", 2), (6, "C", 2),
+               (8, "Dm", 2), (10, "C", 2), (12, "Bb", 2), (14, "C", 2),
+               (16, "Gm", 2), (18, "Asus4", 1), (19, "A", 1)]
+    final = [(20, "Dm9", 4)]
     lead = motif(0, 88) + answer(4, 86) + motif(8, 102) + [
-        n(12, .5, "B5", 100), n(12.5, .5, "A5", 94), n(13, 1, "F#5", 100),
-        n(14, .5, "G5", 96), n(14.5, .5, "A5", 100), n(15, 1, "B5", 106),
-        n(16, .5, "G5", 100), n(16.5, .5, "F#5", 94), n(17, 1, "E5", 98),
-        n(18, .5, "A4", 96), n(18.5, .5, "D5", 100), n(19, .5, "F#5", 104), n(19.5, .5, "A5", 108),
-        n(20, 4, "D6", 112)]
-    drums = groove(0, full=False) + groove(4, full=False) + groove(8) + groove(12)
-    drums += [n(16, .25, KICK, 110), n(17, .25, SNARE, 100), n(17, .25, CLAP, 92), n(17.5, .25, KICK, 96)]
-    drums += [n(16 + i * .5, .25, HAT, 70) for i in range(4)]
-    drums += snare_roll(18, 2, 56, 120)
-    drums += [n(8, 2, CRASH, 100), n(20, 4, CRASH, 120), n(20, .25, KICK, 122), n(20, .25, CLAP, 92)]
+        n(12, .5, "F4", 100), n(12.5, .5, "G4", 94), n(13, 1, "A4", 100),
+        n(14, .5, "G4", 96), n(14.5, .5, "A4", 100), n(15, 1, "C5", 106),
+        n(16, .5, "Bb4", 100), n(16.5, .5, "A4", 94), n(17, 1, "G4", 98),
+        n(18, .5, "A3", 96), n(18.5, .5, "D4", 100), n(19, .5, "E4", 104), n(19.5, .5, "A4", 108),
+        n(20, 4, "D5", 112)]
+    drums = groove(0, full=False) + groove(4, full=False) + impact(8, 2, 104) + groove(8) + groove(12)
+    drums += [n(16, .25, KICK, 110), n(17, .25, SNARE, 100), n(17, .25, CLAP, 80), n(17.5, .25, KICK, 96)]
+    drums += [n(16 + i * .25, .2, HAT, 66 if i % 2 == 0 else 42) for i in range(8)]
+    drums += build_roll(18, 2, 52, 120) + impact(20)
     return dict(
         name="outro", title="Outro", length=15.0, fade=1.2,
         markers=[(0, "Motif (leger)"), (8, "Motif (plein)"), (16, "Montee"), (20, "Final")],
         tracks={
             "Melodie - Synth Lead": lead,
-            "Glockenspiel": octave_up(motif(8, 102) + lead[-5:-1], .7) + sparkle(20),
-            "Piano Pop": piano_comp(changes[:10]) + [n(18, 1, p, 84) for p in CHORDS["Asus4"][0]]
-            + [n(19, 1, p, 88) for p in CHORDS["A"][0]] + [n(20, 4, p, 96) for p in CHORDS["D"][0]],
-            "Nappe Cordes": pad(changes + final, 66),
-            "Basse Synth": bass_line(changes) + [n(20, 4, "D2", 112)],
+            "Arpege Synth": arpeggio(changes),
+            "Piano": piano_part(changes[:8], 70) + piano_part(changes[8:] + final, 84),
+            "Cordes Graves": strings(changes + final, 68),
+            "Basse Synth": bass_line(changes + final),
             "Batterie": drums,
         })
 
@@ -234,7 +234,7 @@ def write_midi(cue, path):
     conductor += [mido.MetaMessage("track_name", name=f"Podcast - {cue['title']}", time=0),
                   mido.MetaMessage("set_tempo", tempo=mido.bpm2tempo(BPM), time=0),
                   mido.MetaMessage("time_signature", numerator=4, denominator=4, time=0),
-                  mido.MetaMessage("key_signature", key="D", time=0)]
+                  mido.MetaMessage("key_signature", key=KEY, time=0)]
     last = 0
     for beat, label in cue["markers"]:
         tick = int(beat * PPQ)
@@ -294,54 +294,60 @@ def lowpass_weight(k, freq, fc, order=2):
 
 
 def inst_lead(p, dur, vel):
+    """Synthé chaud : trois dents de scie légèrement désaccordées, filtre assez fermé."""
     f = hz(p)
-    total = dur + 0.35
+    total = dur + 0.4
     t = np.arange(int(total * SR)) / SR
-    vib = 0.0035 * np.sin(2 * np.pi * 5.5 * t) * np.clip((t - 0.25) / 0.3, 0, 1)
+    vib = 0.0025 * np.sin(2 * np.pi * 5.2 * t) * np.clip((t - 0.3) / 0.3, 0, 1)
     out = 0
-    for det in (-0.006, 0.0, 0.007):
+    for det in (-0.005, 0.0, 0.006):
         ff = f * (1 + det)
-        out = out + additive(ff, t, lambda k: (1 / k) * lowpass_weight(k, ff, 3200), 40, vib)
-        # un peu de carré pour la rondeur
-        out = out + 0.5 * additive(ff, t, lambda k: (1 / k if k % 2 else 0) * lowpass_weight(k, ff, 2400), 30, vib)
-    return out * adsr(len(t), dur, 0.008, 0.25, 0.75, 0.3) / 3
+        out = out + additive(ff, t, lambda k: (1 / k) * lowpass_weight(k, ff, 1900), 40, vib)
+    out = out + 0.5 * np.sin(np.pi * np.cumsum(np.full_like(t, f)) / SR)  # octave grave, pour l'assise
+    return out * adsr(len(t), dur, 0.014, 0.3, 0.8, 0.35) / 3
 
 
-def inst_glock(p, dur, vel):
+def inst_arp(p, dur, vel):
+    """Pluck synthé feutré : la pulsation de la ville, en retrait."""
     f = hz(p)
-    t = np.arange(int(1.8 * SR)) / SR
-    out = sum(a * np.sin(2 * np.pi * f * r * t) * np.exp(-t * dcy)
-              for r, a, dcy in [(1, 1, 2.6), (2.76, .35, 7), (5.40, .16, 12), (8.93, .06, 18)])
-    return out * np.clip(t / 0.002, 0, 1)
+    t = np.arange(int((dur + 0.3) * SR)) / SR
+    fc = 500 + 2200 * np.exp(-t / 0.045)
+    phase = 2 * np.pi * f * t
+    out = np.zeros_like(t)
+    for k in range(1, 30):
+        if k * f > SR * 0.45:
+            break
+        out += (1 / k) / np.sqrt(1 + (k * f / fc) ** 4) * np.sin(k * phase)
+    return out * np.exp(-t / 0.2) * np.clip(t / 0.002, 0, 1)
 
 
 def inst_piano(p, dur, vel):
     f = hz(p)
     total = dur + 0.4
     t = np.arange(int(total * SR)) / SR
-    bright = 0.6 + 0.6 * vel / 127
+    bright = 0.45 + 0.4 * vel / 127
     out = np.zeros_like(t)
     for k in range(1, 16):
         fk = f * k * np.sqrt(1 + 0.0004 * k * k)
         if fk > SR * 0.45:
             break
-        out += (bright ** k) / k ** 1.1 * np.sin(2 * np.pi * fk * t) * np.exp(-t * (1.2 + 0.55 * k))
-    hammer = sosfilt(butter(2, [800, 6000], "bandpass", fs=SR, output="sos"),
-                     RNG.standard_normal(len(t))) * np.exp(-t * 120) * 0.15
+        out += (bright ** k) / k ** 1.1 * np.sin(2 * np.pi * fk * t) * np.exp(-t * (0.9 + 0.5 * k))
+    hammer = sosfilt(butter(2, [600, 4000], "bandpass", fs=SR, output="sos"),
+                     RNG.standard_normal(len(t))) * np.exp(-t * 120) * 0.1
     env = np.clip(t / 0.003, 0, 1) * np.where(t > dur, np.exp(-(t - dur) / 0.08), 1)
     return (out + hammer) * env
 
 
-def inst_pad(p, dur, vel):
+def inst_strings(p, dur, vel):
     f = hz(p)
-    total = dur + 0.6
+    total = dur + 0.7
     t = np.arange(int(total * SR)) / SR
-    trem = 1 + 0.0025 * np.sin(2 * np.pi * 4.8 * t)
+    vib = 0.003 * np.sin(2 * np.pi * 4.6 * t)
     out = 0
-    for det in (-0.009, -0.003, 0.004, 0.01):
+    for det in (-0.008, -0.002, 0.003, 0.009):
         ff = f * (1 + det)
-        out = out + additive(ff, t, lambda k: (1 / k) * lowpass_weight(k, ff, 1700), 30, trem - 1)
-    return out * adsr(len(t), dur, 0.22, 0.6, 0.85, 0.55) / 4
+        out = out + additive(ff, t, lambda k: (1 / k) * lowpass_weight(k, ff, 1300), 30, vib)
+    return out * adsr(len(t), dur, 0.18, 0.6, 0.85, 0.6) / 4
 
 
 def inst_bass(p, dur, vel):
@@ -349,7 +355,7 @@ def inst_bass(p, dur, vel):
     total = dur + 0.08
     t = np.arange(int(total * SR)) / SR
     phase = 2 * np.pi * f * t
-    fc = 380 + 1500 * np.exp(-t / 0.07)
+    fc = 320 + 1100 * np.exp(-t / 0.06)
     out = np.zeros_like(t)
     for k in range(1, 40):
         if k * f > 6000:
@@ -376,50 +382,55 @@ def band(x, lo=None, hi=None):
 def inst_drum(p, dur, vel):
     if p == KICK:
         t = np.arange(int(0.5 * SR)) / SR
-        f = 48 + 110 * np.exp(-t / 0.035)
-        body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.22)
-        click = band(noise(len(t)), 1500, 8000) * np.exp(-t / 0.004) * 0.4
+        f = 46 + 105 * np.exp(-t / 0.035)
+        body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.25)
+        click = band(noise(len(t)), 1500, 6000) * np.exp(-t / 0.004) * 0.3
         return np.tanh(1.6 * (body + click))
     if p == SNARE:
         t = np.arange(int(0.35 * SR)) / SR
-        tone = np.sin(2 * np.pi * 190 * t) * np.exp(-t / 0.05) * 0.6
-        nz = band(noise(len(t)), 1200, 9000) * np.exp(-t / 0.09)
+        tone = np.sin(2 * np.pi * 180 * t) * np.exp(-t / 0.06) * 0.7
+        nz = band(noise(len(t)), 1000, 7000) * np.exp(-t / 0.1)
         return tone + nz
     if p == CLAP:
         t = np.arange(int(0.4 * SR)) / SR
         env = np.exp(-t / 0.11)
         for off in (0.0, 0.011, 0.022):
             env = env + (t >= off) * np.exp(-np.clip(t - off, 0, None) / 0.004) * 1.4
-        return band(noise(len(t)), 900, 3500) * env * 0.8
-    if p in (HAT, OHAT):
-        length = 0.06 if p == HAT else 0.32
-        t = np.arange(int((length + 0.05) * SR)) / SR
-        return band(noise(len(t)), 7000) * np.exp(-t / (length / 3)) * 0.8
+        return band(noise(len(t)), 800, 3000) * env * 0.7
+    if p == HAT:
+        t = np.arange(int(0.1 * SR)) / SR
+        return band(noise(len(t)), 7000) * np.exp(-t / 0.015) * 0.7
+    if p in (FLOOR_TOM, LOW_TOM):
+        f0 = 78 if p == FLOOR_TOM else 104
+        t = np.arange(int(0.8 * SR)) / SR
+        f = f0 * (1 + 0.5 * np.exp(-t / 0.03))
+        body = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t / 0.3)
+        return np.tanh(1.3 * (body + band(noise(len(t)), 200, 2000) * np.exp(-t / 0.02) * 0.3))
     if p == CRASH:
         t = np.arange(int(2.6 * SR)) / SR
-        ring = sum(np.sin(2 * np.pi * fr * t) for fr in (3150, 4870, 6230, 7710)) * 0.05
-        return (band(noise(len(t)), 4500) + band(ring, 3000)) * np.exp(-t / 0.75) * np.clip(t / 0.002, 0, 1) * 0.6
+        ring = sum(np.sin(2 * np.pi * fr * t) for fr in (2950, 4370, 5830)) * 0.04
+        return (band(noise(len(t)), 3200, 11000) + band(ring, 2500)) * np.exp(-t / 0.8) * np.clip(t / 0.002, 0, 1) * 0.5
     return np.zeros(1)
 
 
 # Réglages de mix par piste : instrument, gain, pan (-1..1), envoi réverbe
 MIX = {
-    "Melodie - Synth Lead": (inst_lead, 0.30, 0.0, 0.22),
-    "Glockenspiel": (inst_glock, 0.24, 0.35, 0.35),
-    "Piano Pop": (inst_piano, 0.17, -0.3, 0.18),
-    "Nappe Cordes": (inst_pad, 0.16, 0.3, 0.40),
-    "Basse Synth": (inst_bass, 0.17, 0.0, 0.0),
-    "Batterie": (inst_drum, 0.42, 0.0, 0.08),
+    "Melodie - Synth Lead": (inst_lead, 0.30, 0.0, 0.25),
+    "Arpege Synth": (inst_arp, 0.29, 0.4, 0.35),
+    "Piano": (inst_piano, 0.19, -0.3, 0.22),
+    "Cordes Graves": (inst_strings, 0.16, 0.25, 0.45),
+    "Basse Synth": (inst_bass, 0.14, 0.0, 0.0),
+    "Batterie": (inst_drum, 0.33, 0.0, 0.12),
 }
 
-HAT_PANS = {HAT: 0.3, OHAT: 0.3, CRASH: -0.25}
+HAT_PANS = {HAT: 0.3, CRASH: -0.25, LOW_TOM: -0.15, FLOOR_TOM: 0.15}
 
 
 def reverb_ir():
-    t = np.arange(int(1.6 * SR)) / SR
-    env = np.exp(-t / 0.35) * np.clip(t / 0.01, 0, 1)
-    ir = np.stack([band(noise(len(t)), 300, 9000) * env, band(noise(len(t)), 300, 9000) * env], axis=1)
-    pre = int(0.018 * SR)
+    t = np.arange(int(2.0 * SR)) / SR
+    env = np.exp(-t / 0.45) * np.clip(t / 0.01, 0, 1)
+    ir = np.stack([band(noise(len(t)), 250, 7000) * env, band(noise(len(t)), 250, 7000) * env], axis=1)
+    pre = int(0.022 * SR)
     ir = np.vstack([np.zeros((pre, 2)), ir])
     return ir / np.sqrt(np.sum(ir ** 2) / 2)
 
@@ -513,7 +524,7 @@ def main():
         os.makedirs(os.path.join(OUT, d), exist_ok=True)
     for i, build in enumerate((cue_jingle, cue_virgule, cue_outro), 1):
         cue = dedupe(build())
-        base = f"{i:02d}_{cue['name']}_100bpm_Dmaj"
+        base = f"{i:02d}_{cue['name']}_100bpm_{KEY}"
         write_midi(cue, os.path.join(OUT, "midi", base + ".mid"))
         mix, stems, lufs, peak = render_cue(cue)
         sdir = os.path.join(OUT, "stems", base)
