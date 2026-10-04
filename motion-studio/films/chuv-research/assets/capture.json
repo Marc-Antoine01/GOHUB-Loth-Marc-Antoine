@@ -1,6 +1,6 @@
 {
  "source": "https://www.chuv.ch/fr/recherche-et-innovation/la-recherche-au-chuv",
- "capturedAt": "2026-10-04T20:58:32.313Z",
+ "capturedAt": "2026-10-04T21:13:09.272Z",
  "shots": {
   "mobile-top": {
    "file": "shots/mobile-top.png",
@@ -195,19 +195,25 @@
   "news": {
    "target": [
     1351,
-    585.2,
+    150.2,
     44,
     44
    ],
    "before": "shots/d-news-before.png",
    "hover": "shots/d-news-hover.png",
    "after": "shots/d-news-after.png",
-   "url": "https://www.chuv.ch/fr/recherche-et-innovation/la-recherche-au-chuv"
+   "url": "https://www.chuv.ch/fr/recherche-et-innovation/la-recherche-au-chuv",
+   "cards": [
+    45,
+    239.2,
+    1350,
+    511
+   ]
   },
   "trials": {
    "target": [
     525,
-    307.2,
+    575.2,
     135.3,
     23
    ],

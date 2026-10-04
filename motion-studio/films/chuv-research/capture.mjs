@@ -91,9 +91,12 @@ async function crop(p, name, loc) {
   await crop(p, 'd-soutiens-cards', p.locator('ul.list-of-links', { hasText: 'Essais cliniques' }));
 
   // Real mouse actions: before, hover (the site's own hover state), after. Boxes are viewport CSS px.
-  async function act(name, loc, { scrollTo, wait = 1300, nav = false } = {}) {
+  async function act(name, loc, { scrollTo, top, wait = 1300, nav = false } = {}) {
     loc = loc.first();
-    if (scrollTo) { await scrollTo.first().scrollIntoViewIfNeeded(); await p.mouse.wheel(0, -160); await settle(p); }
+    if (scrollTo && top != null) { // put the section heading `top` px below the viewport edge
+      await scrollTo.first().scrollIntoViewIfNeeded();
+      await scrollTo.first().evaluate((e, top) => window.scrollTo(0, e.getBoundingClientRect().top + window.scrollY - top), top); await settle(p);
+    } else if (scrollTo) { await scrollTo.first().scrollIntoViewIfNeeded(); await p.mouse.wheel(0, -160); await settle(p); }
     else { await p.evaluate(() => window.scrollTo(0, 0)); await settle(p); }
     await p.mouse.move(720, 450); await settle(p, 300);
     const a = (manifest.actions[name] = { target: await box(loc) });
@@ -109,7 +112,8 @@ async function crop(p, name, loc) {
   const menu = await act('menu', p.locator('header button.parent', { hasText: 'Recherche et innovation' }));
   menu.items = await p.evaluate(() => [...document.querySelectorAll('header a')].filter((e) => { const r = e.getBoundingClientRect(); return r.height > 0 && r.y > 150; }).map((e) => e.innerText.trim()).filter(Boolean));
   await p.goto(PAGE, { waitUntil: 'networkidle' }); await settle(p);
-  const news = await act('news', p.locator(':is(a,button)', { hasText: 'Actualités suivantes' }), { scrollTo: p.locator('h2', { hasText: 'Actualités' }) });
+  const news = await act('news', p.locator(':is(a,button)', { hasText: 'Actualités suivantes' }), { scrollTo: p.locator('h2', { hasText: 'Actualités' }), top: 150 });
+  news.cards = await box(p.locator('.flickity-viewport, [class*=slider], [class*=carousel]').first());
   const trialsItem = p.locator('ul.list-of-links li', { hasText: 'Essais cliniques' });
   await crop(p, 'd-card-trials', trialsItem);
   await act('trials', trialsItem.locator('a', { hasText: 'Essais cliniques' }), { scrollTo: p.locator('ul.list-of-links', { hasText: 'Essais cliniques' }), nav: true });

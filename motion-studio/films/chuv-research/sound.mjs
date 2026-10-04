@@ -86,3 +86,37 @@ export function score({ sr, duration, synth: s }) {
   s.mixInto(master, s.pingpong(delaySend, BEAT * 0.75, { feedback: 0.38 }), 0.5, duck);
   return s.saturate(master, 1.3);
 }
+
+// SFX on the measured grid (beats.json), matched to the picture in index.html.
+export function sfx({ sr, duration, beats, synth: s }) {
+  const b = s.bus(sr, duration);
+  const B = (i) => beats.beats[i] ?? i * 0.5;
+  const click = (() => { const c = s.tick(sr, { freq: 1900, decay: 0.012 }), k = s.kick(sr, { freq: 120, punch: 300, decay: 0.05 }); for (let i = 0; i < k.length && i < c.length; i++) c[i] += k[i] * 0.5; return c; })();
+  const hoverTick = s.tick(sr, { freq: 3200, decay: 0.008 });
+  const whoosh = (len, seed) => s.whoosh(sr, len, { seed });
+  const at = (v, t, gain, pan = 0) => b.add(v, Math.max(0, t), { gain, pan });
+
+  // Hook: a slam per word, each preceded by a short air push.
+  for (let i = 0; i < 5; i++) {
+    at(whoosh(0.22, 50 + i), B(i) - 0.18, 0.35, i % 2 ? 0.3 : -0.3);
+    at(s.tick(sr, { freq: 900, decay: 0.03 }), B(i), 0.55);
+  }
+  at(s.tick(sr, { freq: 2600, decay: 0.02 }), B(5), 0.3); // staircase step
+  // Transitions: whooshes that end on the section beat.
+  for (const [i, len, g] of [[6, 0.45, 0.6], [12, 0.4, 0.6], [18, 0.4, 0.55], [24, 0.4, 0.55], [35, 0.35, 0.45]]) at(whoosh(len, 60 + i), B(i) - len * 0.85, g);
+  // Page assembly: a tick per piece as it lands.
+  for (const [i, d] of [[6, 0.1], [6, 0.16], [6, 0.22], [7, 0], [8, 0], [9, 0], [10, 0]]) at(click, B(i) + d, 0.32, (d * 3) - 0.3);
+  at(whoosh(0.25, 66), B(11) - 0.2, 0.35); // punch-in on the title
+  // Features: hover tick when the cursor reaches the target, click on the beat.
+  for (const start of [12, 18, 24]) { at(hoverTick, B(start + 2), 0.25); at(click, B(start + 3), 0.7); }
+  // Metric: odometer ticks on sixteenths of the measured beat, thinning out as the count settles.
+  const q = (B(31) - B(30)) / 4;
+  for (let j = 0; j < 7; j++) at(s.tick(sr, { freq: 2200 + j * 120, decay: 0.01 }), B(30) + j * q * (1 + j * 0.25), 0.35 - j * 0.04, j % 2 ? 0.25 : -0.25);
+  at(whoosh(0.3, 71), B(32) - 0.25, 0.3);
+  at(click, B(33), 0.4);
+  // Lockup: CTA unroll, then the final click.
+  at(whoosh(0.3, 80), B(36) - 0.25, 0.35);
+  at(hoverTick, B(39) - 0.12, 0.25);
+  at(click, B(39), 0.75);
+  return b;
+}

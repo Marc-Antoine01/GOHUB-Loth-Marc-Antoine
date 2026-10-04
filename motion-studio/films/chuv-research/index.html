@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<title>La recherche au CHUV</title>
+<style>
+  @font-face { font-family: Sharp; src: url(assets/fonts/Medium20.woff2) format('woff2'); }
+  @font-face { font-family: Atlas; src: url(assets/fonts/AtlasGrotesk-Regular-Web.woff2) format('woff2'); }
+  :root { --petrol: #004664; --cyan: #62E8FF; --ink: #212121; --grey: #F3F3F3; }
+  html, body { margin: 0; overflow: hidden; background: var(--petrol); }
+  #stage { position: relative; overflow: hidden; background: var(--petrol); }
+  .abs { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+  .scene { position: absolute; left: 0; top: 0; overflow: hidden; }
+  .mask { position: absolute; overflow: hidden; }
+  .sharp { font-family: Sharp, sans-serif; font-weight: 400; letter-spacing: -0.025em; white-space: nowrap; }
+  .atlas { font-family: Atlas, sans-serif; white-space: nowrap; }
+  img { display: block; }
+</style>
+<script src="/lib/runtime.js"></script>
+</head>
+<body><div id="stage"></div>
+<script>
+// La recherche au CHUV: 20 s, 120 BPM. Pure function of time: seek(t) paints frame t, nothing carried between frames.
+const F = window.FILM, W = F.width, H = F.height, FMT = F.format || '9x16';
+const BEATS = (window.BEATS && window.BEATS.beats) || [];
+const beat = (i) => BEATS[i] ?? i * 0.5; // measured grid; nominal 0.5 s fallback for preview without beats.json
+const { range, clamp, lerp, ease, spring } = M;
+const bump = (t, at, len) => { const u = (t - at) / len; return u < 0 || u > 1 ? 0 : Math.sin(Math.PI * u); };
+const PETROL = '#004664', CYAN = '#62E8FF', INK = '#212121', GREY = '#F3F3F3';
+
+const stage = document.getElementById('stage');
+stage.style.width = W + 'px'; stage.style.height = H + 'px';
+
+// ---------- one timeline, three canvases ----------
+const LAYOUT = {
+  '9x16': {
+    hook: { font: 205, x: 80, top: 560, maxW: 920, photo: [80, 150, 920, 330] },
+    service: { k: 2.2, x: 111, y: 110, h: 760, desk: null },
+    feat: { panel: [60, 230, 960, 900], cap: { x: 80, y: 1260, verb: 150, sub: 46, idx: 38 } },
+    metric: { font: 440, x: 80, top: 260, label: { x: 80, y: 900, size: 76 }, card: { x: 380, y: 1180, s: 1.75 } },
+    lock: { logo: [110, 380, 820], cta: { x: 110, y: 930, size: 52 }, url: { x: 110, y: 1100, size: 40 }, photo: [0, 1300, 1080, 620] },
+    cursor: 58,
+  },
+  '1x1': {
+    hook: { font: 150, x: 80, top: 150, maxW: 920, photo: null },
+    service: { k: 1.316, x: 283, y: 40, h: 760, desk: null },
+    feat: { panel: [60, 50, 960, 700], cap: { x: 80, y: 790, verb: 116, sub: 40, idx: 32 } },
+    metric: { font: 340, x: 70, top: 110, label: { x: 80, y: 520, size: 56 }, card: { x: 620, y: 600, s: 1.15 } },
+    lock: { logo: [110, 250, 640], cta: { x: 110, y: 690, size: 44 }, url: { x: 110, y: 830, size: 34 } },
+    cursor: 50,
+  },
+  '16x9': {
+    hook: { font: 170, x: 120, top: 110, maxW: 860, photo: [1080, 110, 720, 860] },
+    service: { k: 1.316, x: 220, y: 40, h: 760, desk: [820, 228, 1000] },
+    feat: { panel: [800, 90, 1020, 900], cap: { x: 110, y: 330, verb: 130, sub: 40, idx: 36 } },
+    metric: { font: 470, x: 110, top: 150, label: { x: 120, y: 720, size: 66 }, card: { x: 1230, y: 250, s: 1.55 } },
+    lock: { logo: [140, 250, 640], cta: { x: 140, y: 690, size: 44 }, url: { x: 140, y: 830, size: 36 }, photo: [1100, 0, 820, 1080] },
+    cursor: 54,
+  },
+}[FMT];
+
+// ---------- dom helpers (setup only) ----------
+function el(tag, cls, parent, html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html != null) e.innerHTML = html;
+  (parent || stage).appendChild(e);
+  return e;
+}
+const css = (e, s) => { for (const k in s) e.style[k] = s[k]; return e; };
+const tf = (e, x = 0, y = 0, s = 1, r = 0, pre = '') => { e.style.transform = `${pre} translate(${x}px,${y}px) rotate(${r}deg) scale(${s})`; };
+const imgs = [];
+function img(src, parent, w, h) {
+  const i = el('img', 'abs', parent);
+  i.src = 'assets/' + src;
+  if (w) i.style.width = w + 'px';
+  if (h) i.style.height = h + 'px';
+  imgs.push(i);
+  return i;
+}
+// A line of text inside a clipping mask; returns { mask, inner } so seek(t) can slide the inner line.
+function maskLine(parent, text, cls, size, color, x, y, extra = {}) {
+  const mask = css(el('div', 'mask', parent), { left: x + 'px', top: y + 'px', height: size * 1.18 + 'px', paddingRight: '0.2em' });
+  const inner = css(el('div', cls, mask, text), { fontSize: size + 'px', lineHeight: size * 1.18 + 'px', color, ...extra });
+  return { mask, inner };
+}
+// '' inherits, so a hidden scene also hides children that are "on".
+const show = (e, on) => { e.style.visibility = on ? '' : 'hidden'; };
+// Mask-in then mask-out: inner line rises into view and leaves upward. Not a fade.
+function rise(line, t, inAt, outAt = Infinity, dur = 0.36) {
+  const pin = ease.outExpo(range(t, inAt, inAt + dur));
+  const pout = outAt === Infinity ? 0 : ease.inExpo(range(t, outAt, outAt + 0.26));
+  line.inner.style.transform = `translateY(${(1 - pin) * 110 - pout * 110}%)`;
+}
+
+// ---------- layers ----------
+const scene = (bg) => css(el('div', 'scene'), { width: W + 'px', height: H + 'px', background: bg || 'transparent' });
+const sHook = scene(PETROL);
+const greyBg = css(el('div', 'abs'), { width: W + 'px', height: H + 'px', background: GREY });
+const sService = scene();
+const sFeat = scene();
+const sMetric = scene(CYAN);
+const sLock = scene(PETROL);
+
+// ---------- 1. hook: five words, one per beat ----------
+const HK = LAYOUT.hook;
+const WORDS = ['Chaque', 'maladie', 'attend', 'sa', 'réponse.'];
+const hookLines = WORDS.map((w, i) => maskLine(sHook, w, 'sharp', HK.font, i === 4 ? CYAN : '#fff', HK.x, 0));
+let photoSlices = [];
+const PHOTO = 'photos/csm_chuv-bandeau-recherche-boites_33915b2605.webp';
+if (HK.photo) {
+  const [px, py, pw, ph] = HK.photo;
+  photoSlices = WORDS.map((_, i) => css(el('div', 'abs', sHook), {
+    left: px + (pw / 5) * i + 'px', top: py + 'px', width: Math.ceil(pw / 5) + 1 + 'px', height: ph + 'px',
+    backgroundImage: `url(assets/${PHOTO})`, backgroundRepeat: 'no-repeat',
+  }));
+}
+
+// ---------- 2. service: the real mobile page rebuilt from its own pixels ----------
+const SV = LAYOUT.service, k = SV.k;
+const svPanel = css(el('div', 'abs', sService), {
+  width: 390 * k + 'px', height: SV.h * k + 'px', overflow: 'hidden', borderRadius: 30 + 'px',
+  boxShadow: '0 40px 90px rgba(0, 40, 60, 0.28)', transformOrigin: '50% 50%',
+});
+const svBg = css(el('div', 'abs', svPanel), { width: 390 * k + 'px', height: SV.h * k + 'px', background: PETROL });
+const SPRITE = 'assets/shots/mobile-top.png';
+// [css box in mobile-top.png], beat index it lands on, entrance style
+const PIECES = [
+  { box: [15, 15, 87, 50], beat: 6, delay: 0.1, from: [-170, 0, 0] },
+  { box: [229, 19, 90, 42], beat: 6, delay: 0.16, from: [0, -110, 0] },
+  { box: [345, 25, 30, 30], beat: 6, delay: 0.22, from: [140, 0, 220] },
+  { box: [15, 130, 360, 82], beat: 7, wipe: 'up' },
+  { box: [15, 262, 110, 38], beat: 8, stamp: true },
+  { box: [15, 339.4, 360, 200], beat: 9, wipe: 'down' },
+  { box: [0, 539.4, 390, SV.h - 539.4], beat: 10, from: [0, 300, 0] },
+].map((p) => {
+  const [x, y, w, h] = p.box;
+  p.el = css(el('div', 'abs', svPanel), {
+    width: w * k + 'px', height: h * k + 'px', backgroundImage: `url(${SPRITE})`,
+    backgroundSize: `${390 * k}px ${844 * k}px`, backgroundPosition: `${-x * k}px ${-y * k}px`, transformOrigin: '50% 50%',
+  });
+  return p;
+});
+let svDesk = null;
+if (SV.desk) {
+  const [dx, dy, dw] = SV.desk;
+  svDesk = css(img('shots/desktop-top.png', sService, dw, dw * 900 / 1440), { borderRadius: '18px', boxShadow: '0 40px 90px rgba(0, 40, 60, 0.28)' });
+  svDesk.dataset.x = dx; svDesk.dataset.y = dy;
+}
+
+// ---------- 3. features: real desktop states, real targets, a cursor doing the action ----------
+const FP = LAYOUT.feat, [PX, PY, PW, PH] = FP.panel;
+const CAP = FP.cap;
+const FEATS = [
+  {
+    start: 6, name: 'menu', reveal: 'drop', target: [854.1, 98, 253.9, 44],
+    idx: '01', verb: 'Explorer', move: 'swing', sub: 'Lieu de recherche et d’innovation',
+    cam: [[0, 1000, 300, 760], [1.1, 990, 150, 470], [1.6, 990, 150, 470], [2.25, 250, 230, 520], [3, 250, 240, 480]],
+  },
+  {
+    start: 9, name: 'trials', reveal: 'page', target: [525, 575.2, 135.3, 23],
+    idx: '02', verb: 'Accompagner', move: 'rise', sub: 'Soutien aux essais cliniques',
+    cam: [[0, 640, 600, 760], [1.1, 650, 570, 500], [1.6, 650, 570, 500], [2.2, 420, 250, 840], [3, 420, 255, 800]],
+  },
+  {
+    start: 12, name: 'news', reveal: 'slide', target: [1351, 150.2, 44, 44],
+    idx: '03', verb: 'Suivre', move: 'zoom', sub: 'Les actualités de la recherche',
+    cam: [[0, 1150, 330, 760], [1.1, 1210, 260, 520], [1.6, 1210, 270, 520], [2.3, 760, 400, 760], [3, 760, 420, 640]],
+  },
+].map((f) => {
+  f.panel = css(el('div', 'abs', sFeat), {
+    left: PX + 'px', top: PY + 'px', width: PW + 'px', height: PH + 'px', overflow: 'hidden', borderRadius: '26px',
+    background: '#fff', boxShadow: '0 40px 90px rgba(0, 40, 60, 0.25)', transformOrigin: '50% 50%',
+  });
+  f.camEl = css(el('div', 'abs', f.panel), { width: '1440px', height: '900px' });
+  f.before = img(`shots/d-${f.name}-before.png`, f.camEl, 1440, 900);
+  f.hover = img(`shots/d-${f.name}-hover.png`, f.camEl, 1440, 900);
+  if (f.reveal === 'slide') {
+    // The carousel row moves for real: old cards leave left, new cards arrive from the right.
+    const Y0 = 232, Y1 = 760; // the cards row (capture.json -> actions.news.cards)
+    f.strip = css(el('div', 'abs', f.camEl), { top: Y0 + 'px', width: '1440px', height: Y1 - Y0 + 'px', overflow: 'hidden', background: '#fff' });
+    f.stripOld = css(img(`shots/d-${f.name}-before.png`, f.strip, 1440, 900), { top: -Y0 + 'px' });
+    f.stripNew = css(img(`shots/d-${f.name}-after.png`, f.strip, 1440, 900), { top: -Y0 + 'px' });
+  } else {
+    f.after = img(`shots/d-${f.name}-after.png`, f.camEl, 1440, 900);
+  }
+  f.ring = css(el('div', 'abs', f.panel), { borderRadius: '50%', border: `0 solid ${CYAN}`, boxSizing: 'border-box' });
+  f.cursor = cursorEl(f.panel);
+  f.lines = [
+    maskLine(sFeat, f.idx, 'atlas', CAP.idx, PETROL, CAP.x, CAP.y),
+    maskLine(sFeat, f.verb, 'sharp', CAP.verb, INK, CAP.x - CAP.verb * 0.04, CAP.y + CAP.idx * 1.5),
+    maskLine(sFeat, f.sub, 'atlas', CAP.sub, INK, CAP.x, CAP.y + CAP.idx * 1.5 + CAP.verb * 1.12),
+  ];
+  return f;
+});
+const CAP_W = FMT === '16x9' ? 600 : PW - 40;
+
+function cursorEl(parent) {
+  const s = LAYOUT.cursor;
+  const c = el('div', 'abs', parent, `<svg width="${s}" height="${s * 1.5}" viewBox="0 0 20 30"><path d="M1 1 L1 24 L6.6 18.6 L10.4 27.6 L14 26 L10.3 17.2 L18 17.2 Z" fill="#fff" stroke="${INK}" stroke-width="1.6" stroke-linejoin="round"/></svg>`);
+  c.style.transformOrigin = '0 0';
+  return c;
+}
+
+// ---------- 4. metric: 800, counted like the site counts it ----------
+const MT = LAYOUT.metric;
+const numWrap = css(el('div', 'abs', sMetric), { left: MT.x + 'px', top: MT.top + 'px', transformOrigin: '0 100%' });
+const digitCols = [0, 1, 2].map(() => {
+  const col = css(el('div', 'mask', numWrap), { top: 0, height: MT.font * 0.96 + 'px' });
+  const strip = css(el('div', 'sharp', col, '01234567890'.split('').map((d) => `<div>${d}</div>`).join('')), {
+    fontSize: MT.font + 'px', lineHeight: MT.font * 0.96 + 'px', color: PETROL, textAlign: 'center',
+  });
+  return { col, strip };
+});
+const numBar = css(el('div', 'abs', sMetric), { height: Math.round(MT.font * 0.045) + 'px', background: PETROL, transformOrigin: '0 50%' });
+const metricLabel = [
+  maskLine(sMetric, 'projets de recherche', 'atlas', MT.label.size, PETROL, MT.label.x, MT.label.y),
+  maskLine(sMetric, 'clinique', 'atlas', MT.label.size, PETROL, MT.label.x, MT.label.y + MT.label.size * 1.2),
+];
+const card = css(img('ui/m-figure-800.png', sMetric, 360 * MT.card.s, 358 * MT.card.s), {
+  left: MT.card.x + 'px', top: MT.card.y + 'px', borderRadius: 14 * MT.card.s + 'px', transformOrigin: '50% 50%',
+  boxShadow: '0 30px 70px rgba(0, 50, 70, 0.25)',
+});
+
+// ---------- 5. lockup ----------
+const LK = LAYOUT.lock;
+const logo = css(img('brand/logo.svg', sLock, LK.logo[2], LK.logo[2] * 50 / 98), { left: LK.logo[0] + 'px', top: LK.logo[1] + 'px', transformOrigin: '0 50%' });
+const cta = css(el('div', 'abs', sLock), { left: LK.cta.x + 'px', top: LK.cta.y + 'px', transformOrigin: '0 50%' });
+const ctaPill = css(el('div', 'atlas', cta), {
+  position: 'relative', background: CYAN, color: INK, fontSize: LK.cta.size + 'px', lineHeight: '1.2',
+  padding: '0.42em 0.95em 0.5em', borderRadius: '0.5em', overflow: 'hidden',
+});
+const ctaText = el('span', null, ctaPill, 'Découvrir la recherche au CHUV');
+const ctaArrow = css(el('span', null, ctaPill, '→'), { display: 'inline-block', marginLeft: '0.5em' });
+ctaText.style.display = 'inline-block';
+const urlLine = maskLine(sLock, 'chuv.ch › Recherche et innovation', 'atlas', LK.url.size, '#fff', LK.url.x, LK.url.y);
+let lockPhoto = null;
+if (LK.photo) {
+  const [lx, ly, lw, lh] = LK.photo;
+  lockPhoto = css(el('div', 'abs', sLock), { left: lx + 'px', top: ly + 'px', width: lw + 'px', height: lh + 'px', backgroundImage: `url(assets/${PHOTO})`, backgroundSize: 'cover', backgroundPosition: '50% 40%' });
+}
+const lockRing = css(el('div', 'abs', sLock), { borderRadius: '50%', border: `0 solid ${CYAN}`, boxSizing: 'border-box' });
+const lockCursor = cursorEl(sLock);
+
+// ---------- setup that needs fonts and images (measurement only, before any frame) ----------
+let digitW = 0, numW = 0, ctaBox = null;
+window.ready = (async () => {
+  await document.fonts.load(`100px Sharp`); await document.fonts.load(`100px Atlas`);
+  await Promise.all(imgs.map((i) => i.decode().catch(() => {})));
+  // Hook: fit the widest word to the column, then stack the lines.
+  const widest = Math.max(...hookLines.map((l) => l.inner.getBoundingClientRect().width));
+  const fs = Math.min(HK.font, HK.font * HK.maxW / widest);
+  hookLines.forEach((l, i) => {
+    css(l.inner, { fontSize: fs + 'px', lineHeight: fs * 1.18 + 'px' });
+    css(l.mask, { height: fs * 1.18 + 'px', top: HK.top + i * fs * 0.98 - fs * 0.1 + 'px' });
+  });
+  if (HK.photo) {
+    const p = new Image(); p.src = 'assets/' + PHOTO; await p.decode();
+    const [, , pw, ph] = HK.photo, s = Math.max(pw / p.naturalWidth, ph / p.naturalHeight);
+    const bw = p.naturalWidth * s, bh = p.naturalHeight * s;
+    photoSlices.forEach((e, i) => css(e, { backgroundSize: `${bw}px ${bh}px`, backgroundPosition: `${-(pw / 5) * i - (bw - pw) / 2}px ${-(bh - ph) / 2}px` }));
+  }
+  // Metric: equal digit columns so 8-0-0 sits on a steady rhythm.
+  const probe = el('span', 'sharp', sMetric, '0'); probe.style.fontSize = MT.font + 'px';
+  digitW = probe.getBoundingClientRect().width * 0.98; probe.remove();
+  digitCols.forEach((d, i) => css(d.col, { left: i * digitW + 'px', width: digitW + 'px' }));
+  numW = digitW * 3;
+  css(numBar, { left: MT.x + digitW * 0.06 + 'px', top: MT.top + MT.font * 1.0 + 'px', width: numW * 0.96 + 'px' });
+  for (const f of FEATS) for (const [j, size] of [[1, CAP.verb], [2, CAP.sub]]) {
+    const v = f.lines[j], w = v.inner.getBoundingClientRect().width;
+    if (w > CAP_W) css(v.inner, { fontSize: size * CAP_W / w + 'px' });
+  }
+  // CTA: shrink the label until the pill fits the frame with a margin.
+  const maxPill = W - LK.cta.x - 70;
+  let r = ctaPill.getBoundingClientRect();
+  if (r.width > maxPill) { css(ctaPill, { fontSize: LK.cta.size * maxPill / r.width + 'px' }); r = ctaPill.getBoundingClientRect(); }
+  ctaBox = { w: r.width, h: r.height };
+})();
+
+// ---------- frame ----------
+function camAt(keys, lt) {
+  let i = 0;
+  while (i < keys.length - 2 && lt > keys[i + 1][0]) i++;
+  const [t0, ...a] = keys[i], [t1, ...b] = keys[i + 1];
+  const u = ease.inOutCubic(range(lt, t0, t1));
+  let [cx, cy, cw] = a.map((v, j) => lerp(v, b[j], u));
+  let ch = cw * PH / PW;
+  if (ch > 900) { ch = 900; cw = 900 * PW / PH; }
+  if (cw > 1440) { cw = 1440; ch = cw * PH / PW; }
+  cx = clamp(cx, cw / 2, 1440 - cw / 2); cy = clamp(cy, ch / 2, 900 - ch / 2);
+  return { x0: cx - cw / 2, y0: cy - ch / 2, k: PW / cw };
+}
+
+function drawHook(t) {
+  show(sHook, t < beat(6) + 0.2);
+  if (t >= beat(6) + 0.2) return;
+  const exit = beat(6) - 0.3;
+  hookLines.forEach((l, i) => {
+    const land = beat(i), start = land - 0.16;
+    // Word 0 starts 60% in at t=0, so the very first frame already reads "Chaque".
+    const pin = i === 0 ? ease.outExpo(range(t, -0.12, 0.2)) : ease.outExpo(range(t, start, land + 0.18));
+    const pout = ease.inExpo(range(t, exit + i * 0.035, exit + i * 0.035 + 0.3));
+    // On beat 5 the first four lines step right in a staircase; "réponse." holds the left edge.
+    const step = i < 4 ? ease.outBack(range(t, beat(5) - 0.08 + i * 0.03, beat(5) + 0.3 + i * 0.03)) * (4 - i) * HK.font * 0.16 : 0;
+    const punch = 1 + 0.07 * Math.max(0, 1 - spring(t - land, 2.6, 0.38)) * (t >= land ? 1 : 0);
+    l.inner.style.transformOrigin = '0 80%';
+    l.mask.style.transform = `translateX(${step}px)`;
+    l.inner.style.transform = `translateY(${(1 - pin) * 105 - pout * 115}%) skewY(${(1 - pin) * 7}deg) scale(${punch})`;
+  });
+  photoSlices.forEach((s, i) => {
+    const p = i === 0 ? ease.outExpo(range(t, -0.12, 0.25)) : ease.outExpo(range(t, beat(i) - 0.12, beat(i) + 0.3));
+    const q = ease.inExpo(range(t, exit + 0.05 * i, exit + 0.05 * i + 0.3));
+    s.style.clipPath = `inset(${(1 - p) * 100}% 0 ${q * 100}% 0)`;
+  });
+}
+
+function drawService(t) {
+  const on = t >= beat(6) - 0.2 && t < beat(12) + 0.2;
+  show(greyBg, t >= beat(6) - 0.2 && t < beat(30));
+  show(sService, on);
+  // Grey ground pushes up over the hook.
+  const g = ease.outExpo(range(t, beat(6) - 0.2, beat(6) + 0.15));
+  tf(greyBg, 0, (1 - g) * H);
+  if (!on) return;
+  const enter = ease.outExpo(range(t, beat(6) - 0.2, beat(6) + 0.12));
+  const leave = ease.inExpo(range(t, beat(12) - 0.34, beat(12) - 0.02));
+  // Beat 11: the finished page punches in on its title, the new thing before the cut.
+  const drift = 1 + 0.02 * range(t, beat(6), beat(11)) + 0.12 * ease.outExpo(range(t, beat(11) - 0.06, beat(11) + 0.3));
+  css(svPanel, { left: SV.x + 'px', top: SV.y + 'px' });
+  svPanel.style.transformOrigin = `50% ${170 * k}px`;
+  svPanel.style.transform = `perspective(2200px) translate(${-leave * (SV.x + 390 * k + 300)}px, ${(1 - enter) * 160}px) rotateY(${leave * 28}deg) scale(${drift * (0.92 + 0.08 * enter)})`;
+  svBg.style.clipPath = `inset(${(1 - enter) * 100}% 0 0 0)`;
+  for (const p of PIECES) {
+    const land = beat(p.beat) + (p.delay || 0);
+    const [x, y, w, h] = p.box;
+    let dx = 0, dy = 0, r = 0, s = 1, clip = 'none';
+    if (p.wipe) {
+      const u = ease.outExpo(range(t, land - 0.12, land + 0.32));
+      clip = p.wipe === 'up' ? `inset(${(1 - u) * 100}% 0 0 0)` : `inset(0 0 ${(1 - u) * 100}% 0)`;
+      dy = (1 - u) * (p.wipe === 'up' ? 30 : -16) * k;
+      show(p.el, t >= land - 0.12);
+    } else if (p.stamp) {
+      const u = spring(t - (land - 0.08), 2.8, 0.42);
+      s = 1 + (1 - u) * 0.9;
+      show(p.el, t >= land - 0.08);
+    } else {
+      const u = spring(t - (land - 0.2), 2.3, 0.5);
+      dx = (1 - u) * p.from[0] * k; dy = (1 - u) * p.from[1] * k; r = (1 - u) * p.from[2];
+      show(p.el, t >= land - 0.2);
+    }
+    css(p.el, { left: x * k + 'px', top: y * k + 'px', clipPath: clip });
+    tf(p.el, dx, dy, s, r);
+  }
+  if (svDesk) {
+    const u = spring(t - (beat(10) - 0.22), 2.1, 0.55);
+    css(svDesk, { left: svDesk.dataset.x + 'px', top: svDesk.dataset.y + 'px' });
+    show(svDesk, t >= beat(10) - 0.22);
+    svDesk.style.transform = `translate(${(1 - u) * 900 - leave * 2200}px, 0) rotate(${(1 - u) * 6}deg)`;
+  }
+}
+
+function drawFeature(f, t, last) {
+  const lt = t - f.start;
+  const on = lt >= -0.2 && (last ? t < beat(30) : lt < 3.15);
+  show(f.panel, on); f.lines.forEach((l) => show(l.mask, on));
+  if (!on) return;
+  // Panel swings in from the right on the section's first beat, leaves left on the next one.
+  const pin = ease.outExpo(range(lt, -0.2, 0.28));
+  const pout = last ? 0 : ease.inExpo(range(lt, 2.82, 3.12));
+  const a = 1 - pin;
+  if (f.move === 'swing') // from the right on a vertical hinge, out to the left
+    f.panel.style.transform = `perspective(2400px) translateX(${a * (W - PX + 80) - pout * (PX + PW + 200)}px) rotateY(${-a * 22 + pout * 22}deg)`;
+  else if (f.move === 'rise') // up from below on a horizontal hinge, out through the top
+    f.panel.style.transform = `perspective(2400px) translateY(${a * (H - PY + 60) - pout * (PY + PH + 200)}px) rotateX(${a * 24 - pout * 18}deg)`;
+  else // pops from small and turning, settles; the metric cuts over it
+    f.panel.style.transform = `scale(${0.35 + 0.65 * pin + 0.04 * ease.inOutCubic(range(lt, 2.2, 3))}) rotate(${a * -9}deg)`;
+
+  const cam = camAt(f.cam, lt);
+  f.camEl.style.transform = `scale(${cam.k}) translate(${-cam.x0}px, ${-cam.y0}px)`;
+  const [tx, ty, tw, th] = f.target;
+  const click = 1.5;
+  show(f.hover, lt >= 1.0);
+  if (f.reveal === 'drop') {
+    const p = ease.outCubic(range(lt, click, click + 0.34));
+    show(f.after, lt >= click); f.after.style.clipPath = `inset(0 0 ${(1 - p) * 100}% 0)`;
+  } else if (f.reveal === 'page') {
+    const p = ease.outExpo(range(lt, click + 0.05, click + 0.5));
+    show(f.after, lt >= click + 0.05); f.after.style.transform = `translateY(${(1 - p) * 900}px)`;
+  } else {
+    const p = ease.inOutCubic(range(lt, click + 0.04, click + 0.62));
+    show(f.strip, lt >= 1.0);
+    f.stripOld.style.transform = `translateX(${-690 * p}px)`;
+    f.stripNew.style.transform = `translateX(${690 * (1 - p)}px)`;
+  }
+
+  // Cursor: arcs in from the lower right, lands on the real target, presses on the beat.
+  const goal = [tx + tw * 0.55, ty + th * 0.6];
+  const startP = [goal[0] + 300, goal[1] + 420];
+  const u = ease.inOutCubic(range(lt, 0.25, 1.0));
+  const ctrl = [goal[0] + 40, goal[1] + 360];
+  const cx = (1 - u) ** 2 * startP[0] + 2 * (1 - u) * u * ctrl[0] + u * u * goal[0];
+  const cy = (1 - u) ** 2 * startP[1] + 2 * (1 - u) * u * ctrl[1] + u * u * goal[1];
+  const sx = (cx - cam.x0) * cam.k, sy = (cy - cam.y0) * cam.k;
+  const press = 1 - 0.2 * bump(lt, click - 0.02, 0.16);
+  tf(f.cursor, sx, sy, press, 0);
+  const rp = ease.outCubic(range(lt, click, click + 0.42));
+  const rr = 14 + 70 * rp;
+  show(f.ring, lt >= click && rp < 1);
+  css(f.ring, { width: rr * 2 + 'px', height: rr * 2 + 'px', borderWidth: 9 * (1 - rp) + 'px' });
+  tf(f.ring, sx - rr, sy - rr);
+
+  rise(f.lines[0], lt, 0.16, last ? Infinity : 2.66);
+  rise(f.lines[1], lt, 0.2, last ? Infinity : 2.7, 0.42);
+  rise(f.lines[2], lt, 0.36, last ? Infinity : 2.74);
+}
+
+function drawMetric(t) {
+  const t0 = beat(30), on = t >= t0 && t < beat(35);
+  show(sMetric, on);
+  if (!on) return;
+  // Odometer: each column rolls continuously and lands on 8-0-0 together.
+  const v = 800 * ease.outExpo(range(t, t0, t0 + 0.42));
+  [v / 100, v / 10, v].forEach((x, i) => {
+    const pos = ((x % 10) + 10) % 10;
+    digitCols[i].strip.style.transform = `translateY(${-pos * MT.font * 0.96}px)`;
+  });
+  const s = 1 - 0.12 * (1 - spring(t - t0, 2.4, 0.45));
+  const lift = ease.inOutCubic(range(t, beat(33) - 0.1, beat(33) + 0.35));
+  numWrap.style.transform = `translateY(${-lift * MT.font * 0.06}px) scale(${s})`;
+  const b = ease.outExpo(range(t, t0 + 0.3, t0 + 0.55));
+  numBar.style.transform = `translateY(${-lift * MT.font * 0.06}px) scaleX(${b})`;
+  rise(metricLabel[0], t, beat(32) - 0.22);
+  rise(metricLabel[1], t, beat(32) - 0.14);
+  // The site's own key-figure card lands on the half-time kick as proof.
+  const cu = spring(t - (beat(33) - 0.3), 2.0, 0.72); // no overshoot back over the numeral
+  show(card, t >= beat(33) - 0.3);
+  card.style.transform = `translate(${(1 - cu) * W * 0.8}px, ${(1 - cu) * 140}px) rotate(${-4 + (1 - cu) * 16 + Math.sin((t - t0) * 2.2) * 0.6}deg)`;
+}
+
+function drawLockup(t) {
+  const t0 = beat(35), on = t >= t0;
+  show(sLock, on);
+  if (!on) return;
+  // Logo: diagonal sweep matching its hatched strokes, with a stamp.
+  // Hard cut: the logo is already half swept on the cut frame.
+  const a = 55 + ease.outCubic(range(t, t0, t0 + 0.28)) * 85;
+  logo.style.clipPath = `polygon(0 0, ${a}% 0, ${a - 35}% 100%, 0 100%)`;
+  logo.style.transform = `scale(${1 + 0.16 * (1 - spring(t - t0, 2.5, 0.5))})`;
+  // CTA pill unrolls on beat 36, its label rises with it.
+  const pu = ease.outExpo(range(t, beat(36) - 0.22, beat(36) + 0.12));
+  show(cta, t >= beat(36) - 0.22);
+  ctaPill.style.clipPath = `inset(0 ${(1 - pu) * 100}% 0 0 round 0.5em)`;
+  ctaText.style.transform = `translateY(${(1 - ease.outExpo(range(t, beat(36) - 0.14, beat(36) + 0.16))) * 120}%)`;
+  rise(urlLine, t, beat(37) - 0.2);
+  if (lockPhoto) { // bookend: the culture plates from the hook close the film
+    const pu2 = ease.outExpo(range(t, beat(37) - 0.2, beat(37) + 0.25));
+    lockPhoto.style.clipPath = FMT === '16x9' ? `inset(0 0 0 ${(1 - pu2) * 100}%)` : `inset(${(1 - pu2) * 100}% 0 0 0)`;
+    lockPhoto.style.backgroundPosition = `50% ${40 + 8 * range(t, beat(37), 20)}%`;
+  }
+  // Cursor comes for the CTA and clicks it on the last beat.
+  const click = beat(39);
+  const gx = LK.cta.x + (ctaBox ? ctaBox.w : 600) * 0.95, gy = LK.cta.y + (ctaBox ? ctaBox.h : 70) * 0.62;
+  const u = ease.inOutCubic(range(t, beat(38) - 0.1, click - 0.12));
+  const sx = lerp(gx + W * 0.35, gx, u), sy = lerp(gy + H * 0.3, gy, u) + Math.sin(u * Math.PI) * 60;
+  show(lockCursor, t >= beat(38) - 0.1);
+  tf(lockCursor, sx, sy, 1 - 0.2 * bump(t, click - 0.02, 0.16));
+  const hover = t >= click - 0.12;
+  ctaArrow.style.transform = `translateX(${hover ? 0.18 * LK.cta.size * ease.outBack(range(t, click - 0.12, click + 0.1)) : 0}px)`;
+  cta.style.transform = `scale(${1 - 0.035 * bump(t, click, 0.18)})`;
+  const rp = ease.outCubic(range(t, click, click + 0.45)), rr = 14 + 80 * rp;
+  show(lockRing, t >= click && rp < 1);
+  css(lockRing, { width: rr * 2 + 'px', height: rr * 2 + 'px', borderWidth: 9 * (1 - rp) + 'px' });
+  tf(lockRing, gx - rr, gy - rr);
+}
+
+window.seek = (t) => {
+  drawHook(t);
+  drawService(t);
+  show(sFeat, t >= FEATS[0].start - 0.2 && t < beat(30));
+  FEATS.forEach((f, i) => drawFeature(f, t, i === FEATS.length - 1));
+  drawMetric(t);
+  drawLockup(t);
+};
+</script>
+</body></html>
