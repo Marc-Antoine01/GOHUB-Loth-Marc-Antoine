@@ -31,7 +31,7 @@ A film lives in `films/<name>/`:
 
 | File | Purpose |
 |---|---|
-| `film.json` | `{ "duration": s, "fps": 30, "width": 1080, "height": 1920 }` (even width/height) |
+| `film.json` | `{ "duration": s, "fps": 30, "width": 1080, "height": 1920 }` (even width/height), or `"formats": { "9x16": [1080, 1920], "1x1": [1080, 1080] }` for one timeline on several canvases; the page reads `FILM.format`. |
 | `index.html` | Defines `window.seek(t)`; may `await` inside it. Optional `window.ready` promise for setup. Include `/lib/runtime.js` for `M.mulberry32`, `M.noise1`, `M.range`, easings, `M.spring`. |
 | `sound.mjs` | Optional. `export function score(ctx)` → bus (the bed); `export function sfx(ctx)` → bus, with `ctx.beats` from beats.json. Build voices with `ctx.synth` (`lib/synth.mjs`). |
 | `track.{wav,mp3,m4a,flac}` | A supplied track. Replaces `score()`; beats are measured from it. |
@@ -42,6 +42,7 @@ Commands (run from `motion-studio/`):
 
 - `node render.mjs films/<name> --sound`: builds the score, measures `beats.json` with librosa, places the SFX, and mixes to -14 LUFS.
 - `node render.mjs films/<name> --sheet`: writes contact sheets to `out/sheet-NN.png`, with one frame per beat plus t=0. Thumbnails are 390 CSS px wide (phone width), so reading the sheet is the phone-readability check. Also re-renders frames out of order and fails if any frame depends on history.
+- `--format <name>` picks one canvas (default: the first), and `--format all` renders every format from one mix.
 - `node render.mjs films/<name>`: full render to `out/<name>.mp4`. H.264 yuv420p, CRF 16, AAC; integrated loudness is verified after muxing.
 - `node render.mjs --serve`: opens a preview at http://127.0.0.1:4173/films/<name>/. Space plays or pauses (with audio), arrow keys step one frame, and `?t=2.5` freezes on that time.
 

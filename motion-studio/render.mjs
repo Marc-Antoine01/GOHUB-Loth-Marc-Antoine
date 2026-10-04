@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// node render.mjs films/<name> [--sound | --sheet] — and node render.mjs --serve. See CLAUDE.md.
+// node render.mjs films/<name> [--sound | --sheet] [--format <name>|all] — and node render.mjs --serve. See CLAUDE.md.
 import http from 'node:http';
 import { once } from 'node:events';
 import { spawn, spawnSync } from 'node:child_process';
@@ -30,14 +30,16 @@ const readJson = (p) => (existsSync(p) ? JSON.parse(readFileSync(p, 'utf8')) : n
 
 function serve(port = 0) {
   const server = http.createServer((req, res) => {
-    let p = resolve(ROOT, '.' + decodeURIComponent(new URL(req.url, 'http://x').pathname));
+    const url = new URL(req.url, 'http://x');
+    let p = resolve(ROOT, '.' + decodeURIComponent(url.pathname));
     if (p !== ROOT && !p.startsWith(ROOT + sep)) return res.writeHead(403).end();
     if (existsSync(p) && statSync(p).isDirectory()) p = join(p, 'index.html');
     if (!existsSync(p)) return res.writeHead(404).end();
     let body = readFileSync(p);
     if (p.endsWith('.html')) {
       const d = dirname(p);
-      const inject = `<script>window.FILM=${JSON.stringify(readJson(join(d, 'film.json')))};window.BEATS=${JSON.stringify(readJson(join(d, 'beats.json')))};</script>`;
+      const film = existsSync(join(d, 'film.json')) ? resolveFormat(readJson(join(d, 'film.json')), url.searchParams.get('format')) : null;
+      const inject = `<script>window.FILM=${JSON.stringify(film)};window.BEATS=${JSON.stringify(readJson(join(d, 'beats.json')))};</script>`;
       body = body.toString().replace(/<head[^>]*>/i, (m) => m + inject);
     }
     res.writeHead(200, { 'content-type': MIME[extname(p)] || 'application/octet-stream', 'cache-control': 'no-store' });
@@ -66,22 +68,35 @@ const FIND_CSS_MOTION = `(() => [...document.querySelectorAll('*')].filter((e) =
   return s.transitionDuration.split(',').some((d) => parseFloat(d) > 0) || s.animationName.split(',').some((n) => n.trim() !== 'none');
 }).slice(0, 5).map((e) => e.tagName.toLowerCase() + (e.id ? '#' + e.id : '') + (typeof e.className === 'string' && e.className ? '.' + e.className.trim().split(/\\s+/).join('.') : '')))()`;
 
-function loadFilm(dir) {
-  const film = readJson(join(dir, 'film.json'));
-  if (!film) fail(`${dir}/film.json missing`);
+// film.json may list "formats": { "9x16": [1080, 1920], "1x1": [1080, 1080] } — one timeline, several canvases.
+// The page sees FILM.format and FILM.width/height for the chosen one; the first format is the default.
+function resolveFormat(film, name) {
+  if (!film.formats) return { ...film, format: null };
+  const names = Object.keys(film.formats);
+  const format = name || names[0];
+  if (!film.formats[format]) fail(`unknown format "${format}"; film.json has ${names.join(', ')}`);
+  const [width, height] = film.formats[format];
+  return { ...film, width, height, format };
+}
+
+function loadFilm(dir, format) {
+  const raw = readJson(join(dir, 'film.json'));
+  if (!raw) fail(`${dir}/film.json missing`);
+  const film = resolveFormat(raw, format);
   for (const k of ['duration', 'fps', 'width', 'height']) if (!(film[k] > 0)) fail(`film.json: "${k}" must be a positive number`);
   if (film.width % 2 || film.height % 2) fail('film.json: width and height must be even for yuv420p');
-  if (!existsSync(join(dir, 'index.html'))) fail(`${dir}/index.html missing`);
   return film;
 }
 
 async function openFilm(dir, film, port) {
+  if (!existsSync(join(dir, 'index.html'))) fail(`${dir}/index.html missing`);
   const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || undefined });
   const page = await browser.newPage({ viewport: { width: film.width, height: film.height }, deviceScaleFactor: 1 });
   const errors = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await page.addInitScript(GUARD);
-  await page.goto(`http://127.0.0.1:${port}/${relative(ROOT, dir).split(sep).join('/')}/index.html?render`, { waitUntil: 'load' });
+  const query = film.format ? `?render&format=${encodeURIComponent(film.format)}` : '?render';
+  await page.goto(`http://127.0.0.1:${port}/${relative(ROOT, dir).split(sep).join('/')}/index.html${query}`, { waitUntil: 'load' });
   await page.evaluate(async () => { await window.ready; await document.fonts.ready; });
   if (!(await page.evaluate(() => typeof window.seek === 'function'))) fail('index.html must define window.seek(t)');
 
@@ -182,7 +197,8 @@ async function sheet(dir, film, port) {
   }
   if (times[0] > 0.05) times.unshift(0); // the hook lives in the first frames
 
-  const out = join(dir, 'out'), frames = join(out, 'sheet');
+  const tag = film.format ? `-${film.format}` : '';
+  const out = join(dir, 'out'), frames = join(out, `sheet${tag}`);
   rmSync(frames, { recursive: true, force: true });
   mkdirSync(frames, { recursive: true });
 
@@ -212,7 +228,7 @@ async function sheet(dir, film, port) {
       return `<figure><img src="${base}/${String(i).padStart(3, '0')}.png"><figcaption>${b >= 0 ? `beat ${b + 1}` : 'frame'} · ${t.toFixed(2)}s</figcaption></figure>`;
     }).join('');
     await page.setContent(`<style>body{margin:0;padding:8px;background:#202020;color:#ccc;font:12px ui-monospace,monospace;display:grid;grid-template-columns:repeat(${COLS},${THUMB}px);gap:8px;width:max-content}figure{margin:0}img{width:${THUMB}px;display:block}figcaption{padding-top:4px}</style>${cells}`, { waitUntil: 'load' });
-    const file = join(out, `sheet-${String(p + 1).padStart(2, '0')}.png`);
+    const file = join(out, `sheet${tag}-${String(p + 1).padStart(2, '0')}.png`);
     await page.screenshot({ path: file, fullPage: true });
     written.push(relative(ROOT, file));
   }
@@ -222,9 +238,8 @@ async function sheet(dir, film, port) {
 
 // ---- full render ----
 
-async function render(dir, film, port) {
-  const mix = await buildSound(dir, film);
-  const out = join(dir, 'out', `${basename(dir)}.mp4`);
+async function render(dir, film, port, mix) {
+  const out = join(dir, 'out', `${basename(dir)}${film.format ? '-' + film.format : ''}.mp4`);
   const n = Math.round(film.duration * film.fps);
   const enc = spawn('ffmpeg', [
     '-hide_banner', '-loglevel', 'error', '-y',
@@ -268,16 +283,21 @@ try {
     log(`preview: http://127.0.0.1:${port}/films/<name>/  (space: play/pause, arrows: step, ?t=2.5: freeze)`);
   } else {
     const target = args.find((a) => !a.startsWith('--'));
-    if (!target) fail('usage: node render.mjs films/<name> [--sound | --sheet]   |   node render.mjs --serve');
-    const dir = resolve(target), film = loadFilm(dir);
+    if (!target) fail('usage: node render.mjs films/<name> [--sound | --sheet] [--format <name>|all]   |   node render.mjs --serve');
+    const dir = resolve(target), fi = args.indexOf('--format'), want = fi >= 0 ? args[fi + 1] : null;
+    const film = loadFilm(dir, want === 'all' ? null : want);
+    const films = want === 'all' && film.formats ? Object.keys(film.formats).map((f) => loadFilm(dir, f)) : [film];
     const server = await serve();
     const { port } = server.address();
     try {
       if (has('sound')) await buildSound(dir, film);
       else if (has('sheet')) {
         if (!existsSync(join(dir, 'beats.json'))) await buildSound(dir, film);
-        await sheet(dir, film, port);
-      } else await render(dir, film, port);
+        for (const f of films) await sheet(dir, f, port);
+      } else {
+        const mix = await buildSound(dir, film); // one mix for every format: same timeline, same sound
+        for (const f of films) await render(dir, f, port, mix);
+      }
     } finally { server.close(); }
   }
 } catch (e) {

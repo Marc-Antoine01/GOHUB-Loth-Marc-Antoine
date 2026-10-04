@@ -1,0 +1,16 @@
+{
+  "title": "La recherche au CHUV",
+  "duration": 20,
+  "fps": 30,
+  "bpm": 120,
+  "formats": { "9x16": [1080, 1920], "1x1": [1080, 1080], "16x9": [1920, 1080] },
+  "sections": [
+    { "id": "hook",    "start": 0,    "end": 3 },
+    { "id": "service", "start": 3,    "end": 6 },
+    { "id": "feature1","start": 6,    "end": 9 },
+    { "id": "feature2","start": 9,    "end": 12 },
+    { "id": "feature3","start": 12,   "end": 15 },
+    { "id": "metric",  "start": 15,   "end": 17.5 },
+    { "id": "lockup",  "start": 17.5, "end": 20 }
+  ]
+}

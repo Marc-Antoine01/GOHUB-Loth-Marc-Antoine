@@ -141,3 +141,52 @@ export function impact(sr, { seed = 5, decay = 1.2 } = {}) {
   for (let i = 0; i < k.length; i++) k[i] += (r() * 2 - 1) * 0.5 * Math.exp((-i / sr) * 18);
   return k;
 }
+
+// ---- effects on whole buses ------------------------------------------------
+
+// Schroeder reverb (4 combs + 2 allpasses per side, offset for stereo width). Returns a new wet bus.
+export function reverb({ sr, duration, L, R }, { decay = 0.82, damp = 0.35, size = 1 } = {}) {
+  const out = bus(sr, duration);
+  const combs = [1557, 1617, 1491, 1422], aps = [225, 556];
+  for (const [src, dst, spread] of [[L, out.L, 0], [R, out.R, 23]]) {
+    for (const c of combs) {
+      const n = Math.round((c + spread) * size * (sr / 44100)), line = new Float32Array(n);
+      let i = 0, lp = 0;
+      for (let k = 0; k < src.length; k++) {
+        const y = line[i]; lp = y * (1 - damp) + lp * damp;
+        line[i] = src[k] + lp * decay; dst[k] += y / combs.length;
+        i = (i + 1) % n;
+      }
+    }
+    for (const a of aps) {
+      const n = Math.round((a + spread) * (sr / 44100)), line = new Float32Array(n);
+      let i = 0;
+      for (let k = 0; k < dst.length; k++) { const b = line[i], x = dst[k]; line[i] = x + b * 0.5; dst[k] = b - x * 0.5; i = (i + 1) % n; }
+    }
+  }
+  return out;
+}
+
+// Ping-pong delay, time in seconds. Returns a new wet bus.
+export function pingpong({ sr, duration, L, R }, time, { feedback = 0.4 } = {}) {
+  const out = bus(sr, duration), d = Math.round(time * sr);
+  for (let k = 0; k < L.length; k++) {
+    if (k < d) continue;
+    out.L[k] = (L[k - d] + R[k - d]) / 2 + out.R[k - d] * feedback;
+    out.R[k] = out.L[k - d] * feedback;
+  }
+  return out;
+}
+
+// Sum buses into the first, with per-bus gain and an optional per-sample gain curve (e.g. sidechain).
+export function mixInto(dst, src, gain = 1, curve = null) {
+  for (let k = 0; k < dst.L.length; k++) { const g = gain * (curve ? curve(k / dst.sr) : 1); dst.L[k] += src.L[k] * g; dst.R[k] += src.R[k] * g; }
+  return dst;
+}
+
+// Gentle tanh saturation on the master: glues the mix and tames peaks before loudness normalization.
+export function saturate(b, drive = 1.4) {
+  const n = Math.tanh(drive);
+  for (const ch of [b.L, b.R]) for (let k = 0; k < ch.length; k++) ch[k] = Math.tanh(ch[k] * drive) / n;
+  return b;
+}
