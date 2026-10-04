@@ -58,3 +58,14 @@ Desktop: "Recherche et innovation" pill, key figures band, support cards grid, t
 
 Three hero photos (culture plates, pipette, clinical research room) and the news card thumbnails, all from the page.
 They are copyrighted by CHUV, so use them only in this film.
+
+## Client-supplied (earlier session, before site access)
+
+| File | Notes |
+|---|---|
+| `raw-01-hero-mobile.png` | Client's iPhone screenshot of the page (1206×2622, with Safari/iOS chrome). Kept as the original. |
+| `01-hero-mobile.png` | Crop of raw-01: logo, title, "Unil." block, intro paragraph, top of the lab photo. |
+| `logo-crop-mobile.png` | Low-resolution logo crop, superseded by `brand/logo.svg`. |
+
+That session sampled its palette from the screenshot (`#1B4562`, `#88E6FC`). iOS colour management shifts those values,
+so the site's own CSS values above are the reference.
