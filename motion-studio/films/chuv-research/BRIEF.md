@@ -19,6 +19,8 @@ Language on screen: French.
 
 ## Status
 - Done: timeline, 120 BPM score (sound.mjs), beats.json, multi-format rendering (9x16, 1x1, 16x9).
-- Blocked: www.chuv.ch is denied by this cloud environment's network policy, so there are no assets yet.
-- Next: capture assets with Playwright -> assets/ + ASSETS.md -> propose metric -> build -> contact-sheet
-  loop until every score >= 8 -> show the sheet -> full render in all three formats.
+- Done: assets captured (assets/ASSETS.md, capture.json). Chromium needs the proxy CA in its NSS store:
+  `certutil -A -d sql:$HOME/.pki/nssdb -n ccr-agent-proxy -t "C,," -i /root/.ccr/agent-proxy-ca.crt` (package libnss3-tools).
+  Fonts are git-ignored: rerun capture.mjs to fetch them.
+- Proposed metric (awaiting client OK): **800 projets de recherche clinique** (published key figure).
+- Next: build -> contact-sheet loop until every score >= 8 -> show the sheet -> full render in all three formats.

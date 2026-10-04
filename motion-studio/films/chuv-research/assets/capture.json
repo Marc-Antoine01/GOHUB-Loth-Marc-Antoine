@@ -1,0 +1,355 @@
+{
+ "source": "https://www.chuv.ch/fr/recherche-et-innovation/la-recherche-au-chuv",
+ "capturedAt": "2026-10-04T20:58:32.313Z",
+ "shots": {
+  "mobile-top": {
+   "file": "shots/mobile-top.png",
+   "viewport": [
+    390,
+    844
+   ],
+   "dpr": 3
+  },
+  "mobile-full": {
+   "file": "shots/mobile-full.png",
+   "viewport": [
+    390,
+    844
+   ],
+   "dpr": 3,
+   "height": 6743
+  },
+  "desktop-top": {
+   "file": "shots/desktop-top.png",
+   "viewport": [
+    1440,
+    900
+   ],
+   "dpr": 2
+  },
+  "desktop-full": {
+   "file": "shots/desktop-full.png",
+   "viewport": [
+    1440,
+    900
+   ],
+   "dpr": 2
+  }
+ },
+ "ui": {
+  "m-header": {
+   "file": "ui/m-header.png",
+   "box": [
+    0,
+    0,
+    390,
+    80
+   ]
+  },
+  "m-logo": {
+   "file": "ui/m-logo.png",
+   "box": [
+    15,
+    15,
+    87,
+    50
+   ]
+  },
+  "m-burger": {
+   "file": "ui/m-burger.png",
+   "box": [
+    345,
+    25,
+    30,
+    30
+   ]
+  },
+  "m-urgences": {
+   "file": "ui/m-urgences.png",
+   "box": [
+    229,
+    19,
+    90,
+    42
+   ]
+  },
+  "m-h1": {
+   "file": "ui/m-h1.png",
+   "box": [
+    15,
+    130,
+    360,
+    82
+   ]
+  },
+  "m-intro": {
+   "file": "ui/m-intro.png",
+   "box": [
+    15,
+    339.4,
+    360,
+    200
+   ]
+  },
+  "m-figure-800": {
+   "file": "ui/m-figure-800.png",
+   "box": [
+    15,
+    2272.4,
+    360,
+    358
+   ]
+  },
+  "m-figure-600": {
+   "file": "ui/m-figure-600.png",
+   "box": [
+    15,
+    2660.4,
+    360,
+    320
+   ]
+  },
+  "m-figures-h2": {
+   "file": "ui/m-figures-h2.png",
+   "box": [
+    15,
+    2217.4,
+    360,
+    35
+   ]
+  },
+  "m-soutiens-h2": {
+   "file": "ui/m-soutiens-h2.png",
+   "box": [
+    15,
+    3100.4,
+    360,
+    35
+   ]
+  },
+  "m-actualites-h2": {
+   "file": "ui/m-actualites-h2.png",
+   "box": [
+    15,
+    4321.4,
+    138.7,
+    35
+   ]
+  },
+  "d-nav-main": {
+   "file": "ui/d-nav-main.png",
+   "box": [
+    124.4,
+    1475.2,
+    182.3,
+    20
+   ]
+  },
+  "d-figures": {
+   "file": "ui/d-figures.png",
+   "box": [
+    45,
+    2869.2,
+    1350,
+    550
+   ]
+  },
+  "d-soutiens-cards": {
+   "file": "ui/d-soutiens-cards.png",
+   "box": [
+    45,
+    3994.2,
+    890,
+    232
+   ]
+  },
+  "d-card-trials": {
+   "file": "ui/d-card-trials.png",
+   "box": [
+    505,
+    4125.2,
+    430,
+    101
+   ]
+  }
+ },
+ "actions": {
+  "menu": {
+   "target": [
+    854.1,
+    98,
+    253.9,
+    44
+   ],
+   "before": "shots/d-menu-before.png",
+   "hover": "shots/d-menu-hover.png",
+   "after": "shots/d-menu-after.png",
+   "url": "https://www.chuv.ch/fr/recherche-et-innovation/la-recherche-au-chuv",
+   "items": [
+    "La recherche au CHUV\n(current)",
+    "Innovation Office",
+    "Soutiens à la recherche clinique",
+    "Cycle d'un projet de recherche"
+   ]
+  },
+  "news": {
+   "target": [
+    1351,
+    585.2,
+    44,
+    44
+   ],
+   "before": "shots/d-news-before.png",
+   "hover": "shots/d-news-hover.png",
+   "after": "shots/d-news-after.png",
+   "url": "https://www.chuv.ch/fr/recherche-et-innovation/la-recherche-au-chuv"
+  },
+  "trials": {
+   "target": [
+    525,
+    307.2,
+    135.3,
+    23
+   ],
+   "before": "shots/d-trials-before.png",
+   "hover": "shots/d-trials-hover.png",
+   "after": "shots/d-trials-after.png",
+   "url": "https://www.chuv.ch/fr/recherche-et-innovation/offre-de-recherche/web_rof_9/soutien-aux-essais-cliniques"
+  }
+ },
+ "figures": [
+  {
+   "value": 800,
+   "label": "Projets de recherche clinique"
+  },
+  {
+   "value": 600,
+   "label": "Projets initiés par le CHUV"
+  }
+ ],
+ "downloads": [
+  {
+   "url": "https://www.chuv.ch/_assets/e6b276de21152b70b2eb9d74f5fd723c/Images/Logos/logo.svg",
+   "file": "brand/logo.svg"
+  },
+  {
+   "url": "https://www.chuv.ch/_assets/e6b276de21152b70b2eb9d74f5fd723c/Images/Logos/new-logo-unil.svg",
+   "file": "brand/new-logo-unil.svg"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/7/b/csm_chuv-bandeau-recherche-tube_5c63b46090.webp",
+   "file": "photos/csm_chuv-bandeau-recherche-tube_5c63b46090.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/b/e/csm_chuv-bandeau-recherche-boites_33915b2605.webp",
+   "file": "photos/csm_chuv-bandeau-recherche-boites_33915b2605.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/b/c/csm_chuv-bandeau-recherche-crc_261a447c2a.webp",
+   "file": "photos/csm_chuv-bandeau-recherche-crc_261a447c2a.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/user_upload_legoweb/Groupes_Recherche.svg",
+   "file": "brand/Groupes_Recherche.svg"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/CHUV/Recherche_et_innovation/Projets_Recherche.svg",
+   "file": "brand/Projets_Recherche.svg"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/1/4/csm_e3bb486a-a22a-4e07-807d-816478c612be_56ea0cb24a.webp",
+   "file": "photos/csm_e3bb486a-a22a-4e07-807d-816478c612be_56ea0cb24a.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/2/9/csm_0e115a5e-8bc0-456d-a8b1-8e418bda5f1f_003aee89a2.webp",
+   "file": "photos/csm_0e115a5e-8bc0-456d-a8b1-8e418bda5f1f_003aee89a2.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/4/9/csm_e668368c-a82b-4c9e-b050-fa04e5518575_cde6557793.webp",
+   "file": "photos/csm_e668368c-a82b-4c9e-b050-fa04e5518575_cde6557793.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/4/4/csm_aafdcd9e-0695-4176-888e-a347d3434a63_952e4dbc69.webp",
+   "file": "photos/csm_aafdcd9e-0695-4176-888e-a347d3434a63_952e4dbc69.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/a/0/csm_1a8e5e2c-c4af-4ad0-a04a-4c17ba134a6e_542a0b5278.webp",
+   "file": "photos/csm_1a8e5e2c-c4af-4ad0-a04a-4c17ba134a6e_542a0b5278.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/1/9/csm_b9275a57-2f79-494e-814a-6d5586160180_b1b553b2a2.webp",
+   "file": "photos/csm_b9275a57-2f79-494e-814a-6d5586160180_b1b553b2a2.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/8/e/csm_43d37895-4842-4fb2-83f6-47e10e4fef3d_9882ea513b.webp",
+   "file": "photos/csm_43d37895-4842-4fb2-83f6-47e10e4fef3d_9882ea513b.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/c/1/csm_35cc2d4e-f897-4000-9ee2-1b57779465e3_7ac0fc5f9c.webp",
+   "file": "photos/csm_35cc2d4e-f897-4000-9ee2-1b57779465e3_7ac0fc5f9c.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/5/2/csm_987b4928-afc5-44ae-9859-d0109945a0b8_8f3d84e25c.webp",
+   "file": "photos/csm_987b4928-afc5-44ae-9859-d0109945a0b8_8f3d84e25c.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/c/d/csm_b881ffdf-92f9-4c44-9dd6-3b88c3af2cd0_190436944f.webp",
+   "file": "photos/csm_b881ffdf-92f9-4c44-9dd6-3b88c3af2cd0_190436944f.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/7/e/csm_0973ada9-99c3-44a6-82f6-9111cb4f4ac4_69d7b1b2a0.webp",
+   "file": "photos/csm_0973ada9-99c3-44a6-82f6-9111cb4f4ac4_69d7b1b2a0.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/7/2/csm_92da6bb4-2711-43e1-a9d9-48f39f5e1b26_8592877fde.webp",
+   "file": "photos/csm_92da6bb4-2711-43e1-a9d9-48f39f5e1b26_8592877fde.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/d/f/csm_f8ab198f-bd12-4f77-81a0-05d06d3297c2_d76bd5bbe5.webp",
+   "file": "photos/csm_f8ab198f-bd12-4f77-81a0-05d06d3297c2_d76bd5bbe5.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/2/8/csm_1ecb898b-ba5a-4330-9cdd-2b336bd007c5_7b30ffabb4.webp",
+   "file": "photos/csm_1ecb898b-ba5a-4330-9cdd-2b336bd007c5_7b30ffabb4.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/fileadmin/_processed_/7/9/csm_2161de5a-68b8-4b34-bc17-1fad4fe0b130_ac5140a0c0.webp",
+   "file": "photos/csm_2161de5a-68b8-4b34-bc17-1fad4fe0b130_ac5140a0c0.webp"
+  },
+  {
+   "url": "https://www.chuv.ch/_assets/e6b276de21152b70b2eb9d74f5fd723c/Images/Logos/logo-vaud.svg",
+   "file": "brand/logo-vaud.svg"
+  },
+  {
+   "url": "https://www.chuv.ch/_assets/e6b276de21152b70b2eb9d74f5fd723c/Images/Logos/new-logo-unil-white.svg",
+   "file": "brand/new-logo-unil-white.svg"
+  },
+  {
+   "url": "https://www.chuv.ch/_assets/e6b276de21152b70b2eb9d74f5fd723c/Assets/Medium20.woff2",
+   "file": "fonts/Medium20.woff2"
+  },
+  {
+   "url": "https://www.chuv.ch/_assets/e6b276de21152b70b2eb9d74f5fd723c/Assets/AtlasGrotesk-Bold-Web.woff2",
+   "file": "fonts/AtlasGrotesk-Bold-Web.woff2"
+  },
+  {
+   "url": "https://www.chuv.ch/_assets/e6b276de21152b70b2eb9d74f5fd723c/Assets/AtlasGrotesk-Regular-Web.woff2",
+   "file": "fonts/AtlasGrotesk-Regular-Web.woff2"
+  }
+ ],
+ "fontFaces": [
+  "@font-face { font-display: swap; font-family: \"Sharp Grotesk\"; font-style: normal; font-weight: 400; src: url(\"../Medium20.woff2\") format(\"woff2\"), url(\"../Medium20.woff\") format(\"woff\"); }",
+  "@font-face { font-display: swap; font-family: \"Atlas Grotesk Bold\"; font-style: normal; font-weight: 700; src: url(\"../AtlasGrotesk-Bold-Web.woff2\") format(\"woff2\"), url(\"../AtlasGrotesk-Bold-Web.woff\") format(\"woff\"); }",
+  "@font-face { font-display: swap; font-family: \"Atlas Grotesk\"; font-style: normal; font-weight: 400; src: url(\"../AtlasGrotesk-Regular-Web.woff2\") format(\"woff2\"), url(\"../AtlasGrotesk-Regular-Web.woff\") format(\"woff\"); }",
+  "@font-face { font-display: swap; font-family: \"Atlas Grotesk\"; font-style: italic; font-weight: 400; src: url(\"../AtlasGrotesk-RegularItalic-Web.woff2\") format(\"woff2\"), url(\"../AtlasGrotesk-RegularItalic-Web.woff\") format(\"woff\"); }"
+ ],
+ "colors": {
+  "heroBackground": "rgb(0, 70, 100)",
+  "activeNav": "rgb(243, 243, 243)",
+  "text": "rgb(33, 33, 33)",
+  "figuresBand": "rgb(184, 240, 249)",
+  "button": "rgb(0, 70, 100)",
+  "tags": "rgba(0, 0, 0, 0)",
+  "footer": "rgb(0, 97, 68)"
+ }
+}
