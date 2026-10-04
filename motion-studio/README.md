@@ -1,6 +1,6 @@
 # motion-studio
 
-Headless-browser motion pipeline: HTML/Canvas → Playwright frames → ffmpeg video, with Python (librosa) for audio analysis.
+Headless-browser motion pipeline: each film is an HTML page whose `window.seek(t)` paints frame t. Playwright captures frames, ffmpeg encodes them, librosa measures the beat grid, and the score and SFX are synthesized in code.
 
 ## Setup
 
@@ -9,11 +9,22 @@ Headless-browser motion pipeline: HTML/Canvas → Playwright frames → ffmpeg v
 brew install node ffmpeg python        # macOS; apt install on Linux
 npm run setup                          # pip install -r requirements.txt && npm install
 npx playwright install chromium
-npm run smoke                          # renders out/smoke/smoke.mp4 and checks librosa
+npm test                               # renders a fixture end to end and checks contract violations fail
 ```
 
 If Playwright can't download its browser (e.g. a sandbox with a preinstalled Chromium), set
-`CHROMIUM_PATH=/path/to/chrome` before `npm run smoke`.
+`CHROMIUM_PATH=/path/to/chrome` before `node render.mjs` / `npm test`.
+
+## Making a film
+
+Studio rules and the render workflow are in [`CLAUDE.md`](CLAUDE.md). In short:
+
+```bash
+node render.mjs films/<name> --sound   # synth score -> beats.json -> SFX -> -14 LUFS
+node render.mjs films/<name> --sheet   # contact sheet, one frame per beat, at phone width
+node render.mjs films/<name>           # full render: H.264 yuv420p CRF 16
+node render.mjs --serve                # preview at http://127.0.0.1:4173/films/<name>/
+```
 
 ## Skills and plugins
 

@@ -4,8 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "smoke": "node scripts/smoke-test.mjs",
+    "test": "node tests/run.mjs",
     "setup": "pip install -r requirements.txt && npm install"
   },
   "keywords": [],
