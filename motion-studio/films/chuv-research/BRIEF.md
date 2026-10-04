@@ -19,6 +19,6 @@ Language on screen: French.
 
 ## Status
 - Done: timeline, 120 BPM score (sound.mjs), beats.json, multi-format rendering (9x16, 1x1, 16x9).
-- Blocked: www.chuv.ch is denied by this cloud environment's network policy, so there are no assets yet.
+- Blocked: www.chuv.ch is denied by the network policy. Assets come from client screenshots instead (assets/ASSETS.md).
 - Next: capture assets with Playwright -> assets/ + ASSETS.md -> propose metric -> build -> contact-sheet
   loop until every score >= 8 -> show the sheet -> full render in all three formats.
