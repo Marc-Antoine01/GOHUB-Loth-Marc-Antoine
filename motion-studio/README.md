@@ -34,3 +34,14 @@ node render.mjs --serve                # preview at http://127.0.0.1:4173/films/
   Manual install: `claude plugin marketplace add buildwithhanif/claude-animation-skill && claude plugin install claude-animation@claude-animation-skill`.
 
 Start Claude Code here with `claude --model claude-opus-5-5`, then use `/model` to set effort (xhigh for one-shots, max for flagship pieces).
+
+## Remotion and HyperFrames
+
+Two framework projects sit next to the in-house renderer:
+
+- `remotion/`: Remotion 4.0.533 (React). `npm run dev` opens Studio; `npx remotion render SmokeTest out/smoke-test.mp4` checks the install.
+- `hyperframes/`: HyperFrames 0.8.134 (HTML + GSAP). `npm run check`, `npm run render`. GSAP comes from npm (`node_modules/gsap`), not the CDN.
+
+In cloud sessions, `.claude/hooks/session-start.sh` (repo root) installs every dependency, trusts the proxy CA in Chromium's NSS store,
+and exports `CHROMIUM_PATH`, `REMOTION_BROWSER_EXECUTABLE` and `HYPERFRAMES_BROWSER_PATH` for the preinstalled browsers.
+Locally, none of these are needed: Remotion and HyperFrames download their own headless Chrome.
