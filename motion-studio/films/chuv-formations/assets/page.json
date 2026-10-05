@@ -1,0 +1,156 @@
+{
+ "colors": {
+  "activeNav": "rgb(110, 252, 138)",
+  "activeNavText": "rgb(0, 0, 0)",
+  "header": "rgb(0, 97, 68)",
+  "btn": "rgb(0, 97, 68)",
+  "lilac": "rgb(201, 150, 241)",
+  "card": "rgb(255, 255, 255)",
+  "bgs": {
+   "rgb(0, 97, 68)": 2,
+   "rgb(184, 249, 229)": 4,
+   "rgb(243, 243, 243)": 2,
+   "rgb(255, 255, 255)": 1
+  }
+ },
+ "categories": [
+  {
+   "title": "Professions médicales universitaires",
+   "items": [
+    "Pharmacien-ne",
+    "Médecin",
+    "Ecole de formation postgraduée médicale",
+    "Formation continue",
+    "Ecole doctorale: MD, MD-PhD",
+    "Apprentissages",
+    "Formation continue",
+    "Pré-grade: Master",
+    "Stages",
+    "Formations postgraduées de spécialiste",
+    "Formation continue"
+   ]
+  },
+  {
+   "title": "Administration",
+   "items": [
+    "Pharmacien-ne",
+    "Médecin",
+    "Ecole de formation postgraduée médicale",
+    "Formation continue",
+    "Ecole doctorale: MD, MD-PhD",
+    "Apprentissages",
+    "Formation continue",
+    "Pré-grade: Master",
+    "Stages",
+    "Formations postgraduées de spécialiste",
+    "Formation continue"
+   ]
+  },
+  {
+   "title": "Psycho-social",
+   "items": [
+    "Pharmacien-ne",
+    "Médecin",
+    "Ecole de formation postgraduée médicale",
+    "Formation continue",
+    "Ecole doctorale: MD, MD-PhD",
+    "Apprentissages",
+    "Formation continue",
+    "Pré-grade: Master",
+    "Stages",
+    "Formations postgraduées de spécialiste",
+    "Formation continue"
+   ]
+  },
+  {
+   "title": "Soins",
+   "items": [
+    "Bachelor HES",
+    "Apprentissage ASSC",
+    "Stages dans la santé",
+    "Formation continue",
+    "Diplômes et Bachelor",
+    "Apprentissages",
+    "Stages dans la santé",
+    "Formations postgraduées de spécialiste",
+    "Formation continue",
+    "Apprentissages",
+    "Formation continue",
+    "Formation continue"
+   ]
+  },
+  {
+   "title": "Médico-technique et thérapeutique",
+   "items": [
+    "Bachelor HES",
+    "Apprentissage ASSC",
+    "Stages dans la santé",
+    "Formation continue",
+    "Diplômes et Bachelor",
+    "Apprentissages",
+    "Stages dans la santé",
+    "Formations postgraduées de spécialiste",
+    "Formation continue",
+    "Apprentissages",
+    "Formation continue",
+    "Formation continue"
+   ]
+  },
+  {
+   "title": "Logistique",
+   "items": [
+    "Bachelor HES",
+    "Apprentissage ASSC",
+    "Stages dans la santé",
+    "Formation continue",
+    "Diplômes et Bachelor",
+    "Apprentissages",
+    "Stages dans la santé",
+    "Formations postgraduées de spécialiste",
+    "Formation continue",
+    "Apprentissages",
+    "Formation continue",
+    "Formation continue"
+   ]
+  },
+  {
+   "title": "Management et cadres",
+   "items": [
+    "Bachelor HES",
+    "Apprentissage ASSC",
+    "Stages dans la santé",
+    "Formation continue",
+    "Diplômes et Bachelor",
+    "Apprentissages",
+    "Stages dans la santé",
+    "Formations postgraduées de spécialiste",
+    "Formation continue",
+    "Apprentissages",
+    "Formation continue",
+    "Formation continue"
+   ]
+  }
+ ],
+ "downloads": [
+  "brand/logo.svg",
+  "photos/csm_chuv-formation-simulation_e980858c69.webp",
+  "photos/csm_chuv-formation-apprenties_528748adec.webp",
+  "photos/csm_chuv-formation-e-learning_10a6d64ac4.webp",
+  "photos/csm_e3bb486a-a22a-4e07-807d-816478c612be_55eb7010ea.webp",
+  "photos/csm_0e115a5e-8bc0-456d-a8b1-8e418bda5f1f_3f78ec06f0.webp",
+  "photos/csm_aafdcd9e-0695-4176-888e-a347d3434a63_e973ff5712.webp",
+  "photos/csm_fae54673-0ef9-4a48-b758-1d2aae90bfe8_478083d801.webp",
+  "photos/csm_b9275a57-2f79-494e-814a-6d5586160180_ace839cb5d.webp",
+  "photos/csm_43d37895-4842-4fb2-83f6-47e10e4fef3d_7ba072c68f.webp",
+  "photos/csm_987b4928-afc5-44ae-9859-d0109945a0b8_ac5949755a.webp",
+  "photos/csm_0973ada9-99c3-44a6-82f6-9111cb4f4ac4_4e864edd9a.webp",
+  "photos/csm_92da6bb4-2711-43e1-a9d9-48f39f5e1b26_034f449b92.webp",
+  "photos/csm_0c12e33f-2bd4-4d7e-8937-95325cc2fdf1_e11a8b0179.webp",
+  "photos/csm_9d0c2bcf-f1cd-4f0e-b0fb-039100419dfa_b2a3d0f10f.webp",
+  "photos/csm_f3d937a0-d3e3-4355-bc65-c1f2ebe906af_802948ecaa.webp",
+  "photos/csm_95c3079e-ada5-4846-8266-f51ca4b5289a_1cd2521c7a.webp",
+  "photos/csm_880b49c3-3d8c-4409-9a94-43787f044454_7c31d4fa69.webp",
+  "photos/csm_7e796aba-a485-48d2-95f7-e0371ceca5d0_b90b52c744.webp",
+  "photos/csm_47d78f2d-050a-47ef-8b21-013967f20603_57a0b9c82d.webp"
+ ]
+}
