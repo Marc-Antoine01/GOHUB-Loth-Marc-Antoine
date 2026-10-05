@@ -2,7 +2,7 @@
 SHOT({
   id: 's05',
   build(E) {
-    this.O = [-3600, 0, 0];
+    this.O = [1000, 6400, 0];
     const card = E.css(E.el('div', null, null), { position: 'relative', width: '1400px', height: '1800px', transformStyle: 'preserve-3d' });
     const front = E.css(E.panel({ w: 700, h: 940, tone: 'white' }), { position: 'absolute', left: 0, top: 0, backfaceVisibility: 'hidden', padding: '48px' });
     front.appendChild(E.photoMask('assets/photos/csm_chuv-formation-simulation_e980858c69.webp', { w: 652, h: 560, radius: 20 }));
@@ -24,7 +24,7 @@ SHOT({
   draw(t) {
     const { B, bar, place, show } = E;
     const [ox, oy, oz] = this.O;
-    const on = t >= bar(7) && t < bar(9) + 0.6;
+    const on = t >= bar(7) - 0.3 && t < bar(10) + 0.6;
     show(this.card, on); this.sats.forEach((r) => show(r, on));
     // Styles are written even while hidden: a frame never inherits another frame's state.
     const turn = M.ease.inOutCubic(M.range(t, B(34) - 0.5, B(34)));

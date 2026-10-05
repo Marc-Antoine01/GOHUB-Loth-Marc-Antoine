@@ -3,9 +3,9 @@ SHOT({
   id: 's06',
   build(E) {
     this.F = [
-      { to: 260, plus: true, label: 'apprenti·es', beat: 37, pos: [-6800, 0, 0] },
-      { to: 30, label: 'métiers', beat: 39, pos: [-7900, -60, -700] },
-      { to: 13000, label: 'collaboratrices et collaborateurs', beat: 42, pos: [-9000, 40, -200] },
+      { to: 260, plus: true, label: 'apprenti·es', beat: 41, pos: [-800, 6400, 0] },
+      { to: 30, label: 'métiers', beat: 43, pos: [-1900, 6340, -700] },
+      { to: 13000, label: 'collaboratrices et collaborateurs', beat: 46, pos: [-3000, 6440, -200] },
     ].map((f) => {
       const p = E.panel({ w: 980, h: 480, tone: 'mint' });
       E.css(p, { padding: '64px 80px' });
@@ -17,7 +17,7 @@ SHOT({
   },
   draw(t) {
     const { B, bar, place, show } = E;
-    const on = t >= bar(9) - 0.4 && t < bar(11) + 0.6;
+    const on = t >= bar(10) - 0.4 && t < bar(12) + 0.1;
     this.F.forEach((f) => {
       show(f.rec, on);
       // Styles are written even while hidden: a frame never inherits another frame's state.

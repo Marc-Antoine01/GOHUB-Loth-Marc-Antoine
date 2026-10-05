@@ -19,7 +19,8 @@ hop = 128  # ~2.7 ms at 48 kHz
 
 band = {} if "--full" in sys.argv else {"fmax": 200, "n_mels": 24}
 env = librosa.onset.onset_strength(y=y, sr=sr, hop_length=hop, **band)
-tempo, beats = librosa.beat.beat_track(onset_envelope=env, sr=sr, hop_length=hop, units="time", tightness=200)
+# trim=False: keep the last beats too (librosa drops weak beats at the edges by default).
+tempo, beats = librosa.beat.beat_track(onset_envelope=env, sr=sr, hop_length=hop, units="time", tightness=200, trim=False)
 tempo = float(np.atleast_1d(tempo)[0])
 # Backtracked onsets mark where each hit actually starts.
 onsets = librosa.onset.onset_detect(onset_envelope=env, sr=sr, hop_length=hop, units="time", backtrack=True)
@@ -37,10 +38,21 @@ beats = [float(snap(t)) for t in beats]
 # The tracker skips the first beat or two; step back one period at a time while there are onsets to land on.
 period = 60.0 / tempo
 while beats and beats[0] - period > -0.02:
-    t = snap(max(0.0, beats[0] - period))
-    if abs(t - (beats[0] - period)) > 0.05 and t != 0.0:
+    want = beats[0] - period
+    if want < 0.02:  # the grid reaches the start of the file: that beat is t=0
+        beats.insert(0, 0.0)
         break
-    beats.insert(0, max(0.0, t))
+    t = snap(want)
+    if abs(t - want) > 0.05:
+        break
+    beats.insert(0, t)
+# The same gap can open at the end: step forward while the grid still fits in the file.
+dur = len(y) / sr
+while beats and beats[-1] + period < dur - 0.02:
+    t = snap(beats[-1] + period)
+    if abs(t - (beats[-1] + period)) > 0.05:
+        t = beats[-1] + period
+    beats.append(t)
 beats = [round(t, 4) for t in beats]
 
 with open(dst, "w") as f:

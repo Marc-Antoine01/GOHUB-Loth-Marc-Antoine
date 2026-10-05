@@ -1,10 +1,21 @@
 # Reference grammar: "Introducing Skills for the Legora Agent" (whatships.com, 47 s)
 
-What I could see: the page and its poster frame (`legora-skills-poster.webp`). The video itself is hosted on
-`video.twimg.com` (through `proxy.whatships.com`), and both hosts are blocked by this environment's network policy.
-So this is the grammar of one frame plus the page's description, not of the edit. Shot lengths, transitions and music still need the video.
+Source: `legora-skills.mp4` (47 s, 1920×1080 @ 30 fps, from video.twimg.com; git-ignored, reference only).
+Analysis: `ffmpeg` scene detection, a 1 fps contact sheet, and librosa on the soundtrack.
 
 Take the grammar, never the content.
+
+## The edit (from the video)
+- **No hard cuts.** Scene detection finds zero cuts above 0.25 in 47 s. Everything is one continuous camera: drifts, push-ins, racks of focus, and objects passing the lens.
+- **Beat map:** title (0–3 s) → kinetic line with a **word wheel** ("Teach the Agent your standards / processes / preferences / perspectives", neighbours faded above and below, ≈1 word per beat) → the prompt box assembles and files drop in (6–12 s) → **an infinite room of tiles** (12–13 s) → floating category tiles in depth (13–16 s) → **one tile is chosen**, the others fly away, it stacks into layers and flips to its content (16–22 s, the musical breath) → the hero "Working" panel with satellite tables (22–32 s) → **extreme close-up** on a UI detail (Yes / No buttons, shallow DOF) → documents fan out in 3D, "Send" (32–38 s) → the tagline swaps one word ("your way" becomes "without limits"), then a white field with the logo.
+- **Light:** soft diagonal light sweeps cross the frame continuously; the palette is near-monochrome with one brand colour (the logo).
+- **Type:** small, quiet, often a single line; the motion carries the energy, not the size.
+
+## The music (librosa)
+- **Tempo:** a 72 BPM pulse with 144 BPM subdivisions, in both halves.
+- **Key:** A minor (Krumhansl correlation 0.60).
+- **Energy:** steady from 0.5 to 14 s; **a breath from about 14.5 to 21 s** (−37 to −49 dB RMS, against about −24 dB elsewhere); full again from 22 s; a fade to silence at 43–47 s.
+- **Brightness:** the spectral centroid moves between 1 and 3.9 kHz: bright plucks and airy textures over a soft low end.
 
 ## Grammar read from the poster
 - **Space:** many UI panels float in one soft 3D space at different depths, each slightly rotated (≈5–12° on X and Y). No ground, no horizon.

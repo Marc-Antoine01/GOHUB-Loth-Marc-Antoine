@@ -21,7 +21,7 @@ SHOT({
   draw(t) {
     const { B, bar, place, show } = E;
     const [ox, oy, oz] = this.O;
-    const on = t >= bar(5) - 0.6 && t < bar(7);
+    const on = t >= bar(5) - 0.6 && t < bar(7) + 0.5;
     show(this.card, on);
     // Styles are written even while hidden: a frame never inherits another frame's state.
     place(this.card, { x: ox, y: oy, z: oz, rx: 6 });

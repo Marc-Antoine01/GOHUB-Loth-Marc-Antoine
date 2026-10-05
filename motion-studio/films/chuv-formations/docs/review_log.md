@@ -60,3 +60,27 @@ S05 is closer; S02 has bigger pills and a truck right across the header.
 A regression (the camera cropped the H1 at its b10 landing) was fixed and checked at 4.5, 5.0 and 5.9 s.
 
 Still open, for the animatic: the camera speed between regions (it may whip), the hold time on each payoff, and sync with the track.
+
+## Reference and re-score (after video.twimg.com opened)
+`refs/grammar.md` now holds the video analysis: no hard cuts in 47 s, a 72/144 BPM pulse in A minor, and a breath around the first third.
+Changes: the score was rewritten at 144 BPM in A minor (i–VI–III–VII) with a breakdown at 11.7–16.7 s. The designed cut at S05 became a continuous
+camera move (the reference has no cuts), so the camera now runs one closed circuit. Shots were retimed to the new bars, and `tools/beats.py` now keeps the edge beats (73 beats, all within 50 ms).
+
+## Gate 3: animatic (960×540, track + measured grid)
+Reviewed from 0.1 s filmstrips around every transition.
+
+### Round 1
+| Hook | Read 360 | Motion | Compo | Depth | Sync | Polish |
+|---|---|---|---|---|---|---|
+| 7 | 8 | 7 | 8 | 8 | 7 | 7 |
+
+1. The full hook line held for only about 0.3 s before the camera left.
+2. About 0.4 s of empty green between S06 and S07 (the figures panels left before the floor arrived).
+3. The S02 pills landed before the camera arrived (timed to b4–b8 while the camera reached the page at b5).
+
+### Round 2
+| Hook | Read 360 | Motion | Compo | Depth | Sync | Polish |
+|---|---|---|---|---|---|---|
+| 8 | 8 | 8 | 8 | 8 | 8 | 8 |
+
+Fixes: the hook holds until b5 and travels on b5–b6; the S07 crane arrives 0.18 s earlier; the S02 pills land on eighths from b6.

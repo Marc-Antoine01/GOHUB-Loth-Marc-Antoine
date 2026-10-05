@@ -1,1 +1,2 @@
-{ "title": "Formations au CHUV", "duration": 30, "fps": 30, "width": 1920, "height": 1080 }
+{ "title": "Formations au CHUV", "duration": 30, "fps": 30, "width": 1920, "height": 1080,
+  "formats": { "final": [1920, 1080], "animatic": [960, 540] } }

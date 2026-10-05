@@ -8,7 +8,8 @@
 
   // ---- beats
   const BEATS = (window.BEATS && window.BEATS.beats) || [];
-  const B = (i) => (i <= 0 ? 0 : BEATS[i] ?? i * 0.5); // beat 0 is the loop point: exactly 0
+  const PERIOD = 60 / ((window.BEATS && window.BEATS.tempo) || 144);
+  const B = (i) => (i <= 0 ? 0 : BEATS[i] ?? i * PERIOD); // beat 0 is the loop point: exactly 0
   const bar = (n) => B(n * 4);
 
   // ---- stage

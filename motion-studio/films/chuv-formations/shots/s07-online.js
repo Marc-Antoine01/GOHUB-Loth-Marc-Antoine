@@ -2,7 +2,7 @@
 SHOT({
   id: 's07',
   build(E) {
-    this.O = [-8000, 2400, 0];
+    this.O = [-3600, 4200, 0];
     const floor = E.css(E.el('div', null, null), { position: 'relative', width: '4000px', height: '2600px' });
     const head = E.css(E.panel({ w: 1320, h: 360, tone: 'white' }), { position: 'absolute', left: '1240px', top: '60px', padding: '60px 76px' });
     head.appendChild(E.heading('Formation en ligne', 88));
@@ -31,16 +31,16 @@ SHOT({
   draw(t) {
     const { B, bar, place, show } = E;
     const [ox, oy, oz] = this.O;
-    const on = t >= bar(11) - 0.5 && t < bar(13) + 0.5;
+    const on = t >= bar(12) - 0.5 && t < bar(15) + 0.5;
     show(this.floor, on);
     // Styles are written even while hidden: a frame never inherits another frame's state.
     place(this.floor, { x: ox, y: oy, z: oz, rx: 90 });
     this.discs.forEach((d, i) => {
-      const u = M.spring(t - (B(44 + i) - 0.25), 2.4, 0.55);
+      const u = M.spring(t - (B(49 + i) - 0.25), 2.4, 0.55);
       d.style.transform = `scale(${Math.max(0, u)})`;
     });
     this.links.forEach((l, i) => {
-      const end = i === this.links.length - 1 ? B(50) : B(45) + i * 0.32;
+      const end = i === this.links.length - 1 ? B(57) : B(50) + i * 0.45;
       const u = M.ease.inOutCubic(M.range(t, end - 0.4, end));
       l.setAttribute('stroke-dashoffset', (1 - u) * l.dataset.len);
     });

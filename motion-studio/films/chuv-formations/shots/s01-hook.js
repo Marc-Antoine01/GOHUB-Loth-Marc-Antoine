@@ -11,7 +11,7 @@ SHOT({
   },
   draw(t) {
     const { B, place, show } = E;
-    const on = t < B(6);
+    const on = t < B(7);
     this.lines.forEach((rec, i) => {
       // A line exists only once its rotation starts: edge-on text would read as a glitch.
       show(rec, on && t >= B(i) - 0.28);

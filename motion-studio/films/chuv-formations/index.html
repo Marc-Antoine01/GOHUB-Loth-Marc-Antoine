@@ -42,30 +42,35 @@
 <script>
 // One camera for the whole film. Poses are world positions (see ANIMATION_GUIDE.md); the t=30 pose equals t=0 (loop).
 const { B, bar } = E;
+// The world is authored at 1920×1080; smaller canvases (the 960×540 animatic) scale the whole stage.
+if (window.FILM && window.FILM.width !== 1920) {
+  const st = document.getElementById('stage');
+  st.style.transformOrigin = '0 0'; st.style.transform = `scale(${window.FILM.width / 1920})`;
+}
 const LOOP_POSE = { x: -220, y: 30, z: 2300, yaw: -6, focus: 2300 };
 const CAMERA = [
   [0, LOOP_POSE],
   [B(3) + 0.2, { x: 0, y: 0, z: 1550, yaw: 0, focus: 1550 }, 'outExpo'],          // S01 dolly through the type
-  [B(4) - 0.05, { x: 40, y: 0, z: 1500, focus: 1500 }],
-  [B(5), { x: 2900, y: -120, z: 1150, yaw: 6, focus: 1150 }],                        // travel to the page
-  [bar(3) - 0.1, { x: 3380, y: 10, z: 1120, yaw: -4, focus: 1120 }],                 // S02 truck right, crane down
-  [bar(3) + 0.45, { x: 3200, y: 2220, z: 1180, focus: 1180 }],                       // crane down, close on the ring
+  [B(5), { x: 60, y: 0, z: 1470, focus: 1470 }],                                   // hold: the whole line reads for > 1 s
+  [B(6) - 0.05, { x: 2900, y: -120, z: 1150, yaw: 6, focus: 1150 }],                 // travel to the page
+  [bar(3) - 0.1, { x: 3380, y: 10, z: 1120, yaw: -4, focus: 1120 }],                // S02 truck right across the header
+  [bar(3) + 0.45, { x: 3200, y: 2220, z: 1180, focus: 1180 }],                      // crane down, close on the ring
   [B(18) - 0.3, { x: 3200, y: 2200, z: 1150, focus: 1150 }],
-  [B(18) + 0.35, { x: 3200, y: 2140, z: 1520, focus: 1520 }, 'outExpo'],             // pull back as it locks into the grid
+  [B(18) + 0.35, { x: 3200, y: 2140, z: 1520, focus: 1520 }, 'outExpo'],            // pull back as it locks into the grid
   [bar(5) - 0.1, { x: 3200, y: 2130, z: 1460, focus: 1460 }],
-  [bar(5) + 0.4, { x: 3200, y: 3950, z: 1250, pitch: 4, focus: 1250 }],              // S04 top of the path
+  [bar(5) + 0.4, { x: 3200, y: 3950, z: 1250, pitch: 4, focus: 1250 }],             // S04 top of the path
   [B(27) - 0.05, { x: 3260, y: 4650, z: 1000, pitch: 2, focus: 1000 }],
   [bar(7) - 0.02, { x: 3300, y: 4700, z: 780, focus: 780 }],
-  [bar(7), { x: -3600, y: 0, z: 1450, focus: 1450 }, 'cut'],                         // S05 designed cut on the drop
-  [bar(9) - 0.3, { x: -3980, y: -30, z: 1200, yaw: -18, focus: 1250 }],             // orbit left: card stays centred
-  [bar(9) + 0.25, { x: -6700, y: 0, z: 1400, focus: 1400 }],                         // S06 figures
-  [B(39), { x: -7850, y: -40, z: 700, focus: 1400 }],
-  [B(42), { x: -8950, y: 30, z: 1250, focus: 1450 }],
-  [bar(11) + 0.4, { x: -8000, y: 1100, z: 700, pitch: 55, focus: 1470 }],            // S07 crane up over the floor (+pitch = look down)
-  [bar(13) - 0.1, { x: -8000, y: 1250, z: 420, pitch: 66, focus: 1250 }],
-  [bar(13) + 0.45, { x: -40, y: -2360, z: 1300, focus: 1300 }],                      // S08 offer
-  [B(58), { x: 0, y: -2330, z: 1180, focus: 1180 }],
-  [30, LOOP_POSE],                                                                   // back to frame 0
+  [bar(7) + 0.45, { x: 1000, y: 6400, z: 1450, focus: 1450 }, 'outExpo'],           // S05 continuous whip down into the breath
+  [bar(10) - 0.3, { x: 620, y: 6370, z: 1200, yaw: -18, focus: 1250 }],             // slow orbit left: card stays centred
+  [bar(10) + 0.25, { x: -700, y: 6400, z: 1400, focus: 1400 }],                     // S06 figures, truck left
+  [B(43), { x: -1850, y: 6360, z: 700, focus: 1400 }],
+  [B(46), { x: -2950, y: 6430, z: 1250, focus: 1450 }],
+  [bar(12) + 0.22, { x: -3600, y: 2900, z: 700, pitch: 55, focus: 1470 }],           // S07 crane up over the floor (+pitch = look down)
+  [bar(15) - 0.1, { x: -3600, y: 3050, z: 420, pitch: 66, focus: 1250 }],
+  [bar(15) + 0.45, { x: -3240, y: 1240, z: 1300, focus: 1300 }],                    // S08 offer
+  [B(70), { x: -3200, y: 1270, z: 1180, focus: 1180 }],
+  [30, LOOP_POSE],                                                                  // back to frame 0: the circuit closes
 ];
 
 for (const s of E.SHOTS) s.build(E);

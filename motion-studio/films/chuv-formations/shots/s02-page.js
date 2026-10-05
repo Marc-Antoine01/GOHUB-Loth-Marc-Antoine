@@ -39,10 +39,10 @@ SHOT({
     const on = t >= bar(1) - 0.6 && t < bar(3) + 0.6;
     [this.logo, this.h1, ...this.pills, ...this.sats].forEach((r) => show(r, on));
     // Styles are written even while hidden: a frame never inherits another frame's state.
-    const lu = M.spring(t - (B(4) - 0.3), 2.2, 0.6);
+    const lu = M.spring(t - (B(6) - 0.3), 2.2, 0.6);
     place(this.logo, { x: ox - 900 + 90, y: oy - 390, z: oz + (1 - lu) * -900, ry: (1 - lu) * 40 });
     this.pills.forEach((r, i) => {
-      const d = this.pillsData[i], land = B(4 + i), u = M.spring(t - (land - 0.3), 2.2, 0.55);
+      const d = this.pillsData[i], land = B(6) + i * (B(7) - B(6)) / 2, u = M.spring(t - (land - 0.3), 2.2, 0.55);
       const active = d.label === 'Formation' && t >= B(9);
       pillState(d.el, active);
       const punch = active ? 1 + 0.12 * (1 - M.spring(t - B(9), 2.6, 0.4)) : 1;
@@ -52,7 +52,7 @@ SHOT({
     this.h1text.style.clipPath = `inset(0 ${(1 - hu) * 100}% 0 0)`;
     place(this.h1, { x: ox - 540 + 700, y: oy + 40, z: oz + (1 - hu) * 120 });
     this.sats.forEach((r, i) => {
-      const [sx, sy, sz, ry] = this.satPose[i], u = M.spring(t - (B(4 + i) - 0.4), 1.8, 0.7);
+      const [sx, sy, sz, ry] = this.satPose[i], u = M.spring(t - (B(6 + i) - 0.4), 1.8, 0.7);
       place(r, { x: ox + sx, y: oy + sy + (1 - u) * 300, z: oz + sz, ry });
     });
   },
