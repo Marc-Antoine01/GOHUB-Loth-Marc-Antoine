@@ -38,7 +38,7 @@ A film lives in `films/<name>/`:
 | `film.json` | `{ "duration": s, "fps": 30, "width": 1080, "height": 1920 }` (even width/height), or `"formats": { "9x16": [1080, 1920], "1x1": [1080, 1080] }` for one timeline on several canvases; the page reads `FILM.format`. |
 | `index.html` | Defines `window.seek(t)`; may `await` inside it. Optional `window.ready` promise for setup. Include `/lib/runtime.js` for `M.mulberry32`, `M.noise1`, `M.range`, easings, `M.spring`. |
 | `sound.mjs` | Optional. `export function score(ctx)` → bus (the bed); `export function sfx(ctx)` → bus, with `ctx.beats` from beats.json. Build voices with `ctx.synth` (`lib/synth.mjs`). |
-| `track.{wav,mp3,m4a,flac}` | A supplied track. Replaces `score()`; beats are measured from it. |
+| `track.{wav,mp3,m4a,flac}` or `audio/track.*` | A supplied track. Replaces `score()`; beats are measured from it. |
 
 The server injects `window.FILM` (from film.json) and `window.BEATS` (from beats.json) into the page. Films read them and never fetch them.
 

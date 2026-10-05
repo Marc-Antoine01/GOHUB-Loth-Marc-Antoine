@@ -190,3 +190,45 @@ export function saturate(b, drive = 1.4) {
   for (const ch of [b.L, b.R]) for (let k = 0; k < ch.length; k++) ch[k] = Math.tanh(ch[k] * drive) / n;
   return b;
 }
+
+// ---- melodic voices --------------------------------------------------------
+
+// Karplus-Strong plucked string: seeded noise burst through a damped delay line. Bright, short, "UI pluck".
+export function pluck(sr, freq, dur, { seed = 7, damping = 0.996, brightness = 0.5 } = {}) {
+  const r = mulberry32(seed), n = Math.max(2, Math.round(sr / freq)), line = new Float32Array(n);
+  for (let i = 0; i < n; i++) line[i] = r() * 2 - 1;
+  const x = buf(sr, dur);
+  // Loop gain = damping < 1: each pass averages two neighbours (lowpass), so the string decays and never blows up.
+  // brightness 0 = full averaging (dark), 1 = no averaging (bright, rings longer).
+  let p = 0;
+  for (let i = 0; i < x.length; i++) {
+    const cur = line[p], next = line[(p + 1) % n];
+    x[i] = cur;
+    line[p] = damping * (cur * brightness + 0.5 * (cur + next) * (1 - brightness));
+    p = (p + 1) % n;
+  }
+  for (let i = 0; i < x.length; i++) x[i] *= envelope(i, sr, x.length, 0.001, Math.min(0.08, dur * 0.3));
+  return x;
+}
+
+// Two-operator FM bell: inharmonic shimmer that decays into a sine. For the lead motif.
+export function bell(sr, freq, dur, { ratio = 3.5, index = 2.4, decay = 0.9 } = {}) {
+  const x = buf(sr, dur);
+  for (let i = 0; i < x.length; i++) {
+    const t = i / sr, env = Math.exp(-t / decay);
+    const mod = Math.sin(2 * Math.PI * freq * ratio * t) * index * Math.exp(-t / (decay * 0.35));
+    x[i] = Math.sin(2 * Math.PI * freq * t + mod) * env * Math.min(1, t / 0.002);
+  }
+  return x;
+}
+
+// Soft electric-piano-ish chord voice: a few decaying harmonics per note, gentle attack.
+export function keys(sr, freqs, dur, { decay = 1.4, release = 0.25 } = {}) {
+  const x = buf(sr, dur);
+  for (const f of freqs) for (const [h, a] of [[1, 1], [2, 0.35], [3, 0.12], [4, 0.06]]) {
+    const w = (2 * Math.PI * f * h) / sr, d = decay / h;
+    for (let i = 0; i < x.length; i++) x[i] += (Math.sin(w * i) * a * Math.exp(-i / sr / d)) / freqs.length;
+  }
+  for (let i = 0; i < x.length; i++) x[i] *= envelope(i, sr, x.length, 0.006, release);
+  return x;
+}

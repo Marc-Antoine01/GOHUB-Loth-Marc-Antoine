@@ -13,7 +13,7 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
 const SR = 48000, LUFS = -14, TRUE_PEAK = -1, CRF = 16;
 const THUMB = 390; // CSS px = phone screen width, so the contact sheet is also the phone-readability check
 const COLS = 4, SHEET_MAX_H = 2400;
-const TRACKS = ['track.wav', 'track.mp3', 'track.m4a', 'track.flac', 'track.aac'];
+const TRACKS = ['track.wav', 'track.mp3', 'track.m4a', 'track.flac', 'track.aac'].flatMap((f) => [f, 'audio/' + f]);
 
 class ContractError extends Error {}
 const fail = (msg) => { throw new ContractError(msg); };

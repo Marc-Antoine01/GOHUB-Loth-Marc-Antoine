@@ -2,9 +2,8 @@
 
 **Promise:** the CHUV trains people at every level, from apprenticeship to MD-PhD. Its know-how is passed on, and the teaching is recognised.
 
-**Status:** the camera grammar below is provisional. whatships.com (the Legora "skills" reference) is still blocked by the
-network policy, so I have not seen it. When it opens, I will extract its grammar into `refs/grammar.md` (shot lengths,
-camera moves, transitions, type behaviour, never its content) and revise this section.
+**Reference:** `refs/grammar.md`, read from the whatships poster frame. The video itself is still blocked (video.twimg.com),
+so the edit rhythm comes from our own score, not from the reference.
 
 ## Palette: the Formation colorway of chuv.ch
 
@@ -24,13 +23,18 @@ Lilac `#C996F1` exists on the site but stays out of the film (one accent).
 - **UI:** Atlas Grotesk 400. Rows, buttons, labels: exactly as the site sets them.
 - **Sizes at 1920×1080:** key line ≥ 120 px, numbers ≥ 260 px, UI rows ≥ 44 px, nothing under 40 px.
   At 360 px wide (the review size) that gives ≥ 22 px for key lines and ≥ 7.5 px for UI rows: UI rows are texture, so the message never rides on them alone.
-- Copy is verbatim from the site (assets/ASSETS.md), except the hook, which the client wrote.
+- All copy is verbatim from the site (assets/ASSETS.md), the hook included: the client chose the site's own line as the slogan.
 
 ## UI, not photos
 
 The page is rebuilt as **live UI built from the site's own styles**: rows with the arrow, the green button, the active nav pill,
 the category headings, the mint bands. These are real components with real copy, not screenshots and not invented UI.
 Photos only appear *inside* components: masked into a row, a card, a pill or a circle, cropped, never full frame and never a straight cut to a photo.
+
+## Material (from the reference)
+- Panels are frosted glass: mint `#B8F9E5` or white at 82–92 % opacity, `backdrop-filter: blur(18px)`, radius 28 px, a hairline inner edge (white at 40 %), and a long soft shadow toward the bottom left.
+- One hero panel per shot is sharp and carries readable copy. Satellites are smaller, cropped by the frame, defocused, and keep only their real heading plus skeleton bars.
+- Light: a soft radial key, top right, on the green space (`#0B7352` falling to `#004A34`). It is texture, never a backdrop for a centered title.
 
 ## Camera: a continuous move through space
 
