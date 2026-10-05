@@ -186,6 +186,17 @@ async function buildSound(dir, film) {
   return mix;
 }
 
+// ---- purity: compare two renders of the same frame ----
+
+const PURITY_DB = 50;
+function psnr(a, b, tmp) {
+  writeFileSync(tmp + '-a.png', a); writeFileSync(tmp + '-b.png', b);
+  const err = ffmpeg(['-i', tmp + '-a.png', '-i', tmp + '-b.png', '-lavfi', 'psnr', '-f', 'null', '-']);
+  rmSync(tmp + '-a.png'); rmSync(tmp + '-b.png');
+  const m = err.match(/average:(inf|[\d.]+)/);
+  return !m || m[1] === 'inf' ? Infinity : parseFloat(m[1]);
+}
+
 // ---- contact sheet: one frame per beat, at phone width ----
 
 async function sheet(dir, film, port) {
@@ -212,7 +223,12 @@ async function sheet(dir, film, port) {
     }
     // Purity check: revisit frames after jumping around. Any difference means state carried between frames.
     for (const i of [...new Set([times.length - 1, times.length >> 1, 0])]) {
-      if (!(await f.shot(times[i])).equals(shots[i])) fail(`frame at t=${times[i].toFixed(3)} changes with render order: seek(t) carries state between frames`);
+      const again = await f.shot(times[i]);
+      if (again.equals(shots[i])) continue;
+      // Byte-different is not enough: Chromium's raster caches can shift a few values by 1-2 levels.
+      // Real carried state (a moved or changed element) drops PSNR far below this line.
+      const db = psnr(shots[i], again, join(frames, 'purity'));
+      if (db < PURITY_DB) fail(`frame at t=${times[i].toFixed(3)} changes with render order (PSNR ${db.toFixed(1)} dB): seek(t) carries state between frames`);
     }
   } finally { await f.browser.close(); }
 

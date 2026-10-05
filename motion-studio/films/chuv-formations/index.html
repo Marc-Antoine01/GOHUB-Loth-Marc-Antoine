@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<title>Formations au CHUV</title>
+<style>
+  @font-face { font-family: Sharp; src: url(assets/fonts/Medium20.woff2) format('woff2'); }
+  @font-face { font-family: Atlas; src: url(assets/fonts/AtlasGrotesk-Regular-Web.woff2) format('woff2'); }
+  html, body { margin: 0; overflow: hidden; background: #004A34; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden;
+    /* soft key light from the top right (reference grammar): texture of the space, not a title backdrop */
+    background: radial-gradient(ellipse 120% 100% at 78% 12%, #0B7352 0%, #006144 42%, #004A34 100%); }
+  .viewport { position: absolute; inset: 0; perspective: 1400px; perspective-origin: 50% 50%; overflow: hidden; }
+  .world { position: absolute; left: 960px; top: 540px; width: 0; height: 0; transform-style: preserve-3d; transform-origin: 0 0; }
+  .plane { position: absolute; left: 0; top: 0; transform-origin: 0 0; transform-style: preserve-3d; }
+  .sharp { font-family: Sharp, sans-serif; font-weight: 400; letter-spacing: -0.025em; white-space: nowrap; }
+  .atlas { font-family: Atlas, sans-serif; white-space: nowrap; }
+  .glass { position: relative; border-radius: 56px; box-sizing: border-box; overflow: hidden;
+    box-shadow: inset 0 0 0 2px rgba(255,255,255,0.45), -40px 60px 120px rgba(0,30,20,0.35); }
+  .glass.mint { background: rgba(184,249,229,0.88); }
+  .glass.white { background: rgba(255,255,255,0.92); }
+  .row { display: flex; align-items: center; justify-content: space-between; box-sizing: border-box; background: #fff; color: #212121;
+    border-radius: 12px; padding: 0.55em 0.8em; box-shadow: 0 2px 0 rgba(0,0,0,0.04); }
+  .row .arrow { display: inline-flex; font-style: normal; }
+  .pill { display: inline-block; border: 4px solid #fff; border-radius: 16px; padding: 0.22em 0.55em 0.3em; }
+  .button { display: inline-block; background: #006144; color: #fff; border-radius: 12px; padding: 0.6em 1em 0.7em; }
+  .skeleton i { display: block; height: 22px; border-radius: 11px; }
+  .photo { overflow: hidden; position: relative; }
+  .photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .face { position: absolute; left: 0; top: 0; backface-visibility: hidden; }
+</style>
+<script src="/lib/runtime.js"></script>
+</head>
+<body><div id="stage"></div>
+<script src="engine.js"></script>
+<script src="shots/s01-hook.js"></script>
+<script src="shots/s02-page.js"></script>
+<script src="shots/s03-categories.js"></script>
+<script src="shots/s04-path.js"></script>
+<script src="shots/s05-knowhow.js"></script>
+<script src="shots/s06-figures.js"></script>
+<script src="shots/s07-online.js"></script>
+<script src="shots/s08-offer.js"></script>
+<script>
+// One camera for the whole film. Poses are world positions (see ANIMATION_GUIDE.md); the t=30 pose equals t=0 (loop).
+const { B, bar } = E;
+const LOOP_POSE = { x: -220, y: 30, z: 2300, yaw: -6, focus: 2300 };
+const CAMERA = [
+  [0, LOOP_POSE],
+  [B(3) + 0.2, { x: 0, y: 0, z: 1550, yaw: 0, focus: 1550 }, 'outExpo'],          // S01 dolly through the type
+  [B(4) - 0.05, { x: 40, y: 0, z: 1500, focus: 1500 }],
+  [B(5), { x: 2900, y: -120, z: 1150, yaw: 6, focus: 1150 }],                        // travel to the page
+  [bar(3) - 0.1, { x: 3380, y: 10, z: 1120, yaw: -4, focus: 1120 }],                 // S02 truck right, crane down
+  [bar(3) + 0.45, { x: 3200, y: 2220, z: 1180, focus: 1180 }],                       // crane down, close on the ring
+  [B(18) - 0.3, { x: 3200, y: 2200, z: 1150, focus: 1150 }],
+  [B(18) + 0.35, { x: 3200, y: 2140, z: 1520, focus: 1520 }, 'outExpo'],             // pull back as it locks into the grid
+  [bar(5) - 0.1, { x: 3200, y: 2130, z: 1460, focus: 1460 }],
+  [bar(5) + 0.4, { x: 3200, y: 3950, z: 1250, pitch: 4, focus: 1250 }],              // S04 top of the path
+  [B(27) - 0.05, { x: 3260, y: 4650, z: 1000, pitch: 2, focus: 1000 }],
+  [bar(7) - 0.02, { x: 3300, y: 4700, z: 780, focus: 780 }],
+  [bar(7), { x: -3600, y: 0, z: 1450, focus: 1450 }, 'cut'],                         // S05 designed cut on the drop
+  [bar(9) - 0.3, { x: -3980, y: -30, z: 1200, yaw: -18, focus: 1250 }],             // orbit left: card stays centred
+  [bar(9) + 0.25, { x: -6700, y: 0, z: 1400, focus: 1400 }],                         // S06 figures
+  [B(39), { x: -7850, y: -40, z: 700, focus: 1400 }],
+  [B(42), { x: -8950, y: 30, z: 1250, focus: 1450 }],
+  [bar(11) + 0.4, { x: -8000, y: 1100, z: 700, pitch: 55, focus: 1470 }],            // S07 crane up over the floor (+pitch = look down)
+  [bar(13) - 0.1, { x: -8000, y: 1250, z: 420, pitch: 66, focus: 1250 }],
+  [bar(13) + 0.45, { x: -40, y: -2360, z: 1300, focus: 1300 }],                      // S08 offer
+  [B(58), { x: 0, y: -2330, z: 1180, focus: 1180 }],
+  [30, LOOP_POSE],                                                                   // back to frame 0
+];
+
+for (const s of E.SHOTS) s.build(E);
+window.ready = (async () => {
+  await document.fonts.load('100px Sharp'); await document.fonts.load('100px Atlas');
+  await Promise.all(E.imgs.map((i) => i.decode().catch(() => {})));
+  for (const s of E.SHOTS) if (s.layout) s.layout(E); // measurement needs fonts
+})();
+
+window.seek = (t) => {
+  for (const s of E.SHOTS) s.draw(t);
+  E.setCamera(E.cameraAt(CAMERA, t));
+  E.optics();
+};
+</script>
+</body></html>
