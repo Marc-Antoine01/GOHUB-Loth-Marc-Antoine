@@ -29,6 +29,12 @@ if [ -f "$CA" ]; then
   fi
 fi
 
+# HyperFrames: no usage telemetry, no feedback prompts (client decision, see motion-studio/CLAUDE.md).
+(cd "$MS/hyperframes" && HYPERFRAMES_NO_TELEMETRY=1 npx -y hyperframes@0.8.134 telemetry disable >/dev/null 2>&1) || true
+if [ -n "${CLAUDE_ENV_FILE:-}" ]; then
+  printf 'export HYPERFRAMES_NO_TELEMETRY=1\nexport DO_NOT_TRACK=1\nexport HYPERFRAMES_NO_FEEDBACK=1\n' >> "$CLAUDE_ENV_FILE"
+fi
+
 # Point all three tools at the preinstalled browsers instead of downloading their own.
 CHROMIUM=/opt/pw-browsers/chromium
 SHELL_BIN=$(ls /opt/pw-browsers/chromium_headless_shell-*/chrome-linux/headless_shell 2>/dev/null | head -1 || true)

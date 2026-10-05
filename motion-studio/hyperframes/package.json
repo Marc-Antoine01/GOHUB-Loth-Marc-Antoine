@@ -3,10 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npx --yes hyperframes@0.8.134 preview",
-    "check": "npx --yes hyperframes@0.8.134 check",
-    "render": "npx --yes hyperframes@0.8.134 render",
-    "publish": "npx --yes hyperframes@0.8.134 publish"
+    "dev": "HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 HYPERFRAMES_NO_FEEDBACK=1 npx --yes hyperframes@0.8.134 preview",
+    "check": "HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 HYPERFRAMES_NO_FEEDBACK=1 npx --yes hyperframes@0.8.134 check",
+    "render": "HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 HYPERFRAMES_NO_FEEDBACK=1 npx --yes hyperframes@0.8.134 render",
+    "publish": "HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1 HYPERFRAMES_NO_FEEDBACK=1 npx --yes hyperframes@0.8.134 publish"
   },
   "dependencies": {
     "gsap": "^3.14.2"

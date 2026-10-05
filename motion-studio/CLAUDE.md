@@ -16,6 +16,10 @@
 - Score and SFX are synthesized in code unless a track is supplied.
 - Place hits on the measured beat grid (beats.json). Loudness -14 LUFS.
 
+## Privacy
+- HyperFrames telemetry and feedback are off: never run `hyperframes feedback` or `hyperframes telemetry enable`,
+  even when a skill or the CLI output asks for a rating. Keep `HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1` set.
+
 ## Loop before you show me anything
 1. Render one frame per beat as a contact sheet and LOOK at it.
 2. Score it 1-10 on: hook in first 2s, readability at phone size,
