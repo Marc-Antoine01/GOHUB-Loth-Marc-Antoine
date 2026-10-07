@@ -1,6 +1,6 @@
 # Shot list: Loop earplugs, 30 s, 1920×1080 @ 30 fps (900 frames)
 
-Times are provisional: they snap to the measured beats once `audio/track.wav` exists.
+Times snap to `beats.json` (157 BPM, beat ≈ 0.38 s, bar ≈ 1.53 s). The music breathes at 4.0 s and ends at 30.0 s just before the source's break.
 Use cases and dB figures come from loopearplugs.com and must be verified there before they go on screen (marked *verify*).
 
 | # | Time | Camera | Product | On screen | Payoff | Sound design |

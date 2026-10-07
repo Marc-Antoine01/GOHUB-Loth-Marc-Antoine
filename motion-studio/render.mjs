@@ -163,7 +163,8 @@ async function buildSound(dir, film) {
     synth.writeWav(layers[0], await sound.score(ctx));
   }
   if (layers.length) {
-    const r = spawnSync('python3', [join(ROOT, 'tools/beats.py'), layers[0], join(dir, 'beats.json')], { encoding: 'utf8' });
+    // film.json "beatsFull": true tracks the pulse on the full spectrum (tracks with a sparse kick).
+    const r = spawnSync('python3', [join(ROOT, 'tools/beats.py'), layers[0], join(dir, 'beats.json'), ...(film.beatsFull ? ['--full'] : [])], { encoding: 'utf8' });
     if (r.status !== 0) fail(`beat detection failed: ${r.stderr.trim().split('\n').pop()}`);
     log(r.stdout.trim());
   }

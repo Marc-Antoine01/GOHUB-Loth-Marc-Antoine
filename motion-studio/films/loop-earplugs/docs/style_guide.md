@@ -31,7 +31,13 @@ The grammar of an Apple product film (black stage, single product, macro light, 
 - **Product wheel:** the eight earplugs on a carousel ring turning in depth, one name landing per beat (the grammar of the AirPods Max colour wheel).
 
 ## Sound
-- `audio/track.wav` unchanged, beats measured with `tools/beats.py`.
+- **Music:** the client's track "Future Beat" (verclub_music). `audio/track.wav` is an untouched 30 s excerpt (19.89–49.89 s of the source,
+  150 ms fade at the very end only). It is 157 BPM; the grid is measured on the full spectrum (`"beatsFull": true`, the kick is sparse).
+  The excerpt breathes at 4.0 s (a match-cut point) and ends just before the source's break at 50 s, so the logo lands on the silence.
+- **Sound design: organic and powerful, as in Apple's product films** (client's brief). That means real-world textures
+  (breath, fabric, silicone squeeze, skin contact, a seal "pop" when the earplug seats, air) instead of digital bleeps.
+  Hits have weight: sub-thump plus transient, close-miked and dry, with one big shared reverb only on the reveals. Silence is used as a hit.
+  Everything is synthesized from noise, filtered resonances and pitched impacts (no samples), placed on beats.json.
 - **Noise-reduction demonstrations:** each use case has an ambience (crowd, city, snoring, office, playground) that is
   low-pass filtered and lowered when the earplug "goes in". The amount follows the product's published dB figure, and the change lands on a beat.
 - −14 LUFS for the final mix.
