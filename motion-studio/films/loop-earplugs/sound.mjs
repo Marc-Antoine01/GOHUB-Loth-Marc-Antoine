@@ -133,6 +133,7 @@ export function sfx({ sr, duration, beats, synth: s }) {
     for (const [i, bi] of [12, 14, 16].entries()) at(detent(30 + i), B(bi), 0.55, 0.15);
     for (let i = 1; i < 4; i++) at(seal(40 + i, { low: 90, body: 0.06 }), B(18) - 0.05 + i * 0.06, 0.25, -0.3 + i * 0.25);
     at(air(0.5, 44), B(18) - 0.3, 0.2);
+    at(air(1.4, 45), B(17) - 0.2, 0.3, 0.3); // the 360° turn: a long breath of air across the product
   }
 
   // ---- S03 match cut into the macro (air), then live music: the crowd drops 17 dB on the seat

@@ -5,19 +5,10 @@
   /* Inter Tight stands in for Loop's own face (not reachable from this session): see assets/ASSETS.md */
   @font-face { font-family: Display; src: url(assets/fonts/inter-tight-latin-600-normal.woff2) format('woff2'); font-weight: 600; }
   @font-face { font-family: Display; src: url(assets/fonts/inter-tight-latin-400-normal.woff2) format('woff2'); font-weight: 400; }
-  html, body { margin: 0; overflow: hidden; background: #0A0A0A; }
-  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #0A0A0A; font-family: Display, sans-serif; }
-  .layer { position: absolute; inset: 0; overflow: hidden; }
-  .light { position: absolute; inset: 0; }
-  .prod { position: absolute; left: 0; top: 0; }
-  .pbody { position: absolute; inset: 0; transform-origin: 50% 100%; }
-  .pimg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .spec { position: absolute; inset: 0; mix-blend-mode: screen; -webkit-mask-size: 100% 100%; mask-size: 100% 100%; }
-  .refl { position: absolute; left: 0; top: 100%; width: 100%; height: 100%; transform-origin: 50% 50%;
-    -webkit-mask-image: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 38%); mask-image: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 38%); }
-  .macro { position: absolute; inset: 0; overflow: hidden; background: #000; }
-  .macro img { position: absolute; left: 0; top: 50%; width: 1920px; height: 1920px; margin-top: -960px; object-fit: cover; }
-  .macro .sweep { position: absolute; inset: 0; mix-blend-mode: soft-light; }
+  html, body { margin: 0; overflow: hidden; background: #050505; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #050505; font-family: Display, sans-serif; }
+  #gl { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: block; }
+  #type { position: absolute; inset: 0; }
   .mask { position: absolute; overflow: hidden; line-height: 1.12; padding-bottom: 0.06em; white-space: nowrap; letter-spacing: -0.03em; }
   .mask .in { display: block; }
   .mask.center { left: 0 !important; width: 1920px; text-align: center; }
@@ -25,27 +16,23 @@
   .figure .num { font-size: 220px; }
   .figure .unit { font-size: 120px; }
   .figure .snr { font-size: 50px; font-weight: 400; letter-spacing: 0; color: rgba(255,255,255,0.55); margin-left: 24px; vertical-align: 0.2em; }
-  .wave { position: absolute; left: 0; top: 0; }
   .logo { position: absolute; left: 960px; top: 520px; width: 900px; }
   .logo svg { display: block; width: 100%; height: auto; }
 </style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
 <script src="/lib/runtime.js"></script>
 </head>
-<body><div id="stage"></div>
+<body><div id="stage"><div id="type"></div></div>
 <script src="wordmark.js"></script>
 <script src="engine.js"></script>
-<script src="shots.js"></script>
 <script>
+// three.js draws object UUIDs from Math.random (never visual). Route it through seeded mulberry32 so every run is identical.
+Math.random = M.mulberry32(1557);
 // The world is authored at 1920×1080; the 960×540 animatic scales the whole stage.
 if (window.FILM && window.FILM.width !== 1920) {
   const st = document.getElementById('stage');
   st.style.transformOrigin = '0 0'; st.style.transform = `scale(${window.FILM.width / 1920})`;
 }
-for (const s of E.SHOTS) s.build(E);
-window.ready = (async () => {
-  await document.fonts.load('600 100px Display'); await document.fonts.load('400 100px Display');
-  await Promise.all(E.imgs.map((i) => i.decode().catch(() => {})));
-})();
-window.seek = (t) => { for (const s of E.SHOTS) s.draw(t); };
 </script>
+<script type="module" src="film3d.js"></script>
 </body></html>
