@@ -2,9 +2,8 @@
 
 **Promise:** a Loop earplug for every situation. Earplugs shown as a new technology: precise, sculpted, premium.
 
-**Status:** draft. loopearplugs.com, its Shopify CDN and YouTube are blocked in this session, so the brand values below
-(logo, typeface, colours, product names and noise-reduction figures) are placeholders. They are replaced by the
-site's own values in `assets/ASSETS.md` before any still is built. No figure goes on screen unless it is published on loopearplugs.com.
+**Status:** built. Products, wordmark, names and dB figures are the site's own (see `assets/ASSETS.md`).
+Typeface is a stand-in (Inter Tight) until Loop's font is supplied. No figure goes on screen unless it is published on loopearplugs.com.
 
 ## Homage, not imitation
 The grammar of an Apple product film (black stage, single product, macro light, 360° turns, match cuts, one line of type).
