@@ -18,12 +18,14 @@ The grammar of an Apple product film (black stage, single product, macro light, 
 - Loop's display face from the site's @font-face (to be captured), one weight for headlines, one for labels.
 - One line per shot, ≥ 110 px at 1920 wide; product names ≥ 72 px. Never more than 6 words on screen.
 
-## Product: 3D, modelled on the shop photos
-- v2 (client feedback): the products are real-time 3D models (`loop3d.js`) built from the shop's studio photos (`assets/cut/`):
-  one continuous moulded body (ring + neck, the "9" silhouette), a silicone dome tip, the Switch 2 dial in a smoked lens.
-  They approximate the real geometry; Loop's CAD/GLB files would replace them one-for-one if supplied.
-- **No fake shine:** no overlay streaks. Light comes from a studio environment, a key, a rim and a kick, and moves only by moving the lights.
-- **360° and macro:** full turns on the product's own axis, macro glides along the ring and over the tip, fly-outs through the ring.
+## Product: the shop's own photos, in 2.5D (v3)
+- v2's procedural 3D models were not faithful enough (client). v3 uses only Loop's own imagery: the studio cutouts
+  (`assets/cut/`) and the 3D scene renders (`assets/scene/`) as close-ups.
+- **2.5D turn:** each cutout has a depth map derived from its silhouette (`tools/prep_cutouts.py`: every part of a Loop is a
+  rounded tube, so its height across the tube is a half-circle). A shader re-samples the photo along that depth, so a card turns
+  about ±14° with real volume while keeping the real materials and reflections. A full 360° is not possible from one photo.
+- **No fake shine**, no graphic overlays: the light is the one in Loop's photos.
+- **Edit rule:** no shot under 1 s (enforced in `film25d.js`, and checked on the render with `tools/cuts.py`).
 
 ## Camera and edit
 - Slow orbits and push-ins on the product; **match cuts** between products on a shared shape (the ring), position and scale on the cut beat.

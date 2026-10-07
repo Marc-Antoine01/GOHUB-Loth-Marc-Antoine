@@ -27,3 +27,11 @@ disc → smoked glass; carousel crowded and clipped → deep ellipse, smaller sc
 Purity check caught the dial rotation leaking between frames → reset every frame.
 Pass 2 → Hook 8 · readability 8 · motion 8 · variety 9 · brand 8 · sound 8. Fixes: label hidden on dial macros, Quiet trio and Engage pair spread out,
 air on the 360° turn. Full render.
+
+## v3: 2.5D from the shop's photos (client: "3D models not all right"; "a slide shows for one frame at 5 s")
+Root cause of the 5 s flash: in v2 each Switch mode close-up lasted 0.62 s, then the wide shot came back for ~0.13 s (4 frames)
+before the next close-up. v3 makes the Switch passage one continuous push into the ring and lever (2.3 s), and the film checks
+itself: CUTS in film25d.js must all be ≥ 1 s, and tools/cuts.py scans the rendered video (it finds v2's two 0.10 s flashes).
+Pass 1 → Hook 8 · readability 8 · motion 7 · variety 8 · brand 9 · sound 8. Fixes: the Switch push aimed off the product
+(lever measured on the cutout at 0.68/0.57); Quiet trio, Kids and Engage pair clipped at the right edge → reframed.
+Pass 2 → Hook 8 · readability 8 · motion 8 · variety 8 · brand 9 · sound 8 → full render.

@@ -5,7 +5,8 @@ All product imagery and copy come from loopearplugs.com (Shopify store), fetched
 
 | Folder | What | Source |
 |---|---|---|
-| `cut/` | 23 transparent studio cutouts (the `_01` PDP image of each finish), cropped to alpha, ≤1400 px WebP | product pages |
+| `cut/` | 23 transparent studio cutouts (the `_01` PDP image of each finish), cropped to alpha, ≤1800 px WebP, colour bled under transparency (`tools/prep_cutouts.py`) | product pages |
+| `depth/` | one depth map per cutout, derived from its silhouette, for the 2.5D shader | computed |
 | `scene/` | 8 dark/coloured 3D scenes used as macro inserts | product pages (`_04`, `3DScenes_2`, `Quiet_2_Black_Elevated`) |
 | `brand/loop-wordmark.svg` | the "loop earplugs" wordmark | `cdn/shop/files/logo.svg` |
 | `fonts/` | **Inter Tight 400/600 (SIL OFL) — a stand-in.** Loop's own webfont lives in theme assets that were not reachable. Swap in `index.html` @font-face when supplied. | npm @fontsource/inter-tight |
