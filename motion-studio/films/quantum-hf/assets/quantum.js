@@ -89,6 +89,7 @@
   // ---- DOM side: editable text, animated by the scene's GSAP timeline ----
   const el = (tag, css, parent) => { const e = document.createElement(tag); Object.assign(e.style, css); parent && parent.appendChild(e); return e; };
   // The camera push on a DOM layer: same curve as pushCanvas (power2.inOut is the cubic in-out).
+  // Expo curves are passed as functions: GSAP's expo eases are normalised differently from the film's.
   function push(tl, layer, S, from, dur, fx, fy, amount) {
     layer.style.transformOrigin = `${fx}px ${fy}px`;
     tl.fromTo(layer, { scale: 1 }, { scale: 1 + amount, duration: dur, ease: 'power2.inOut' }, Math.max(0, from - S));
@@ -104,9 +105,10 @@
       box.className = 'word';
       const span = el('div', { position: 'absolute', left: `${size * 0.1}px`, top: `${size * 1.05 - asc}px`, font, letterSpacing: `${sp}px`, lineHeight: `${asc + desc}px`, whiteSpace: 'pre', color: it.accent ? accent : color, opacity: 0 }, box);
       span.textContent = it.text;
-      const at = Math.max(S, it.at - 0.2);
+      // The rise runs from at-0.2 to at+0.12; a word whose rise began before the scene starts mid-way (u0).
+      const t0 = it.at - 0.2, at = Math.max(S, t0), u0 = (at - t0) / 0.32;
       tl.set(span, { opacity: 1 }, at - S); // a cut, not a fade: the word appears clipped below its line
-      tl.fromTo(span, { y: size * 1.1, filter: 'blur(10px)' }, { y: 0, filter: 'blur(0px)', duration: it.at + 0.12 - at, ease: 'expo.out' }, at - S);
+      tl.fromTo(span, { y: size * 1.1, filter: 'blur(10px)' }, { y: 0, filter: 'blur(0px)', duration: it.at + 0.12 - at, ease: (p) => ease.outExpo(u0 + p * (1 - u0)) }, at - S);
       cx += wd + size * gap;
     }
     return cx;

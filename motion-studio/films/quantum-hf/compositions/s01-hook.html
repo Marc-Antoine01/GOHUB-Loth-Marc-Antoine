@@ -45,7 +45,7 @@
             Q.push(tl, cam, S, 0, B(8), Q.W / 2, dot.fy, dot.P - 1);
             const zoom = $('#s01-hook-zoom');
             Object.assign(zoom.style, { position: 'absolute', inset: '0', transformOrigin: `${dot.x}px ${dot.y}px` });
-            tl.fromTo(zoom, { scale: 1 }, { scale: 6, duration: 0.32, ease: 'expo.in' }, B(8) - 0.32);
+            tl.fromTo(zoom, { scale: 1 }, { scale: 6, duration: 0.32, ease: M.ease.inExpo }, B(8) - 0.32);
             Q.wordsFrom(tl, S, $('#s01-hook-line'), { size: SIZE });
             Q.monoFrom(tl, S, $('#s01-hook-tag'), { x: dot.X + 6, y: dot.Y + SIZE * 0.8 });
             Q.monoFrom(tl, S, $('#s01-hook-tag2'), { x: dot.X + 6 + 46 * 0.6 * 11, y: dot.Y + SIZE * 0.8 });

@@ -30,5 +30,6 @@ npx hyperframes@0.8.149 render --fps 30 --crf 16 --output renders/quantum-hf.mp4
 Keep `HYPERFRAMES_NO_TELEMETRY=1 DO_NOT_TRACK=1` set (studio rule).
 
 ## Differences from the canvas film
-The timing, layout, colours and sound are the same. The words and captions are now real DOM text, so their antialiasing differs
-slightly from the canvas text, and the first word's rise starts at frame 0 instead of 0.1 s before it.
+The timing, layout, colours and sound are the same: frame by frame the render measures 40 dB PSNR (median) against
+`films/quantum/out/final.mp4`, 33 dB at worst after the first frame. The words and captions are real DOM text, so only their
+antialiasing differs. The expo curves are the film's own functions passed to GSAP (GSAP's `expo` eases are shaped differently).
