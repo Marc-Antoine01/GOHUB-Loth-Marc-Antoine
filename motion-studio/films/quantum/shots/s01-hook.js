@@ -12,13 +12,13 @@
     return { x: X + a + b + c + SIZE * 0.56 + SIZE * 0.2, y: Y - SIZE * 0.08, r: SIZE * 0.075 };
   };
   SHOT({
-    id: 's01', from: () => 0, to: () => B(4),
+    id: 's01', from: () => 0, to: () => B(8),
     draw(g, t, lt) {
       E.field(C.ink);
       const dot = E.hookDot();
-      push(lt, B(4), dot.x, dot.y, 0.05);
+      push(lt, B(8), dot.x, dot.y, 0.05);
       // Snap zoom into the full stop on the last half-beat: the qubit becomes the next shot's nucleus.
-      const zoom = 1 + 5 * M.ease.inExpo(M.range(t, B(4) - 0.32, B(4)));
+      const zoom = 1 + 5 * M.ease.inExpo(M.range(t, B(8) - 0.32, B(8)));
       g.translate(dot.x, dot.y); g.scale(zoom, zoom); g.translate(-dot.x, -dot.y);
       words([{ text: 'Faster,', at: 0.1 }, { text: 'Stronger,', at: B(1) }, { text: 'Computer', at: B(2), accent: true }], X, Y, SIZE, t, { gap: 0.28 });
       // The full stop lands with "Computer", then on beat 3 it wakes up: a ring opens and it starts to oscillate.

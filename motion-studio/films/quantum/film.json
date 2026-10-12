@@ -1,2 +1,2 @@
-{ "title": "Faster, Stronger, Computer.", "duration": 30, "fps": 30, "width": 1920, "height": 1080, "beatsFull": true,
+{ "title": "Faster, Stronger, Computer.", "duration": 45, "fps": 30, "width": 1920, "height": 1080, "beatsFull": true,
   "formats": { "final": [1920, 1080], "animatic": [960, 540] } }

@@ -1,7 +1,7 @@
 // S05 The qubit, bar 7: a Bloch sphere; the state arrow sweeps and lands on the equator, then holds into the silence.
 (() => {
   const { B, C, words, mono, push } = E;
-  E.wipe(B(28), [E.C.blue, E.C.paper, E.C.blue, E.C.paper, E.C.blue, E.C.paper]);
+  E.wipe(B(44), [E.C.blue, E.C.paper, E.C.blue, E.C.paper, E.C.blue, E.C.paper]);
   const SX = 1320, SY = 560, SR = 300;
   E.bloch = (g, t) => {
     g.strokeStyle = C.gray80; g.lineWidth = 2;
@@ -12,9 +12,9 @@
     g.font = '400 40px PlexMono'; g.fillStyle = C.ink; g.textAlign = 'center';
     g.fillText('|0⟩', SX, SY - SR - 50); g.fillText('|1⟩', SX, SY + SR + 82); g.textAlign = 'left';
     // θ sweeps 0 → π → π/2 and lands on the equator on beat 30; φ turns slowly.
-    const u = M.range(t, B(28), B(30));
+    const u = M.range(t, B(44), B(46));
     const th = u < 0.6 ? Math.PI * M.ease.inOutCubic(u / 0.6) : Math.PI - (Math.PI / 2) * M.ease.outBack(M.range(u, 0.6, 1));
-    const ph = 0.9 + (t - B(28)) * 0.6;
+    const ph = 0.9 + (t - B(44)) * 0.6;
     const x = SX + SR * Math.sin(th) * Math.cos(ph) * 0.98, y = SY - SR * Math.cos(th) + SR * 0.28 * Math.sin(th) * Math.sin(ph);
     g.strokeStyle = C.blue; g.lineWidth = 8; g.lineCap = 'round';
     g.beginPath(); g.moveTo(SX, SY); g.lineTo(x, y); g.stroke();
@@ -23,13 +23,13 @@
     return { x, y };
   };
   SHOT({
-    id: 's05', from: () => B(28), to: () => B(31),
+    id: 's05', from: () => B(44), to: () => B(51),
     draw(g, t, lt) {
       E.field(C.paper);
-      push(lt, B(32) - B(28), SX, SY, 0.06);
+      push(lt, B(52) - B(44), SX, SY, 0.06);
       E.bloch(g, t);
-      words([{ text: 'The', at: B(28) + 0.12 }, { text: 'qubit.', at: B(29), accent: true }], 120, 520, 128, t, { color: C.ink, accent: C.blue });
-      mono('// any blend of 0 and 1', 126, 640, t, B(29) + 0.2);
+      words([{ text: 'The', at: B(44) + 0.12 }, { text: 'qubit.', at: B(45), accent: true }], 120, 520, 128, t, { color: C.ink, accent: C.blue });
+      mono('// any blend of 0 and 1', 126, 640, t, B(45) + 0.2);
     },
   });
 })();

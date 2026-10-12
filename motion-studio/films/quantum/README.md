@@ -4,7 +4,7 @@ The quantum world (superposition, entanglement, the qubit), then what quantum co
 (simulate molecules, optimize, secure tomorrow). It promotes quantum computing itself: no logo, no brand. All copy is in English.
 
 ## Deliverables (`out/`, regenerated, not committed)
-`final.mp4` (1920×1080, 30 fps, H.264 CRF 16, AAC, −14 LUFS) · `loop_check.mp4` (last 2 s, then first 2 s) · `poster.png` · `contact.png`
+`final.mp4` (45 s, 1920×1080, 30 fps, H.264 CRF 16, AAC, −14 LUFS) · `loop_check.mp4` (last 2 s, then first 2 s) · `poster.png` · `contact.png`
 
 ## Rebuild
 ```bash

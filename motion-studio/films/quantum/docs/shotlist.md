@@ -1,6 +1,10 @@
-# Shot list: "Faster, Stronger, Computer.", 30 s, 1920×1080 @ 30 fps
+# Shot list: "Faster, Stronger, Computer.", 45 s, 1920×1080 @ 30 fps
 
-Score: an original track at **128 BPM** (beat 0.469 s, bar 1.875 s, 16 bars = 30 s). Shots start on bar lines.
+Score: an original track at **128 BPM** (beat 0.469 s, bar 1.875 s, **24 bars = 45 s**). Shots start on bar lines.
+
+**v2 (client feedback: "every slide is too fast to read"):** the film goes from 30 to 45 s with the same content.
+The sections in bars are: hook 0–2 · world 2–5 · superposition 5–8 · entanglement 8–11 · qubit 11–13 · computer 13–16 (drop at bar 13) · uses 16–22 (three 2-bar panels) · end 22–24.
+Words land at the same pace as before; the added time is hold time for reading. The table below keeps the v1 timings for reference.
 Camera: locked-off and frontal, with a slow push-in in every shot; transitions are graphic wipes.
 
 | # | Bars · time | Field | On screen | Payoff | SFX |

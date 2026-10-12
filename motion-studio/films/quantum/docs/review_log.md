@@ -34,3 +34,13 @@ Open for the animatic: wipe speed against the 128 BPM grid, hold time on each pa
 Checked from 0.1 s filmstrips around 1.2, 5.4, 14.3, 18.5 and 29 s: the snap zoom carries the full stop into the nucleus, the wipes cover and uncover within a beat,
 and the silence holds the Bloch frame before ink swallows it exactly on the drop.
 Fix: the loop clear moves to 29.25 s, so the bars are gone a few frames before 30 s and the last frame is the empty field frame 0 builds on.
+
+## v2: 45 s (client: "too fast to read")
+Every section was lengthened (hook 2 bars, the concept shots 3 bars, each use 2 bars instead of about 1.2); the score was extended to 24 bars, with the drop moved to bar 13; the beats were remeasured (97, all within 32 ms).
+Re-check at 360 px:
+| Hook | Read 360 | Motion | Compo | Depth | Sync | Polish |
+|---|---|---|---|---|---|---|
+| 8 | 9 | 8 | 8 | 8 | 8 | 8 |
+1. The end line held for only about 0.6 s before the loop clear: the clear moved to 44.45 s.
+2. The `2ⁿ` caption ran under the lattice: shortened to `// n qubits, 2^n states`.
+3. The long holds keep moving: the push-in continues, the ghosts breathe, and the orbitals turn.

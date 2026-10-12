@@ -4,15 +4,15 @@
   const NX = 1300, NY = 540;
   const ORB = [{ a: 330, b: 120, rot: 0.35 }, { a: 330, b: 120, rot: -0.75 }, { a: 330, b: 120, rot: 1.45 }];
   SHOT({
-    id: 's02', from: () => B(4), to: () => B(12),
+    id: 's02', from: () => B(8), to: () => B(20),
     draw(g, t, lt) {
       E.field(C.ink);
-      push(lt, B(12) - B(4), NX, NY, 0.06);
+      push(lt, B(20) - B(8), NX, NY, 0.06);
       // Snap zoom: the hook's full stop flies to the nucleus and grows (0.35 s).
       const d = E.hookDot(), z = M.ease.inOutCubic(M.range(lt, 0, 0.35));
       const nx = M.lerp(d.x, NX, z), ny = M.lerp(d.y, NY, z), nr = M.lerp(d.r * 1.9 * 6, 30, z); // continues S01's snap zoom
       // Clouds: seeded dots around each orbital; spread falls from a fuzzy cloud to a crisp ring on beat 8.
-      const crisp = Math.max(0, M.spring(t - (B(8) - 0.15), 2.2, 0.55));
+      const crisp = Math.max(0, M.spring(t - (B(12) - 0.15), 2.2, 0.55));
       const spread = M.lerp(70, 5, crisp) * Math.max(0.25, z);
       ORB.forEach((o, k) => {
         const r = M.mulberry32(100 + k);
@@ -28,9 +28,9 @@
         }
       });
       E.qubit(nx, ny, nr, { fill: C.cyan, ring: C.cyan, ringR: nr * 1.7 });
-      words([{ text: 'The', at: B(5) }, { text: 'quantum', at: B(6), accent: true }], 120, 500, 120, t);
-      words([{ text: 'world.', at: B(7) }], 120, 640, 120, t);
-      mono('// position becomes probability', 126, 740, t, B(8) + 0.1);
+      words([{ text: 'The', at: B(9) }, { text: 'quantum', at: B(10), accent: true }], 120, 500, 120, t);
+      words([{ text: 'world.', at: B(11) }], 120, 640, 120, t);
+      mono('// position becomes probability', 126, 740, t, B(12) + 0.1);
     },
   });
 })();
