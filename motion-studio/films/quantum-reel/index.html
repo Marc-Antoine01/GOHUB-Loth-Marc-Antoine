@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>SUPERPOSITION</title>
+<style>
+  @font-face { font-family: Serif; src: url(assets/fonts/instrument-serif-latin-400-normal.woff2) format('woff2'); font-style: normal; }
+  @font-face { font-family: Serif; src: url(assets/fonts/instrument-serif-latin-400-italic.woff2) format('woff2'); font-style: italic; }
+  @font-face { font-family: Mono; src: url(assets/fonts/jetbrains-mono-latin-400-normal.woff2) format('woff2'); font-weight: 400; }
+  @font-face { font-family: Mono; src: url(assets/fonts/jetbrains-mono-latin-500-normal.woff2) format('woff2'); font-weight: 500; }
+  @font-face { font-family: MonoGreek; src: url(assets/fonts/jetbrains-mono-greek-400-normal.woff2) format('woff2'); font-weight: 400; }
+  @font-face { font-family: MonoGreek; src: url(assets/fonts/jetbrains-mono-greek-500-normal.woff2) format('woff2'); font-weight: 500; }
+  html, body { margin: 0; overflow: hidden; background: #07070A; }
+  #stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; background: #07070A; }
+  #gl { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; display: block; }
+  #type { position: absolute; inset: 0; pointer-events: none; }
+  .serif { font-family: Serif, serif; color: #EDEBE6; letter-spacing: -0.025em; line-height: 1; white-space: nowrap; font-kerning: normal;
+    text-shadow: 0 0 40px rgba(7,7,10,0.85), 0 0 12px rgba(7,7,10,0.6); } /* legibility over the 3D: a dark halo, not a glow */
+  .mono { position: absolute; font-family: Mono, MonoGreek, monospace; color: #A3A29D; font-size: 30px; letter-spacing: 0.04em; white-space: pre; line-height: 1; }
+  .mono b { color: #EDEBE6; font-weight: 500; }
+  .mono { text-shadow: 0 0 10px rgba(7,7,10,0.9); }
+  .mono i { color: #E8B04B; font-style: normal; font-weight: 500; }
+  .mask { position: absolute; overflow: hidden; padding: 0.04em 0.08em 0.16em; margin: -0.04em -0.08em 0; }
+  .mask > .in { display: block; } /* no will-change: a promoted layer rasterizes text differently depending on history */
+  .tick { position: absolute; width: 1px; background: #8B8A86; }
+</style>
+<script type="importmap">{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }</script>
+<script src="/lib/runtime.js"></script>
+</head>
+<body><div id="stage"><div id="type"></div></div>
+<script>
+// three.js draws object UUIDs from Math.random (never visual). Route it through seeded mulberry32 so every run is identical.
+Math.random = M.mulberry32(2026);
+// The world is authored at 1920×1080; the 960×540 animatic scales the whole stage.
+if (window.FILM && window.FILM.width !== 1920) {
+  const st = document.getElementById('stage');
+  st.style.transformOrigin = '0 0'; st.style.transform = `scale(${window.FILM.width / 1920})`;
+}
+</script>
+<script type="module" src="reel.js"></script>
+</body></html>

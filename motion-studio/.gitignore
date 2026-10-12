@@ -7,3 +7,5 @@ films/*/assets/fonts/
 !films/loop-earplugs/assets/fonts/
 # IBM Plex is SIL OFL (assets/fonts/OFL-LICENSE.txt): the HyperFrames project ships its fonts
 !films/quantum-hf/assets/fonts/
+# Instrument Serif and JetBrains Mono are SIL OFL (licences in assets/fonts)
+!films/quantum-reel/assets/fonts/
