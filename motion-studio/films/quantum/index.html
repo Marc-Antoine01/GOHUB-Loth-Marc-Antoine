@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Faster, Stronger, Computer.</title>
+<style>
+  @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+  @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+  @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+  @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+  html, body { margin: 0; overflow: hidden; background: #161616; }
+  canvas { display: block; }
+</style>
+<script src="/lib/runtime.js"></script>
+</head><body><canvas id="c"></canvas>
+<script>
+// Engine: see docs/ANIMATION_GUIDE.md. Everything is drawn from t alone.
+const F = window.FILM, W = 1920, H = 1080, K = F.width / W;
+const cv = document.getElementById('c'); cv.width = F.width; cv.height = F.height;
+const g = cv.getContext('2d');
+const { range, clamp, lerp, ease, spring } = M;
+const BEATS = (window.BEATS && window.BEATS.beats) || [];
+const PERIOD = 60 / ((window.BEATS && window.BEATS.tempo) || 128);
+const E = {
+  W, H, g,
+  C: { ink: '#161616', paper: '#F4F4F4', white: '#FFFFFF', blue: '#0F62FE', cyan: '#82CFFF', blue40: '#78A9FF', purple: '#8A3FFC', purple40: '#BE95FF', magenta: '#EE5396', gray50: '#8D8D8D', gray30: '#C6C6C6', gray80: '#393939', gray20: '#E0E0E0' },
+  B: (i) => (i <= 0 ? 0 : BEATS[i] ?? i * PERIOD),
+  col: (n) => 120 + n * ((W - 240) / 16),
+};
+E.bar = (n) => E.B(n * 4);
+
+E.field = (color, dots = color === E.C.ink ? 'rgba(255,255,255,0.07)' : 'rgba(22,22,22,0.07)') => {
+  g.fillStyle = color; g.fillRect(-W, -H, W * 3, H * 3);
+  g.fillStyle = dots;
+  for (let y = 4; y < H; y += 32) for (let x = 4; x < W; x += 32) g.fillRect(x, y, 2, 2); // IBM grid made visible
+};
+
+// Slow push-in around a focus point (the reference's locked-off frontal lens).
+E.push = (lt, dur, fx, fy, amount = 0.04) => {
+  const s = 1 + amount * ease.inOutCubic(clamp(lt / dur));
+  g.translate(fx, fy); g.scale(s, s); g.translate(-fx, -fy);
+};
+
+const FONT = (w, size, fam = 'PlexSans') => `${w} ${size}px ${fam}`;
+// Word build: each word rises from below its baseline inside its line box, sharpening, and lands on its time.
+E.words = (items, x, y, size, t, { color = E.C.white, accent = E.C.cyan, gap = 0.28 } = {}) => {
+  let cx = x;
+  g.textBaseline = 'alphabetic';
+  for (const it of items) {
+    const w = it.accent ? 600 : 300;
+    g.font = FONT(w, size); g.letterSpacing = `${-size * 0.01}px`;
+    const wd = g.measureText(it.text).width;
+    const p = ease.outExpo(range(t, it.at - 0.2, it.at + 0.12));
+    if (p > 0) {
+      g.save();
+      g.beginPath(); g.rect(cx - size * 0.1, y - size * 1.05, wd + size * 0.3, size * 1.35); g.clip();
+      const blur = (1 - p) * 10;
+      if (blur > 0.2) g.filter = `blur(${blur.toFixed(1)}px)`;
+      g.fillStyle = it.accent ? accent : color;
+      g.fillText(it.text, cx, y + (1 - p) * size * 1.1);
+      g.restore();
+    }
+    cx += wd + size * gap;
+  }
+  return cx;
+};
+// Mono caption, typed one character per frame from `at`.
+E.mono = (text, x, y, t, at, { color = E.C.gray50, size = 46, highlight = null, hiColor = E.C.magenta } = {}) => {
+  const n = Math.floor(Math.max(0, t - at) * 30 * 1.6);
+  if (n <= 0) return;
+  const shown = text.slice(0, n);
+  g.font = FONT(400, size, 'PlexMono'); g.letterSpacing = '0px'; g.textBaseline = 'alphabetic';
+  if (highlight && shown.includes(highlight)) {
+    const i = shown.indexOf(highlight);
+    const a = shown.slice(0, i), b = highlight, c = shown.slice(i + b.length);
+    g.fillStyle = color; g.fillText(a, x, y);
+    let cx = x + g.measureText(a).width;
+    g.fillStyle = hiColor; g.fillText(b, cx, y); cx += g.measureText(b).width;
+    g.fillStyle = color; g.fillText(c, cx, y);
+  } else { g.fillStyle = color; g.fillText(shown, x, y); }
+  if (n < text.length + 8 && Math.floor((t - at) * 4) % 2 === 0) { // cursor while typing
+    g.fillStyle = color; g.fillRect(x + g.measureText(shown).width + 4, y - size * 0.8, size * 0.5, size * 0.95);
+  }
+};
+// A qubit: disc + 2 px ring.
+E.qubit = (x, y, r, { fill = E.C.blue, ring = E.C.cyan, ringR = r * 1.6, lw = 2 } = {}) => {
+  g.fillStyle = fill; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+  if (ringR > r) { g.strokeStyle = ring; g.lineWidth = lw; g.beginPath(); g.arc(x, y, ringR, 0, Math.PI * 2); g.stroke(); }
+};
+
+// Bar wipe: covers the frame in 0.25 s, uncovers in 0.25 s, centred on `at` (the switch).
+const WIPES = [];
+E.wipe = (at, colors, { bars = 6, dir = 1 } = {}) => WIPES.push({ at, colors, bars, dir });
+function drawWipes(t) {
+  for (const w of WIPES) {
+    const lt = t - w.at;
+    if (lt < -0.42 || lt > 0.42) continue;
+    const bh = H / w.bars;
+    for (let i = 0; i < w.bars; i++) {
+      const d = i * 0.035;
+      const cover = ease.inOutCubic(range(lt, -0.3 + d, -0.05 + d));
+      const uncover = ease.inOutCubic(range(lt, 0.05 + d, 0.3 + d));
+      if (cover <= 0 || uncover >= 1) continue;
+      const x0 = w.dir > 0 ? -W + cover * W + uncover * W : W - cover * W - uncover * W;
+      g.fillStyle = w.colors[i % w.colors.length];
+      g.fillRect(x0 - 1, i * bh - 0.5, W + 2, bh + 1);
+    }
+  }
+}
+
+const SHOTS = [];
+window.SHOT = (s) => SHOTS.push(s);
+window.E = E;
+</script>
+<script src="shots/s01-hook.js"></script>
+<script src="shots/s02-world.js"></script>
+<script src="shots/s03-superposition.js"></script>
+<script src="shots/s04-entanglement.js"></script>
+<script src="shots/s05-qubit.js"></script>
+<script src="shots/s06-computer.js"></script>
+<script src="shots/s07-uses.js"></script>
+<script src="shots/s08-end.js"></script>
+<script>
+window.ready = (async () => {
+  await Promise.all(['300 100px PlexSans', '600 100px PlexSans', '400 100px PlexMono'].map((f) => document.fonts.load(f)));
+})();
+window.seek = (t) => {
+  g.setTransform(K, 0, 0, K, 0, 0);
+  g.filter = 'none';
+  // The shot whose window contains t draws the frame; windows are contiguous (switches sit under wipes).
+  const s = SHOTS.find((s) => t >= s.from() && t < s.to()) || SHOTS[SHOTS.length - 1];
+  g.save(); s.draw(g, t, t - s.from()); g.restore();
+  g.setTransform(K, 0, 0, K, 0, 0); g.filter = 'none';
+  drawWipes(t);
+};
+</script>
+</body></html>
