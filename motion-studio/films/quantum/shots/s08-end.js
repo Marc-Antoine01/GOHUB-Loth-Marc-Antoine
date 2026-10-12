@@ -11,15 +11,15 @@
       E.field(C.ink);
       if (t >= LOOP_CLEAR) return;
       E.push(lt, 45 - B(88), 900, 520, 0.03);
-      const end = words([{ text: 'Faster,', at: B(89) }, { text: 'Stronger,', at: B(90) }, { text: 'Computer', at: B(91), accent: true }], X, Y, SIZE, t);
+      const end = words([{ text: 'Faster,', at: B(88) + 0.3 }, { text: 'Stronger,', at: B(89) }, { text: 'Computer', at: B(90), accent: true }], X, Y, SIZE, t);
       // The full stop: the qubit from the hook falls into place and rings.
       const dx = end - SIZE * 0.28 + SIZE * 0.13, dy = Y - SIZE * 0.07, rr = SIZE * 0.075;
-      const fall = Math.max(0, M.spring(t - (B(92) - 0.25), 2.4, 0.5));
-      if (t >= B(92) - 0.25) {
-        const ring = M.range(t, B(92), B(92) + 0.6);
-        E.qubit(dx, M.lerp(dy - 420, dy, fall), rr, { fill: C.cyan, ring: C.cyan, ringR: t >= B(92) && ring < 1 ? rr * (1.5 + 3 * ring) : 0 });
+      const fall = Math.max(0, M.spring(t - (B(91) - 0.25), 2.4, 0.5));
+      if (t >= B(91) - 0.25) {
+        const ring = M.range(t, B(91), B(91) + 0.6);
+        E.qubit(dx, M.lerp(dy - 420, dy, fall), rr, { fill: C.cyan, ring: C.cyan, ringR: t >= B(91) && ring < 1 ? rr * (1.5 + 3 * ring) : 0 });
       }
-      mono('// the quantum world, now computable', X + 6, Y + 96, t, B(93));
+      mono('// the quantum world, now computable', X + 6, Y + 96, t, B(91) + 0.3);
     },
   });
 })();

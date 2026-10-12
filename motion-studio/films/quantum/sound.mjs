@@ -5,7 +5,7 @@ export function sfx({ sr, duration, beats, synth: s }) {
   const tick = (f) => s.tick(sr, { freq: f, decay: 0.012 });
   const glass = (midi, g = 0.18) => s.bell(sr, s.midiHz(midi), 0.9, { ratio: 3.01, index: 0.9, decay: 0.45 });
   // Word builds: a soft tick per word.
-  for (const t of [0.1, B(1), B(2), B(9), B(10), B(11), B(21), B(22), B(24), B(25), B(34), B(45), B(65), B(66), B(73), B(74), B(81), B(82), B(89), B(90), B(91)]) at(tick(2600), t, 0.14);
+  for (const t of [0.1, B(1), B(2), B(9), B(10), B(11), B(21), B(22), B(24), B(25), B(34), B(45), B(65), B(66), B(73), B(74), B(81), B(82), B(88) + 0.3, B(89), B(90)]) at(tick(2600), t, 0.14);
   // The qubit wakes: glass ping; snap zoom: air.
   at(glass(100), B(3), 0.2); at(s.whoosh(sr, 0.35, { seed: 3 }), B(8) - 0.32, 0.3);
   // Orbitals snap: granular shimmer.
@@ -24,6 +24,6 @@ export function sfx({ sr, duration, beats, synth: s }) {
   at(s.whoosh(sr, 0.3, { seed: 48 }), B(75) - 0.25, 0.2);
   at(s.kick(sr, { freq: 90, punch: 300, decay: 0.08 }), B(83), 0.5); at(tick(1500), B(83), 0.3);
   // End: the qubit lands as the full stop.
-  at(glass(100), B(92), 0.22);
+  at(glass(100), B(91), 0.22);
   return b;
 }
