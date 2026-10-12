@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S07 Simulate molecules</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s07-molecules-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s07-molecules-cam { position: absolute; inset: 0; }
+        #s07-molecules-cam .words, #s07-molecules-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s07-molecules" data-width="1920" data-height="1080">
+        <canvas id="s07-molecules-gfx"></canvas>
+        <div id="s07-molecules-cam">
+          <div class="words" id="s07-molecules-l1" data-x="120" data-y="450" data-size="120" data-color="ink" data-accent="blue">
+            <span data-beat="65">Simulate</span>
+          </div>
+          <div class="words" id="s07-molecules-l2" data-x="120" data-y="590" data-size="120" data-color="ink" data-accent="blue">
+            <span data-beat="66" class="accent">molecules.</span>
+          </div>
+          <div class="mono" id="s07-molecules-c1" data-x="126" data-y="700" data-beat="68">// new medicines, new materials</div>
+        </div>
+      </div>
+      <script>
+        // S07 Simulate molecules. Film time 29.9947–33.7493 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 29.9947, E = 33.7493, ID = 's07-molecules';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const VX = 1360, VY = 560;
+            Q.push(tl, cam, S, S, B(72) - B(64), VX, VY, 0.05);
+            for (const id of ['l1', 'l2']) Q.wordsFrom(tl, S, $(`#s07-molecules-${id}`));
+            Q.monoFrom(tl, S, $('#s07-molecules-c1'));
+            Q.drive(tl, S, S, E, (t) => {
+              Q.field(g, C.paper);
+              Q.pushCanvas(g, t - S, B(72) - B(64), VX, VY, 0.05);
+              // A hexagonal ring with three side atoms: atoms drift in one after another from beat 64.5, bonds draw on beat 68,
+              // then the molecule turns slowly while a pulse runs round the ring on each beat (the simulation running).
+              const r = M.mulberry32(7), atoms = [];
+              for (let i = 0; i < 6; i++) atoms.push([170 * Math.cos(i * Math.PI / 3 + Math.PI / 6), 170 * Math.sin(i * Math.PI / 3 + Math.PI / 6), 30, C.blue]);
+              for (const i of [0, 2, 4]) atoms.push([170 * 1.85 * Math.cos(i * Math.PI / 3 + Math.PI / 6), 170 * 1.85 * Math.sin(i * Math.PI / 3 + Math.PI / 6), 22, C.purple]);
+              const land = B(68), rot = 0.5 * M.ease.inOutCubic(M.range(t, B(67), B(72)));
+              const bonds = [[0, 1], [1, 2], [2, 3], [3, 4], [4, 5], [5, 0], [0, 6], [2, 7], [4, 8]];
+              const pos = atoms.map(([x, y], i) => {
+                const sx = 900 + r() * 950, sy = 120 + r() * 840;
+                const u = Math.max(0, M.spring(t - (Bf(64.5) + i * 0.2), 1.3, 0.72));
+                const rx = VX + x * Math.cos(rot) - y * Math.sin(rot), ry = VY + x * Math.sin(rot) + y * Math.cos(rot);
+                return [M.lerp(sx, rx, u), M.lerp(sy, ry, u)];
+              });
+              g.strokeStyle = C.gray80; g.lineWidth = 6; g.lineCap = 'round';
+              bonds.forEach(([a, bb], k) => {
+                const bp = M.ease.outExpo(M.range(t, land - 0.15 + k * 0.05, land + 0.35 + k * 0.05));
+                if (bp <= 0) return;
+                const [x1, y1] = pos[a], [x2, y2] = pos[bb];
+                g.beginPath(); g.moveTo(x1, y1); g.lineTo(M.lerp(x1, x2, bp), M.lerp(y1, y2, bp)); g.stroke();
+              });
+              atoms.forEach(([, , rad, col], i) => {
+                let ring = t >= land && i < 6 ? rad + 10 * (1 - M.range(t, land, land + 0.4)) : 0;
+                for (const k of [69, 70, 71]) { const u = M.range(t, B(k) + i * 0.06, B(k) + i * 0.06 + 0.35); if (i < 6 && u > 0 && u < 1) ring = rad + 4 + 22 * M.ease.outCubic(u); }
+                Q.qubit(g, pos[i][0], pos[i][1], rad, { fill: col, ring: col, ringR: ring });
+              });
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

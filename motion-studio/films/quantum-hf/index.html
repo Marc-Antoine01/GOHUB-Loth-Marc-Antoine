@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en" data-resolution="landscape">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1920, height=1080" />
+    <title>Faster, Stronger, Computer.</title>
+    <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: #161616; }
+      #root { position: relative; width: 100%; height: 100%; overflow: hidden; background: #161616; }
+      #transitions { z-index: 10; }
+    </style>
+    <!-- GSAP is vendored (no network at render). quantum.js is the shared engine every scene uses: beat grid, colours, text builders. -->
+    <script src="assets/vendor/gsap.min.js"></script>
+    <script src="assets/quantum.js"></script>
+  </head>
+  <body>
+    <!-- 45 s at 128 BPM (24 bars). Track 1: the ten scenes, cut on the beat under the wipes. Track 2: the wipes.
+         Track 3: the original score. Track 4: the SFX, placed on the same beat grid. Together they measure -14 LUFS. -->
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="45"
+      data-width="1920"
+      data-height="1080"
+    >
+      <div
+        id="s01-hook"
+        data-composition-id="s01-hook"
+        data-composition-src="compositions/s01-hook.html"
+        data-start="0"
+        data-duration="3.7493"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s02-world"
+        data-composition-id="s02-world"
+        data-composition-src="compositions/s02-world.html"
+        data-start="3.7493"
+        data-duration="5.624"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s03-superposition"
+        data-composition-id="s03-superposition"
+        data-composition-src="compositions/s03-superposition.html"
+        data-start="9.3733"
+        data-duration="5.6214"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s04-entanglement"
+        data-composition-id="s04-entanglement"
+        data-composition-src="compositions/s04-entanglement.html"
+        data-start="14.9947"
+        data-duration="5.6266"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s05-qubit"
+        data-composition-id="s05-qubit"
+        data-composition-src="compositions/s05-qubit.html"
+        data-start="20.6213"
+        data-duration="3.2774"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s06-computer"
+        data-composition-id="s06-computer"
+        data-composition-src="compositions/s06-computer.html"
+        data-start="23.8987"
+        data-duration="6.096"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s07-molecules"
+        data-composition-id="s07-molecules"
+        data-composition-src="compositions/s07-molecules.html"
+        data-start="29.9947"
+        data-duration="3.7546"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s08-routes"
+        data-composition-id="s08-routes"
+        data-composition-src="compositions/s08-routes.html"
+        data-start="33.7493"
+        data-duration="3.744"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s09-lock"
+        data-composition-id="s09-lock"
+        data-composition-src="compositions/s09-lock.html"
+        data-start="37.4933"
+        data-duration="3.7574"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="s10-end"
+        data-composition-id="s10-end"
+        data-composition-src="compositions/s10-end.html"
+        data-start="41.2507"
+        data-duration="3.7493"
+        data-track-index="1"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <div
+        id="transitions"
+        data-composition-id="transitions"
+        data-composition-src="compositions/transitions.html"
+        data-start="0"
+        data-duration="45"
+        data-track-index="2"
+        data-width="1920"
+        data-height="1080"
+      ></div>
+      <audio id="score" src="audio/score.m4a" data-start="0" data-duration="45" data-track-index="3" data-volume="1"></audio>
+      <audio id="sfx" src="audio/sfx.m4a" data-start="0" data-duration="45" data-track-index="4" data-volume="1"></audio>
+    </div>
+    <script>
+      // The host has no motion of its own: each scene and the transitions register their own timeline.
+      const tl = gsap.timeline({ paused: true });
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>

@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S10 End card: the line returns</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s10-end-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s10-end-cam { position: absolute; inset: 0; }
+        #s10-end-cam .words, #s10-end-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s10-end" data-width="1920" data-height="1080">
+        <canvas id="s10-end-gfx"></canvas>
+        <div id="s10-end-cam">
+          <div class="words" id="s10-end-line" data-x="120" data-y="560" data-size="120">
+            <span data-beat="88" data-offset="0.3">Faster,</span>
+            <span data-beat="89">Stronger,</span>
+            <span data-beat="90" class="accent">Computer</span>
+          </div>
+          <div class="mono" id="s10-end-c1" data-x="126" data-y="656" data-beat="91" data-offset="0.3">// the quantum world, now computable</div>
+        </div>
+      </div>
+      <script>
+        // S10 End card: the line returns. Film time 41.2507–45.0000 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 41.2507, E = 45, ID = 's10-end';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const LOOP_CLEAR = 44.45; // the transitions' last wipe sweeps the card away; the last frames are the empty field frame 0 starts from
+            const SIZE = 120, Y = 560;
+            Q.push(tl, cam, S, S, 45 - B(88), 900, 520, 0.03);
+            const end = Q.wordsFrom(tl, S, $('#s10-end-line'));
+            Q.monoFrom(tl, S, $('#s10-end-c1'));
+            tl.set(cam, { opacity: 0 }, LOOP_CLEAR - S);
+            // The full stop: the qubit from the hook falls into place and rings.
+            const dx = end - SIZE * 0.28 + SIZE * 0.13, dy = Y - SIZE * 0.07, rr = SIZE * 0.075;
+            Q.drive(tl, S, S, E, (t) => {
+              Q.field(g, C.ink);
+              if (t >= LOOP_CLEAR) return;
+              Q.pushCanvas(g, t - S, 45 - B(88), 900, 520, 0.03);
+              const fall = Math.max(0, M.spring(t - (B(91) - 0.25), 2.4, 0.5));
+              if (t >= B(91) - 0.25) {
+                const ring = M.range(t, B(91), B(91) + 0.6);
+                Q.qubit(g, dx, M.lerp(dy - 420, dy, fall), rr, { fill: C.cyan, ring: C.cyan, ringR: t >= B(91) && ring < 1 ? rr * (1.5 + 3 * ring) : 0 });
+                // It keeps listening: a thin ripple on each remaining beat, as in the hook.
+                for (const k of [92, 93]) {
+                  const u = M.range(t, B(k), B(k) + 0.45);
+                  if (u > 0 && u < 1) { g.strokeStyle = `rgba(130,207,255,${(0.8 * (1 - u)).toFixed(3)})`; g.lineWidth = 2; g.beginPath(); g.arc(dx, dy, rr * (1.3 + 2 * M.ease.outCubic(u)), 0, Math.PI * 2); g.stroke(); }
+                }
+              }
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

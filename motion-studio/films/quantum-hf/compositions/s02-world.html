@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S02 The quantum world</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s02-world-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s02-world-cam { position: absolute; inset: 0; }
+        #s02-world-cam .words, #s02-world-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s02-world" data-width="1920" data-height="1080">
+        <canvas id="s02-world-gfx"></canvas>
+        <div id="s02-world-cam">
+          <div class="words" id="s02-world-l1" data-x="120" data-y="500" data-size="120">
+            <span data-beat="9">The</span>
+            <span data-beat="10" class="accent">quantum</span>
+          </div>
+          <div class="words" id="s02-world-l2" data-x="120" data-y="640" data-size="120">
+            <span data-beat="11">world.</span>
+          </div>
+          <div class="mono" id="s02-world-c1" data-x="126" data-y="740" data-beat="13" data-offset="0.1">// position becomes probability</div>
+          <div class="mono" id="s02-world-c2" data-x="126" data-y="800" data-beat="16" data-color="gray30">// until you look</div>
+        </div>
+      </div>
+      <script>
+        // S02 The quantum world. Film time 3.7493–9.3733 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 3.7493, E = 9.3733, ID = 's02-world';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const NX = 1300, NY = 540;
+            const ORB = [{ a: 330, b: 120, rot: 0.35 }, { a: 330, b: 120, rot: -0.75 }, { a: 330, b: 120, rot: 1.45 }];
+            const CX = NX + 330 * Math.cos(0.35) * 0.7, CY = NY + 330 * Math.sin(0.35) * 0.7 - 60; // where the look finds it
+            const d = Q.hookDot();
+            Q.push(tl, cam, S, S, B(20) - B(8), NX, NY, 0.06);
+            for (const id of ['l1', 'l2']) Q.wordsFrom(tl, S, $(`#s02-world-${id}`));
+            for (const id of ['c1', 'c2']) Q.monoFrom(tl, S, $(`#s02-world-${id}`));
+            Q.drive(tl, S, S, E, (t) => {
+              const lt = t - S;
+              Q.field(g, C.ink);
+              Q.pushCanvas(g, lt, B(20) - B(8), NX, NY, 0.06);
+              // The hook's full stop flies to the nucleus and grows (0.35 s): it continues S01's snap zoom.
+              const z = M.ease.inOutCubic(M.range(lt, 0, 0.35));
+              const nx = M.lerp(d.sx, NX, z), ny = M.lerp(d.sy, NY, z), nr = M.lerp(d.r * 1.9 * 6 * d.P, 30, z);
+              // Clouds: seeded dots around each orbital; the spread falls from a fuzzy cloud to a crisp ring on beat 13.
+              const crisp = Math.max(0, M.spring(t - (B(13) - 0.15), 2.2, 0.55));
+              // The measurement: orbital 0 collapses to one bright point on beat 16, then spreads out again by beat 19.
+              const look = M.ease.outExpo(M.range(t, B(16) - 0.12, B(16) + 0.1)) * (1 - M.ease.inOutCubic(M.range(t, B(17), B(19))));
+              const spread = M.lerp(70, 5, crisp) * Math.max(0.25, z);
+              ORB.forEach((o, k) => {
+                const r = M.mulberry32(100 + k);
+                g.fillStyle = k === 1 ? C.purple40 : C.blue40;
+                const spin = t * (0.35 + k * 0.12), col = k === 0 ? look : 0;
+                for (let i = 0; i < 700; i++) {
+                  const th = r() * Math.PI * 2 + spin, u = r(), v = r();
+                  const gauss = Math.sqrt(-2 * Math.log(u + 1e-9)) * Math.cos(2 * Math.PI * v);
+                  const zz = M.lerp(1.8, 1, z), ex = (o.a + gauss * spread) * Math.cos(th) * zz, ey = (o.b + gauss * spread * 0.6) * Math.sin(th) * zz;
+                  let x = nx + ex * Math.cos(o.rot) - ey * Math.sin(o.rot), y = ny + ex * Math.sin(o.rot) + ey * Math.cos(o.rot);
+                  if (col > 0) { x = M.lerp(x, CX, col); y = M.lerp(y, CY, col); }
+                  const s = 2 + (i % 3 === 0 ? 1 : 0);
+                  g.fillRect(x - s / 2, y - s / 2, s, s);
+                }
+              });
+              if (look > 0.02) { // the measured position: the one place the electron was found
+                const u = M.range(t, B(16), B(16) + 0.6);
+                Q.qubit(g, CX, CY, 14 * look, { fill: C.white, ring: C.white, ringR: u < 1 ? 14 + 60 * M.ease.outCubic(u) : 0 });
+              }
+              Q.qubit(g, nx, ny, nr, { fill: C.cyan, ring: C.cyan, ringR: nr * 1.7 });
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

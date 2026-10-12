@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S08 Optimize the impossible</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s08-routes-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s08-routes-cam { position: absolute; inset: 0; }
+        #s08-routes-cam .words, #s08-routes-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s08-routes" data-width="1920" data-height="1080">
+        <canvas id="s08-routes-gfx"></canvas>
+        <div id="s08-routes-cam">
+          <div class="words" id="s08-routes-l1" data-x="120" data-y="450" data-size="120" data-color="ink" data-accent="blue">
+            <span data-beat="73" class="accent">Optimize</span>
+          </div>
+          <div class="words" id="s08-routes-l2" data-x="120" data-y="590" data-size="120" data-color="ink" data-accent="blue">
+            <span data-beat="74">the</span>
+            <span data-beat="74" data-offset="0.23">impossible.</span>
+          </div>
+          <div class="mono" id="s08-routes-c1" data-x="126" data-y="700" data-beat="76">// routes, portfolios, power grids</div>
+        </div>
+      </div>
+      <script>
+        // S08 Optimize the impossible. Film time 33.7493–37.4933 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 33.7493, E = 37.4933, ID = 's08-routes';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const VX = 1360, VY = 560;
+            Q.push(tl, cam, S, S, B(80) - B(72), VX, VY, 0.05);
+            for (const id of ['l1', 'l2']) Q.wordsFrom(tl, S, $(`#s08-routes-${id}`));
+            Q.monoFrom(tl, S, $('#s08-routes-c1'));
+            Q.drive(tl, S, S, E, (t) => {
+              Q.field(g, C.paper);
+              Q.pushCanvas(g, t - S, B(80) - B(72), VX, VY, 0.05);
+              // Fourteen tangled routes from A to B keep searching (their bends wander) until beat 76, when they collapse onto
+              // the one shortest path; a traveller then runs it from beat 77 and arrives on beat 79.
+              const ax = 1000, bx = 1800, y = VY, r = M.mulberry32(21);
+              const solve = Math.max(0, M.spring(t - (B(76) - 0.2), 2.0, 0.6));
+              const live = (1 - Math.min(1, solve)) * M.ease.inOutCubic(M.range(t, B(72), B(73)));
+              for (let k = 0; k < 14; k++) {
+                const c1 = [ax + 150 + r() * 400, 160 + r() * 760], c2 = [bx - 150 - r() * 400, 160 + r() * 760];
+                c1[1] += 110 * live * M.noise1(30 + k, t * 1.3); c2[1] += 110 * live * M.noise1(60 + k, t * 1.3);
+                const s1 = [M.lerp(c1[0], ax + 300, solve), M.lerp(c1[1], y, solve)], s2 = [M.lerp(c2[0], bx - 300, solve), M.lerp(c2[1], y, solve)];
+                g.strokeStyle = solve > 0.95 ? C.blue : C.gray30; g.lineWidth = solve > 0.95 ? 8 : 3;
+                g.beginPath(); g.moveTo(ax, y); g.bezierCurveTo(s1[0], s1[1], s2[0], s2[1], bx, y); g.stroke();
+              }
+              const go = M.ease.inOutCubic(M.range(t, B(77), B(79)));
+              if (go > 0 && go < 1) Q.qubit(g, M.lerp(ax, bx, go), y, 14, { fill: C.purple, ringR: 0 });
+              Q.qubit(g, ax, y, 20, { fill: C.ink, ringR: 0 });
+              const arrive = M.range(t, B(79), B(79) + 0.5);
+              Q.qubit(g, bx, y, 20, { fill: C.blue, ring: C.blue, ringR: t >= B(76) ? 34 + (arrive > 0 && arrive < 1 ? 30 * M.ease.outCubic(arrive) : 0) : 0 });
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

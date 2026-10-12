@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S01 Hook: "Faster, Stronger, Computer."</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s01-hook-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s01-hook-cam { position: absolute; inset: 0; }
+        #s01-hook-cam .words, #s01-hook-cam .mono { position: absolute; inset: 0; }
+        #s01-hook-zoom { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s01-hook" data-width="1920" data-height="1080">
+        <canvas id="s01-hook-gfx"></canvas>
+        <div id="s01-hook-cam">
+          <div id="s01-hook-zoom">
+            <div class="words" id="s01-hook-line" data-x="120" data-y="600" data-color="white" data-accent="cyan">
+              <span data-at="0.1">Faster,</span>
+              <span data-beat="1">Stronger,</span>
+              <span data-beat="2" class="accent">Computer</span>
+            </div>
+            <div class="mono" id="s01-hook-tag" data-beat="1" data-offset="0.05">// quantum</div>
+            <div class="mono" id="s01-hook-tag2" data-beat="5" data-color="gray30">computing</div>
+          </div>
+        </div>
+      </div>
+      <script>
+        // S01 Hook: "Faster, Stronger, Computer.". Film time 0.0000–3.7493 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 0, E = 3.7493, ID = 's01-hook';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const dot = Q.hookDot(), SIZE = dot.size;
+            // The camera: a centred push, then the snap zoom into the full stop on the last half-beat (it becomes S02's nucleus).
+            Q.push(tl, cam, S, 0, B(8), Q.W / 2, dot.fy, dot.P - 1);
+            const zoom = $('#s01-hook-zoom');
+            Object.assign(zoom.style, { position: 'absolute', inset: '0', transformOrigin: `${dot.x}px ${dot.y}px` });
+            tl.fromTo(zoom, { scale: 1 }, { scale: 6, duration: 0.32, ease: 'expo.in' }, B(8) - 0.32);
+            Q.wordsFrom(tl, S, $('#s01-hook-line'), { size: SIZE });
+            Q.monoFrom(tl, S, $('#s01-hook-tag'), { x: dot.X + 6, y: dot.Y + SIZE * 0.8 });
+            Q.monoFrom(tl, S, $('#s01-hook-tag2'), { x: dot.X + 6 + 46 * 0.6 * 11, y: dot.Y + SIZE * 0.8 });
+            Q.drive(tl, S, S, E, (t) => {
+              Q.field(g, C.ink);
+              Q.pushCanvas(g, t, B(8), Q.W / 2, dot.fy, dot.P - 1);
+              const z = 1 + 5 * M.ease.inExpo(M.range(t, B(8) - 0.32, B(8)));
+              g.translate(dot.x, dot.y); g.scale(z, z); g.translate(-dot.x, -dot.y);
+              // The full stop lands with "Computer", then on beat 3 it wakes up: a ring opens and it starts to oscillate.
+              if (t >= B(2) - 0.05) {
+                const wake = M.spring(t - B(3), 2.4, 0.35);
+                const osc = t >= B(3) ? Math.sin((t - B(3)) * Math.PI * 2 * 2.13) * 6 * Math.exp(-(t - B(3)) * 0.4) : 0;
+                Q.qubit(g, dot.x, dot.y + osc, dot.r * (1 + 0.9 * Math.max(0, wake)), { fill: C.cyan, ring: C.cyan, ringR: t >= B(3) ? dot.r * (1 + 2.4 * Math.max(0, wake)) : 0, lw: 4 });
+                // Heartbeat: from beat 5 a ripple runs out inside its ring on every beat.
+                for (const k of [5, 6, 7]) {
+                  const u = M.range(t, B(k), B(k) + 0.45);
+                  if (u > 0 && u < 1) { g.strokeStyle = `rgba(130,207,255,${(0.8 * (1 - u)).toFixed(3)})`; g.lineWidth = 2; g.beginPath(); g.arc(dot.x, dot.y + osc, dot.r * (1.3 + 2 * M.ease.outCubic(u)), 0, Math.PI * 2); g.stroke(); }
+                }
+              }
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

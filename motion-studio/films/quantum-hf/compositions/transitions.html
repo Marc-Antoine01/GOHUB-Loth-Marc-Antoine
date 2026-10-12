@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Transitions: stacked-bar wipes</title>
+  </head>
+  <body>
+    <template>
+      <style>
+        #root { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+        #transitions-bars .wipe { position: absolute; inset: 0; }
+        #transitions-bars .bar { position: absolute; left: -1px; width: 1922px; height: 181px; opacity: 0; }
+      </style>
+      <div id="root" data-composition-id="transitions" data-width="1920" data-height="1080">
+        <div id="transitions-bars">
+          <div class="wipe" data-at="9.3733" data-dir="1" data-colors="blue paper blue paper blue paper"></div>
+          <div class="wipe" data-at="14.9947" data-dir="-1" data-colors="blue paper blue40 paper blue paper"></div>
+          <div class="wipe" data-at="20.6213" data-dir="1" data-colors="blue paper blue paper blue paper"></div>
+          <div class="wipe" data-at="29.9947" data-dir="1" data-colors="blue paper blue paper blue paper"></div>
+          <div class="wipe" data-at="33.7493" data-dir="-1" data-colors="blue paper blue40 paper blue paper"></div>
+          <div class="wipe" data-at="37.4933" data-dir="1" data-colors="blue paper blue paper blue paper"></div>
+          <div class="wipe" data-at="41.2507" data-dir="-1" data-colors="blue ink blue ink blue ink"></div>
+          <div class="wipe" data-at="44.45" data-dir="1" data-colors="gray80 ink gray80 ink gray80 ink"></div>
+        </div>
+      </div>
+      <script>
+        // Every scene change sits under a wipe: six bars cover the frame in 0.25 s, the cut happens at data-at,
+        // and they uncover in 0.25 s, each bar 35 ms after the one above. data-dir 1 sweeps left to right, -1 right to left.
+        (() => {
+          const { C, W, H } = Q;
+          const tl = gsap.timeline({ paused: true });
+          for (const w of document.querySelectorAll('#transitions-bars .wipe')) {
+            const at = +w.dataset.at, dir = +w.dataset.dir, colors = w.dataset.colors.split(' ');
+            colors.forEach((c, i) => {
+              const bar = document.createElement('div');
+              bar.className = 'bar'; bar.style.top = `${(i * H) / 6 - 0.5}px`; bar.style.background = C[c] || c;
+              w.appendChild(bar);
+              const d = i * 0.035;
+              tl.set(bar, { opacity: 1 }, at - 0.3 + d); // painted only while it crosses the frame
+              tl.fromTo(bar, { x: -dir * W }, { x: 0, duration: 0.25, ease: 'power2.inOut' }, at - 0.3 + d);
+              tl.to(bar, { x: dir * W, duration: 0.25, ease: 'power2.inOut' }, at + 0.05 + d);
+              tl.set(bar, { opacity: 0 }, at + 0.3 + d);
+            });
+          }
+          window.__timelines['transitions'] = tl;
+        })();
+      </script>
+    </template>
+  </body>
+</html>

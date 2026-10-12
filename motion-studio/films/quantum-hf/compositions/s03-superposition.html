@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S03 Superposition: 0 and 1 at once</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s03-superposition-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s03-superposition-cam { position: absolute; inset: 0; }
+        #s03-superposition-cam .words, #s03-superposition-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s03-superposition" data-width="1920" data-height="1080">
+        <canvas id="s03-superposition-gfx"></canvas>
+        <div id="s03-superposition-cam">
+          <div class="words" id="s03-superposition-l1" data-x="120" data-y="460" data-size="128" data-color="ink" data-accent="blue">
+            <span data-beat="21">0</span>
+            <span data-beat="21" data-offset="0.23">and</span>
+            <span data-beat="22">1.</span>
+          </div>
+          <div class="words" id="s03-superposition-l2" data-x="120" data-y="610" data-size="128" data-color="ink" data-accent="blue">
+            <span data-beat="24">At</span>
+            <span data-beat="25" class="accent">once.</span>
+          </div>
+          <div class="mono" id="s03-superposition-c1" data-x="126" data-y="720" data-beat="26">|ψ⟩ = α|0⟩ + β|1⟩</div>
+          <div class="mono" id="s03-superposition-c2" data-x="126" data-y="790" data-beat="28" data-size="38">// α, β: how much of each</div>
+        </div>
+      </div>
+      <script>
+        // S03 Superposition: 0 and 1 at once. Film time 9.3733–14.9947 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 9.3733, E = 14.9947, ID = 's03-superposition';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const GX = 1340, GY = 690;
+            Q.push(tl, cam, S, S, B(32) - B(20), GX, GY - 200, 0.04);
+            for (const id of ['l1', 'l2']) Q.wordsFrom(tl, S, $(`#s03-superposition-${id}`));
+            for (const id of ['c1', 'c2']) Q.monoFrom(tl, S, $(`#s03-superposition-${id}`));
+            Q.drive(tl, S, S, E, (t) => {
+              const lt = t - S;
+              Q.field(g, C.paper);
+              Q.pushCanvas(g, lt, B(32) - B(20), GX, GY - 200, 0.04);
+              // The bit: "0" and "1" in the same place; on beat 24 they part and breathe against each other on every beat.
+              const split = Math.max(0, M.spring(t - (B(24) - 0.12), 2.0, 0.5));
+              const beatPhase = ((t - B(24)) / (B(25) - B(24))) % 1;
+              const breathe = t > B(24) ? 0.5 - 0.5 * Math.cos(beatPhase * Math.PI * 2) : 0;
+              const off = split * (150 + 18 * breathe);
+              const enter = M.ease.outExpo(M.range(t, B(20) + 0.05, B(21)));
+              // α and β: from beat 27 the weight swings between the two over 4 beats, twice.
+              const w = t > B(27) ? Math.sin(((t - B(27)) / (B(31) - B(27))) * Math.PI * 2) * M.ease.inOutCubic(M.range(t, B(27), B(28))) : 0;
+              const s0 = 1 + 0.16 * w, s1 = 1 - 0.16 * w;
+              g.save();
+              g.font = '300 520px PlexSans'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+              g.beginPath(); g.rect(GX - 700, GY - 520, 1400, 560); g.clip();
+              g.globalCompositeOperation = 'multiply';
+              g.fillStyle = C.blue; g.save(); g.translate(GX - off, GY + (1 - enter) * 560); g.scale(s0, s0); g.fillText('0', 0, 0); g.restore();
+              g.fillStyle = C.purple; g.save(); g.translate(GX + off, GY + (1 - enter) * 560); g.scale(s1, s1); g.fillText('1', 0, 0); g.restore();
+              g.restore();
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

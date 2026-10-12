@@ -5,3 +5,5 @@ tests/*/beats.json
 films/*/assets/fonts/
 # Inter Tight is SIL OFL (assets/fonts/OFL.txt): safe to commit
 !films/loop-earplugs/assets/fonts/
+# IBM Plex is SIL OFL (assets/fonts/OFL-LICENSE.txt): the HyperFrames project ships its fonts
+!films/quantum-hf/assets/fonts/

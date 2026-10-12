@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S06 The computer: silence, then the qubit lattice and 2ⁿ</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s06-computer-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s06-computer-cam { position: absolute; inset: 0; }
+        #s06-computer-cam .words, #s06-computer-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s06-computer" data-width="1920" data-height="1080">
+        <canvas id="s06-computer-gfx"></canvas>
+        <div id="s06-computer-cam">
+          <div class="mono" id="s06-computer-c1" data-x="126" data-y="760" data-beat="52">// 11 qubits</div>
+          <div class="mono" id="s06-computer-c2" data-x="126" data-y="760" data-beat="61">// n qubits, 2^n states</div>
+          <div class="mono" id="s06-computer-c3" data-x="126" data-y="820" data-beat="62" data-size="38" data-color="gray30">// +1 qubit, ×2 states</div>
+        </div>
+      </div>
+      <script>
+        // S06 The computer: silence, then the qubit lattice and 2ⁿ. Film time 23.8987–29.9947 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 23.8987, E = 29.9947, ID = 's06-computer';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const ROWS = 7, COLS = 11, LX = 860, LY = 230, DX = 88, DY = 100;
+            const row = (r) => Bf(52 + r * 1.4); // a row every 1.4 beats: the last lands on beat 60.4
+            Q.push(tl, cam, S, B(52), B(64) - B(52), 1300, 540, 0.035);
+            const c1 = Q.monoFrom(tl, S, $('#s06-computer-c1'));
+            // The count in the first caption follows the lit rows (11, 22 … 77); at beat 61 it gives way to the second caption.
+            const digits = [...c1.querySelectorAll('span')].slice(3, 5);
+            for (let r = 1; r < ROWS; r++) { const n = String((r + 1) * COLS); tl.set(digits[0], { textContent: n[0] }, row(r) - S); tl.set(digits[1], { textContent: n[1] }, row(r) - S); }
+            tl.set(c1, { opacity: 0 }, B(61) - S);
+            for (const id of ['c2', 'c3']) Q.monoFrom(tl, S, $(`#s06-computer-${id}`));
+            Q.drive(tl, S, S, E, (t) => {
+              if (t < B(52)) {
+                // The silence: the Bloch frame holds, then ink swallows it from the qubit, landing exactly on the drop.
+                Q.field(g, C.paper);
+                g.save(); Q.pushCanvas(g, t - B(44), B(52) - B(44), Q.SX, Q.SY, 0.06); const tip = Q.bloch(g, t); g.restore();
+                const r = 2400 * M.ease.inExpo(M.range(t, B(51) + 0.05, B(52)));
+                g.fillStyle = C.ink; g.beginPath(); g.arc(tip.x, tip.y, Math.max(0, r), 0, Math.PI * 2); g.fill();
+                return;
+              }
+              Q.field(g, C.ink);
+              Q.pushCanvas(g, t - B(52), B(64) - B(52), 1300, 540, 0.035);
+              // Lattice links (stylised heavy-hex: horizontal rows, a vertical link every 4 nodes, alternating offset).
+              g.lineWidth = 2;
+              for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+                const x = LX + c * DX, y = LY + r * DY, lit = t >= row(r);
+                g.strokeStyle = lit ? 'rgba(130,207,255,0.55)' : C.gray80;
+                if (c < COLS - 1) { g.beginPath(); g.moveTo(x, y); g.lineTo(x + DX, y); g.stroke(); }
+                if (r < ROWS - 1 && (c + (r % 2) * 2) % 4 === 0) { g.beginPath(); g.moveTo(x, y); g.lineTo(x, y + DY); g.stroke(); }
+              }
+              for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+                const x = LX + c * DX, y = LY + r * DY;
+                const p = Math.max(0, M.spring(t - (row(r) + c * 0.012), 2.6, 0.45));
+                if (t < row(r)) { g.fillStyle = C.gray80; g.beginPath(); g.arc(x, y, 9, 0, Math.PI * 2); g.fill(); continue; }
+                // After the count: a diagonal wave runs through the lattice on every beat (the computation working).
+                let wv = 0;
+                for (const k of [61, 62, 63]) { const dd = (t - B(k)) * 2.6 - (c + r) / (ROWS + COLS - 2); if (dd > 0 && dd < 0.35) wv = Math.max(wv, Math.sin((dd / 0.35) * Math.PI)); }
+                Q.qubit(g, x, y, 9 + 4 * p + 5 * wv, { fill: wv > 0.5 ? C.cyan : C.blue, ring: C.cyan, ringR: 13 + 8 * p + 10 * wv });
+              }
+              // 2ⁿ: the exponent counts the lit rows' qubits, then becomes n on beat 61.
+              let lit = 0; for (let r = 0; r < ROWS; r++) if (t >= row(r)) lit = r + 1; lit = Math.max(1, lit);
+              g.textBaseline = 'alphabetic';
+              g.font = '300 300px PlexSans'; g.fillStyle = C.white; g.fillText('2', 120, 640);
+              const ex = t >= B(61) ? 'n' : String(lit * COLS);
+              const pop = 1 + 0.12 * (1 - Math.max(0, M.spring(t - (t >= B(61) ? B(61) : row(lit - 1)), 2.6, 0.4)));
+              g.save(); g.translate(300, 470); g.scale(pop, pop); g.font = '600 140px PlexSans'; g.fillStyle = C.cyan; g.fillText(ex, 0, 0); g.restore();
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

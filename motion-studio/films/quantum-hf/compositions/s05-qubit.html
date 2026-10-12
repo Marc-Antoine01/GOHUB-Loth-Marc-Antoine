@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S05 The qubit (Bloch sphere)</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s05-qubit-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s05-qubit-cam { position: absolute; inset: 0; }
+        #s05-qubit-cam .words, #s05-qubit-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s05-qubit" data-width="1920" data-height="1080">
+        <canvas id="s05-qubit-gfx"></canvas>
+        <div id="s05-qubit-cam">
+          <div class="words" id="s05-qubit-l1" data-x="120" data-y="520" data-size="128" data-color="ink" data-accent="blue">
+            <span data-beat="44" data-offset="0.12">The</span>
+            <span data-beat="45" class="accent">qubit.</span>
+          </div>
+          <div class="mono" id="s05-qubit-c1" data-x="126" data-y="640" data-beat="45" data-offset="0.2">// any blend of 0 and 1</div>
+          <div class="mono" id="s05-qubit-c2" data-x="126" data-y="700" data-beat="49" data-size="38">// balanced: half 0, half 1</div>
+        </div>
+      </div>
+      <script>
+        // S05 The qubit (Bloch sphere). Film time 20.6213–23.8987 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 20.6213, E = 23.8987, ID = 's05-qubit';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            Q.push(tl, cam, S, S, B(52) - B(44), Q.SX, Q.SY, 0.06);
+            Q.wordsFrom(tl, S, $('#s05-qubit-l1'));
+            for (const id of ['c1', 'c2']) Q.monoFrom(tl, S, $(`#s05-qubit-${id}`));
+            Q.drive(tl, S, S, E, (t) => {
+              Q.field(g, C.paper);
+              Q.pushCanvas(g, t - S, B(52) - B(44), Q.SX, Q.SY, 0.06);
+              Q.bloch(g, t);
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>

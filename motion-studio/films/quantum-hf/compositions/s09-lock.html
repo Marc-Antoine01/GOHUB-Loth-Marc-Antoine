@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>S09 Secure tomorrow</title>
+  </head>
+  <body>
+    <template>
+      <style>
+      @font-face { font-family: PlexSans; font-weight: 300; src: url(assets/fonts/IBMPlexSans-Light.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 400; src: url(assets/fonts/IBMPlexSans-Regular.woff2) format('woff2'); }
+      @font-face { font-family: PlexSans; font-weight: 600; src: url(assets/fonts/IBMPlexSans-SemiBold.woff2) format('woff2'); }
+      @font-face { font-family: PlexMono; font-weight: 400; src: url(assets/fonts/IBMPlexMono-Regular.woff2) format('woff2'); }
+        #root { position: absolute; inset: 0; overflow: hidden; }
+        #s09-lock-gfx { position: absolute; inset: 0; width: 100%; height: 100%; }
+        #s09-lock-cam { position: absolute; inset: 0; }
+        #s09-lock-cam .words, #s09-lock-cam .mono { position: absolute; inset: 0; }
+      </style>
+      <div id="root" data-composition-id="s09-lock" data-width="1920" data-height="1080">
+        <canvas id="s09-lock-gfx"></canvas>
+        <div id="s09-lock-cam">
+          <div class="words" id="s09-lock-l1" data-x="120" data-y="450" data-size="120" data-color="ink" data-accent="blue">
+            <span data-beat="81">Secure</span>
+          </div>
+          <div class="words" id="s09-lock-l2" data-x="120" data-y="590" data-size="120" data-color="ink" data-accent="blue">
+            <span data-beat="82" class="accent">tomorrow.</span>
+          </div>
+          <div class="mono" id="s09-lock-c1" data-x="126" data-y="700" data-beat="83" data-highlight="at risk">// today's encryption is at risk</div>
+          <div class="mono" id="s09-lock-c2" data-x="126" data-y="760" data-beat="85" data-size="38">// so we build new locks</div>
+        </div>
+      </div>
+      <script>
+        // S09 Secure tomorrow. Film time 37.4933–41.2507 s. Graphics: canvas, repainted from film time t by the timeline.
+        // Text: the .words / .mono markup above (edit the words or their data-beat there).
+        (() => {
+          const { M, B, Bf, C } = Q, S = 37.4933, E = 41.2507, ID = 's09-lock';
+          Q.ready.then(() => {
+            const tl = gsap.timeline({ paused: true });
+            const g = Q.canvas(document.getElementById(`${ID}-gfx`)), cam = document.getElementById(`${ID}-cam`);
+            const $ = (sel) => cam.querySelector(sel);
+            const VX = 1360, VY = 560;
+            Q.push(tl, cam, S, S, B(88) - B(80), VX, VY, 0.05);
+            for (const id of ['l1', 'l2']) Q.wordsFrom(tl, S, $(`#s09-lock-${id}`));
+            for (const id of ['c1', 'c2']) Q.monoFrom(tl, S, $(`#s09-lock-${id}`));
+            Q.drive(tl, S, S, E, (t) => {
+              Q.field(g, C.paper);
+              Q.pushCanvas(g, t - S, B(88) - B(80), VX, VY, 0.05);
+              // Today's lock sits closed; on beat 83 it is cracked (the shackle springs open, the body flashes magenta),
+              // and on beat 85 a new one snaps shut, blue, with a small overshoot: encryption made for the quantum era.
+              const open = Math.max(0, M.spring(t - B(83), 3.0, 0.4)), close = Math.max(0, M.spring(t - (B(85) - 0.12), 2.6, 0.38));
+              const shake = t > B(82) && t < B(83) ? 6 * Math.sin(t * 90) * M.range(t, B(82), B(83)) : 0;
+              const lift = 120 * (open - close);
+              const bw = 360, bh = 300, cx = VX + shake, x = cx - bw / 2, yb = VY - 40;
+              g.strokeStyle = C.ink; g.lineWidth = 34; g.lineCap = 'butt';
+              g.beginPath(); g.moveTo(cx - 110, yb - lift + 4); g.lineTo(cx - 110, yb - 120 - lift); g.arc(cx, yb - 120 - lift, 110, Math.PI, 0); g.lineTo(cx + 110, yb - lift * 0.2); g.stroke();
+              g.fillStyle = t >= B(85) ? C.blue : t >= B(83) ? C.magenta : C.gray80; g.beginPath(); g.roundRect(x, yb, bw, bh, 18); g.fill();
+              g.fillStyle = C.paper; g.beginPath(); g.arc(cx, yb + 120, 26, 0, Math.PI * 2); g.fill(); g.fillRect(cx - 9, yb + 130, 18, 70);
+              const ring = M.range(t, B(85), B(85) + 0.6);
+              if (ring > 0 && ring < 1) { g.strokeStyle = C.blue; g.lineWidth = 3 * (1 - ring); g.beginPath(); g.roundRect(x - 40 * ring, yb - 40 * ring, bw + 80 * ring, bh + 80 * ring, 18 + 20 * ring); g.stroke(); }
+            });
+            window.__timelines[ID] = tl;
+          });
+        })();
+      </script>
+    </template>
+  </body>
+</html>
