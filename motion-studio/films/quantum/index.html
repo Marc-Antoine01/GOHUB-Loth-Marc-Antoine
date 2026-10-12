@@ -26,6 +26,8 @@ const E = {
   col: (n) => 120 + n * ((W - 240) / 16),
 };
 E.bar = (n) => E.B(n * 4);
+// Fractional beat index: B(52.5) is the 8th note between beats 52 and 53.
+E.Bf = (x) => { const i = Math.floor(x); return M.lerp(E.B(i), E.B(i + 1), x - i); };
 
 E.field = (color, dots = color === E.C.ink ? 'rgba(255,255,255,0.07)' : 'rgba(22,22,22,0.07)') => {
   g.fillStyle = color; g.fillRect(-W, -H, W * 3, H * 3);

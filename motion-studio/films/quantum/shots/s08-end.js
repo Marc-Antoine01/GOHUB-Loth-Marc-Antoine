@@ -18,6 +18,11 @@
       if (t >= B(91) - 0.25) {
         const ring = M.range(t, B(91), B(91) + 0.6);
         E.qubit(dx, M.lerp(dy - 420, dy, fall), rr, { fill: C.cyan, ring: C.cyan, ringR: t >= B(91) && ring < 1 ? rr * (1.5 + 3 * ring) : 0 });
+        // It keeps listening: a thin ring on each remaining beat, as in the hook.
+        for (const b of [92, 93]) {
+          const u = M.range(t, B(b), B(b) + 0.45);
+          if (u > 0 && u < 1) { g.strokeStyle = `rgba(130,207,255,${(0.8 * (1 - u)).toFixed(3)})`; g.lineWidth = 2; g.beginPath(); g.arc(dx, dy, rr * (1.3 + 2 * M.ease.outCubic(u)), 0, Math.PI * 2); g.stroke(); }
+        }
       }
       mono('// the quantum world, now computable', X + 6, Y + 96, t, B(91) + 0.3);
     },

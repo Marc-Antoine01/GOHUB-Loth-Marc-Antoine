@@ -1,4 +1,5 @@
-// S05 The qubit, bar 7: a Bloch sphere; the state arrow sweeps and lands on the equator, then holds into the silence.
+// S05 The qubit, bars 11-12: a Bloch sphere; the state arrow sweeps the whole sphere over 5 beats (0, 1, around)
+// and lands on the equator on beat 49, then circles it into the silence.
 (() => {
   const { B, C, words, mono, push } = E;
   E.wipe(B(44), [E.C.blue, E.C.paper, E.C.blue, E.C.paper, E.C.blue, E.C.paper]);
@@ -11,10 +12,12 @@
     g.beginPath(); g.moveTo(SX, SY - SR - 30); g.lineTo(SX, SY + SR + 30); g.stroke();
     g.font = '400 40px PlexMono'; g.fillStyle = C.ink; g.textAlign = 'center';
     g.fillText('|0⟩', SX, SY - SR - 50); g.fillText('|1⟩', SX, SY + SR + 82); g.textAlign = 'left';
-    // θ sweeps 0 → π → π/2 and lands on the equator on beat 30; φ turns slowly.
-    const u = M.range(t, B(44), B(46));
-    const th = u < 0.6 ? Math.PI * M.ease.inOutCubic(u / 0.6) : Math.PI - (Math.PI / 2) * M.ease.outBack(M.range(u, 0.6, 1));
-    const ph = 0.9 + (t - B(44)) * 0.6;
+    // θ sweeps 0 → π (beat 46.5), back up past the pole (beat 48) and lands on the equator on beat 49; φ keeps turning.
+    const u = M.range(t, B(44) + 0.2, B(49));
+    const th = u < 0.45 ? Math.PI * M.ease.inOutCubic(u / 0.45)
+      : u < 0.75 ? Math.PI - Math.PI * 0.85 * M.ease.inOutCubic(M.range(u, 0.45, 0.75))
+      : Math.PI * 0.15 + Math.PI * 0.35 * M.ease.outBack(M.range(u, 0.75, 1));
+    const ph = 0.9 + (t - B(44)) * 0.9;
     const x = SX + SR * Math.sin(th) * Math.cos(ph) * 0.98, y = SY - SR * Math.cos(th) + SR * 0.28 * Math.sin(th) * Math.sin(ph);
     g.strokeStyle = C.blue; g.lineWidth = 8; g.lineCap = 'round';
     g.beginPath(); g.moveTo(SX, SY); g.lineTo(x, y); g.stroke();
@@ -30,6 +33,7 @@
       E.bloch(g, t);
       words([{ text: 'The', at: B(44) + 0.12 }, { text: 'qubit.', at: B(45), accent: true }], 120, 520, 128, t, { color: C.ink, accent: C.blue });
       mono('// any blend of 0 and 1', 126, 640, t, B(45) + 0.2);
+      mono(t < B(49) ? '' : '// balanced: half 0, half 1', 126, 700, t, B(49), { color: C.gray50, size: 38 });
     },
   });
 })();

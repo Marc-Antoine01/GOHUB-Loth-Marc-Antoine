@@ -1,4 +1,5 @@
-// S03 Superposition, bars 3-4: one bit is 0 and 1 at once; it splits into two breathing ghosts on beat 16.
+// S03 Superposition, bars 5-7: one bit is 0 and 1 at once; it splits into two breathing ghosts on beat 24,
+// then from beat 27 the amplitudes trade weight (α grows, β shrinks, and back) while the formula types.
 (() => {
   const { B, C, words, mono, push } = E;
   E.wipe(B(20), [E.C.blue, E.C.paper, E.C.blue, E.C.paper, E.C.blue, E.C.paper]);
@@ -14,16 +15,20 @@
       const breathe = t > B(24) ? 0.5 - 0.5 * Math.cos(beatPhase * Math.PI * 2) : 0;
       const off = split * (150 + 18 * breathe);
       const enter = M.ease.outExpo(M.range(t, B(20) + 0.05, B(21)));
+      // α and β: from beat 27 the weight swings between the two over 4 beats, twice.
+      const w = t > B(27) ? Math.sin(((t - B(27)) / (B(31) - B(27))) * Math.PI * 2) * M.ease.inOutCubic(M.range(t, B(27), B(28))) : 0;
+      const s0 = 1 + 0.16 * w, s1 = 1 - 0.16 * w;
       g.save();
       g.font = '300 520px PlexSans'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
       g.beginPath(); g.rect(GX - 700, GY - 520, 1400, 560); g.clip();
       g.globalCompositeOperation = 'multiply';
-      g.fillStyle = C.blue; g.fillText('0', GX - off, GY + (1 - enter) * 560);
-      g.fillStyle = C.purple; g.fillText('1', GX + off, GY + (1 - enter) * 560);
+      g.fillStyle = C.blue; g.save(); g.translate(GX - off, GY + (1 - enter) * 560); g.scale(s0, s0); g.fillText('0', 0, 0); g.restore();
+      g.fillStyle = C.purple; g.save(); g.translate(GX + off, GY + (1 - enter) * 560); g.scale(s1, s1); g.fillText('1', 0, 0); g.restore();
       g.restore();
       words([{ text: '0', at: B(21) }, { text: 'and', at: B(21) + 0.23 }, { text: '1.', at: B(22) }], 120, 460, 128, t, { color: C.ink, accent: C.blue });
       words([{ text: 'At', at: B(24) }, { text: 'once.', at: B(25), accent: true }], 120, 610, 128, t, { color: C.ink, accent: C.blue });
       mono('|ψ⟩ = α|0⟩ + β|1⟩', 126, 720, t, B(26));
+      mono('// α, β: how much of each', 126, 790, t, B(28), { color: C.gray50, size: 38 });
     },
   });
 })();

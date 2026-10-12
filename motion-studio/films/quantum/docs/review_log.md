@@ -44,3 +44,23 @@ Re-check at 360 px:
 1. The end line held for only about 0.6 s before the loop clear: the clear moved to 44.45 s.
 2. The `2ⁿ` caption ran under the lattice: shortened to `// n qubits, 2^n states`.
 3. The long holds keep moving: the push-in continues, the ghosts breathe, and the orbitals turn.
+
+## v3: framing and no dead holds (client: "the first slide overflows", "nothing should ever sit still")
+1. The hook line ran off the right edge (the full stop at about x 1905, and the push centred on it pushed further). Its size is now solved from the measured line,
+   so the dot and its widest ring end at x 1800, and the push is centred on the frame. S02 picks up the pushed dot position, so the snap zoom stays continuous.
+2. Every build now runs across its whole section, with a new event every 1–2 beats:
+   - hook: a heartbeat ripple on beats 5–7, and `computing` typed after `// quantum`;
+   - world: the clouds drift until the orbital snap on beat 13; on beat 16 a look collapses one cloud to a point, which melts back by beat 19 (`// until you look`);
+   - superposition: from beat 27 the amplitudes trade weight (the 0 grows, the 1 shrinks, and back), with `// α, β: how much of each`;
+   - entanglement: the qubits drift apart after the first flip, then flip back together on beat 40 (`// however far apart`);
+   - qubit: the Bloch arrow sweeps over 5 beats (down to |1⟩, back past the pole, and onto the equator on beat 49), then keeps circling;
+   - lattice: a row every 1.4 beats (the last on 60.4), n on beat 61, then waves run through the lattice on beats 61–63;
+   - uses: the atoms drift in one by one and the molecule turns and pulses; the routes keep searching until beat 76, then a traveller runs the path;
+     today's lock shakes, cracks open in magenta on beat 83, and a new blue lock snaps shut on beat 85;
+   - end: the full stop keeps rippling until the loop clear.
+3. SFX retimed to every new event (sound.mjs).
+Re-check at 360 px (sheet-final-01..03):
+| Hook | Read 360 | Motion | Compo | Depth | Sync | Polish |
+|---|---|---|---|---|---|---|
+| 9 | 9 | 9 | 8 | 8 | 8 | 8 |
+Fixed in this round: the `// +1 qubit, ×2 states` caption ran under the lattice (now 38 px); the hook's ripple touched the "r" (it now ripples inside the ring); the `however far apart` gray was too light on paper.

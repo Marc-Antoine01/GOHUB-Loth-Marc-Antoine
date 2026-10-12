@@ -1,4 +1,5 @@
-// S06 The computer, bars 8-9: in the silence the dark field expands from the qubit; on the drop a qubit lattice lights row by row; 2ⁿ.
+// S06 The computer, bars 13-15: in the silence the dark field expands from the qubit; on the drop a qubit lattice lights
+// a row every 1.4 beats; 2ⁿ counts them, becomes n on beat 61, then waves of computation run through the lattice.
 (() => {
   const { B, C, words, mono } = E;
   const ROWS = 7, COLS = 11, LX = 860, LY = 230, DX = 88, DY = 100;
@@ -15,7 +16,7 @@
       }
       E.field(C.ink);
       E.push(t - B(52), B(64) - B(52), 1300, 540, 0.035);
-      const row = (r) => B(52 + r); // one row per beat
+      const row = (r) => E.Bf(52 + r * 1.4); // a row every beat and a bit: the last lands on beat 60.4
       // Lattice links (stylised heavy-hex: horizontal rows, a vertical link every 4 nodes, alternating offset).
       g.lineWidth = 2;
       for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
@@ -28,17 +29,23 @@
         const x = LX + c * DX, y = LY + r * DY;
         const p = Math.max(0, M.spring(t - (row(r) + c * 0.012), 2.6, 0.45));
         if (t < row(r)) { g.fillStyle = C.gray80; g.beginPath(); g.arc(x, y, 9, 0, Math.PI * 2); g.fill(); }
-        else E.qubit(x, y, 9 + 4 * p, { fill: C.blue, ring: C.cyan, ringR: 13 + 8 * p });
+        else {
+          // After the count: a diagonal wave runs through the lattice on every beat (the computation working).
+          let wv = 0;
+          for (const b of [61, 62, 63]) { const d = (t - B(b)) * 2.6 - (c + r) / (ROWS + COLS - 2); if (d > 0 && d < 0.35) wv = Math.max(wv, Math.sin((d / 0.35) * Math.PI)); }
+          E.qubit(x, y, 9 + 4 * p + 5 * wv, { fill: wv > 0.5 ? C.cyan : C.blue, ring: C.cyan, ringR: 13 + 8 * p + 10 * wv });
+        }
       }
       // 2ⁿ: the exponent counts the lit rows' qubits doubling, then becomes n on beat 39.
       let lit = 0; for (let r = 0; r < ROWS; r++) if (t >= row(r)) lit = r + 1; lit = Math.max(1, lit); // rows lit so far
       const n = lit * COLS;
       g.textBaseline = 'alphabetic';
       g.font = '300 300px PlexSans'; g.fillStyle = C.white; g.fillText('2', 120, 640);
-      const ex = t >= B(59) ? 'n' : String(n);
-      const pop = 1 + 0.12 * (1 - Math.max(0, M.spring(t - (t >= B(59) ? B(59) : row(lit - 1)), 2.6, 0.4)));
+      const ex = t >= B(61) ? 'n' : String(n);
+      const pop = 1 + 0.12 * (1 - Math.max(0, M.spring(t - (t >= B(61) ? B(61) : row(lit - 1)), 2.6, 0.4)));
       g.save(); g.translate(300, 470); g.scale(pop, pop); g.font = '600 140px PlexSans'; g.fillStyle = C.cyan; g.fillText(ex, 0, 0); g.restore();
-      mono(t >= B(59) ? '// n qubits, 2^n states' : `// ${n} qubits`, 126, 760, t, t >= B(59) ? B(59) : B(52));
+      mono(t >= B(61) ? '// n qubits, 2^n states' : `// ${n} qubits`, 126, 760, t, t >= B(61) ? B(61) : B(52));
+      mono('// +1 qubit, ×2 states', 126, 820, t, B(62), { color: C.gray30, size: 38 });
     },
   });
 })();
