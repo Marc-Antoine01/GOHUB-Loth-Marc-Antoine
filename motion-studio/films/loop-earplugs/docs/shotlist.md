@@ -16,3 +16,9 @@ Use cases and dB figures come from loopearplugs.com and must be verified there b
 | S09 Logo | 0:26–0:30 | pull back to an empty black stage, the logo lands | – | Loop logo | logo on the last downbeat; the end frame | final seal thump, then the track tail |
 
 Pacing: a payoff every 2–4 s. Match cuts at 6, 10 and 13 s use the ring as the shared shape.
+
+## As built (beat indices into beats.json; see shots.js)
+S01 0–B11 macro (Experience 2 black scene) → B4 silhouette of Switch 2, lit at B6–B7, two lines · S02 B11–B20 Switch 2, modes on B12/B14/B16, four finishes line up on B18 ·
+S03 B20–B30 gold macro match cut, Live music, seat B24 → 17 dB, finishes B27/B28 · S04 B30–B35 Quiet 2, seat B32 → 24 dB, violet scene insert B35–B38 ·
+S05 B38–B44 Dream, night light, seat B40 → 27 dB · S06 B44–B50 Engage 2, voice kept, seat B46 → 16 dB; silence frame B50 (the track's dip) ·
+S07 B51–B56 Engage Kids 2, colour pops B51/B53/B54 · S08 B56–B70 wheel, names B57–B64, row on B66, light ripple B67 · S09 wordmark on B71, line on B73.

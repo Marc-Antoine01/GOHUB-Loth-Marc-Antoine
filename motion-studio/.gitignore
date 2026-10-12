@@ -3,3 +3,5 @@ out/
 __pycache__/
 tests/*/beats.json
 films/*/assets/fonts/
+# Inter Tight is SIL OFL (assets/fonts/OFL.txt): safe to commit
+!films/loop-earplugs/assets/fonts/

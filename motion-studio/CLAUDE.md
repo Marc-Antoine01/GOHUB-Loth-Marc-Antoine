@@ -48,6 +48,7 @@ Commands (run from `motion-studio/`):
 - `node render.mjs films/<name> --sheet`: writes contact sheets to `out/sheet-NN.png`, with one frame per beat plus t=0. Thumbnails are 390 CSS px wide (phone width), so reading the sheet is the phone-readability check. Also re-renders frames out of order and fails if any frame depends on history.
 - `--format <name>` picks one canvas (default: the first), and `--format all` renders every format from one mix.
 - `node render.mjs films/<name>`: full render to `out/<name>.mp4`. H.264 yuv420p, CRF 16, AAC; integrated loudness is verified after muxing.
+- `python3 tools/cuts.py films/<name>/out/<file>.mp4`: lists the hard cuts in a render and fails on any shot under 0.8 s (a shot that flashes for a few frames reads as a glitch).
 - `node render.mjs --serve`: opens a preview at http://127.0.0.1:4173/films/<name>/. Space plays or pauses (with audio), arrow keys step one frame, and `?t=2.5` freezes on that time.
 
 What fails a render: any call to `setTimeout`, `setInterval`, `requestAnimationFrame`, `Math.random` or `Element.animate`; any element with a CSS transition or animation; a page error; or a non-deterministic frame.
