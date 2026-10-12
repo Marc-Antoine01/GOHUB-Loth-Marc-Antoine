@@ -2,6 +2,8 @@
 
 **Promise:** the quantum world (superposition, entanglement, interference) explained in images, then what quantum computers do with it
 (simulating molecules, optimisation, and the risks and opportunities for cryptography), with the energy of a product launch film.
+**It promotes quantum computing itself, not a brand** (client's decision): no logo, no company name, no product name.
+**Language: all English** (client's decision).
 
 ## Brand: the IBM design language, not the IBM logo
 - Typeface: **IBM Plex Sans** (Light 300 for the display, SemiBold 600 for the accent word) and **IBM Plex Mono** for captions and code.
@@ -18,8 +20,7 @@
 | Rare signal | Magenta 50 | `#EE5396` (only for "risk" in the crypto beat) |
 
 - **2× grid** (IBM's layout grid): a 16-column, 1920 px frame with 120 px margins; everything snaps to 8 px.
-- **No IBM 8-bar logo and no "IBM Quantum" wordmark.** They are trademarks, and the film would read as an official IBM ad. The end card is the film's own
-  title. Ask the client before adding any IBM mark.
+- **No logo of any kind** (client's decision): the IBM design language is used as a visual style only, with no IBM mark or name anywhere.
 
 ## Look
 - Flat, precise, technical: thin 1–2 px strokes, circles and Bloch spheres drawn as 2D ellipses, dot grids, wave lines.
@@ -38,9 +39,10 @@ Transitions are graphic wipes: **stacked bars** (in Blue 60 / Gray 100), a field
   a definition (2ⁿ states for n qubits) or labelled as illustrative.
 
 ## Sound
-- An original **dynamic electronic** score, synthesized in code. Brief: inspired by the client's YouTube reference.
-  That video is blocked in this session (youtube.com), so the score is built from the brief and from the whatships reference's energy curve
-  (≈ 117–128 BPM, drops and silences as punctuation).
+- Client's reference track: **"circles!" by nekodex**. No source can be reached from this session (Bandcamp, SoundCloud, YouTube and osu! are blocked).
+  Its licence also has to be checked: nekodex tracks distributed through osu! are licensed for osu! only, so a promotional film needs the artist's permission or a purchased licence.
+  Until a file and its rights are supplied, the animatic runs on an original placeholder score synthesized in code: dynamic electronic,
+  bright, with drops and silences used as punctuation.
 - SFX: a glassy "ping" for qubits, a granular shimmer for superposition, a stereo tie for entanglement, a whoosh on wipes,
   and a sub-drop on the big reveals. All on the measured beats; −14 LUFS.
 
