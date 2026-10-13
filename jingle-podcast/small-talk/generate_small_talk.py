@@ -2,12 +2,14 @@
 """« Ville et Engagement », version « petite conversation » : ludique, rapide, complice.
 
 Dans l'esprit des formats d'interview web décontractés (sans reprendre aucune musique existante) :
-  - 118 BPM, groove funk léger avec un soupçon de swing ;
-  - mélodie sifflée, liée et posée : sept notes sur le rythme du titre
-    « Vil-le et en-ga-ge-MENT » (la – do – do – ré – FA – mi – DO) ;
+  - 118 BPM, groove funk léger avec un peu de swing sur les doubles croches ;
+  - mélodie sifflée, nouvelle : sept notes bavardes sur le rythme du titre
+    « Vil-le et en-ga-ge-MENT » (do – la – do – ré – FA – mi – do) ;
   - guitare funky (accords secs + grattés étouffés), clavinet, basse funky avec approches chromatiques ;
   - batterie sèche, claquements de doigts, shaker ; fin sur un accord court et pétillant (F6/9).
 Aucune cloche, aucune percussion métallique, pas de chœur.
+
+Formats : logo (5 s), jingle (8,6 s), jingle court (2,9 s) et trois virgules (motif, montée, descente).
 
 Usage : python3 generate_small_talk.py
 """
@@ -38,7 +40,7 @@ DRUMS = "Batterie - Claquements - Shaker"
 
 KICK, SNARE, SNAP, SHAKER = 36, 38, 39, 70  # 39 = claquement (hand clap en GM), 70 = maracas
 SCRATCH_VEL = 30  # en dessous : accord gratté étouffé (convention guitare)
-SWING = 0.02  # léger retard des doubles croches « faibles », en temps
+SWING = 0.035  # retard des doubles croches « faibles », en temps
 
 gen.TRACKS = [
     (WHISTLE, 0, 78, 100, 64),
@@ -63,31 +65,26 @@ HOOK_WORDS = ["Vil", "le", "et", "en", "ga", "ge", "ment"]
 # --------------------------------------------------------------------------
 # Mélodie sifflée (début, durée, note, vélocité)
 # --------------------------------------------------------------------------
-def legato(t0, vel, cells):
-    """Notes liées : chaque note dure jusqu'au début de la suivante (sauf la dernière)."""
-    out = []
-    for i, (o, p, dv, *last) in enumerate(cells):
-        d = (cells[i + 1][0] - o) if i + 1 < len(cells) else last[0]
-        out.append(n(t0 + o, d, p, vel + dv))
-    return out
-
-
-def hook(t0, vel=100, ment=1.0):
-    """Vil-le et en-ga-ge-MENT : la – do – do – ré – FA – mi – DO, lié et posé sur les temps."""
-    return legato(t0, vel, [(0, "A4", -4), (.75, "C5", -10), (1, "C5", -6), (1.5, "D5", -4),
-                            (2, "F5", 6), (3, "E5", -6), (3.5, "C5", 4, ment)])
+def hook(t0, vel=100):
+    """Vil-le et en-ga-ge-MENT : do – la – do – ré – FA – mi – do, en doubles croches bavardes."""
+    cells = [(0, .4, "C5", 0), (.75, .2, "A4", -14), (1, .2, "C5", -8), (1.5, .2, "D5", -6),
+             (1.75, .6, "F5", 8), (2.5, .2, "E5", -8), (3, .7, "C5", 4)]
+    return [n(t0 + o, d, p, vel + dv) for o, d, p, dv in cells]
 
 
 def answer(t0, vel=94):
-    """Réponse sur Gm7 – C7 : quelques notes longues qui relancent doucement vers fa."""
-    return legato(t0, vel, [(.5, "Bb4", 0), (1, "A4", -4), (1.5, "G4", 0),
-                            (2.5, "Bb4", -2), (3, "C5", 0), (3.5, "E5", 4, .5)])
+    """Petite réponse sifflée sur Gm7 – C7, qui relance vers fa."""
+    cells = [(.5, .2, "Bb4", 0), (.75, .2, "A4", -6), (1, .4, "G4", 2),
+             (2, .2, "E4", -4), (2.25, .2, "G4", -2), (2.5, .2, "Bb4", 0), (2.75, .2, "C5", 2), (3, .4, "E5", 6)]
+    return [n(t0 + o, d, p, vel + dv) for o, d, p, dv in cells]
 
 
 def climb(t0, vel=100):
-    """Variante finale : une montée liée vers le fa final."""
-    return legato(t0, vel, [(0, "Bb4", -4), (.5, "D5", -2), (1, "F5", 6),
-                            (2, "G4", -4), (2.5, "Bb4", -2), (3, "C5", 0), (3.5, "E5", 4, .5)])
+    """Variante finale : la réponse monte jusqu'au sol, pour retomber sur le fa."""
+    cells = [(0, .2, "Bb4", -6), (.25, .2, "D5", -4), (.5, .4, "F5", 4), (1, .2, "E5", -6), (1.25, .2, "D5", -8),
+             (1.5, .4, "Bb4", 0), (2, .2, "G4", -4), (2.25, .2, "Bb4", -2), (2.5, .2, "C5", 0), (2.75, .2, "E5", 2),
+             (3, .45, "G5", 8)]
+    return [n(t0 + o, d, p, vel + dv) for o, d, p, dv in cells]
 
 
 # --------------------------------------------------------------------------
@@ -198,7 +195,7 @@ def inst_drums(p, dur, vel):
 
 
 gen.MIX = {
-    WHISTLE: (None, 0.26, 0.0, 0.35),
+    WHISTLE: (None, 0.30, 0.0, 0.35),
     GUITAR: (inst_guitar, 0.72, 0.45, 0.20),
     CLAV: (inst_clav, 0.40, -0.45, 0.15),
     BASS: (inst_bass, 0.29, 0.0, 0.0),
@@ -258,7 +255,7 @@ def clav_part(changes, vel=86):
 
 
 def bass_part(changes, vel=104):
-    """Fondamentale, quinte, et approche chromatique vers l'accord suivant (sans saut d'octave)."""
+    """Fondamentale, octave qui saute, quinte, et approche chromatique vers l'accord suivant."""
     out = []
     for idx, (start, name, length) in enumerate(changes):
         root, fifth = note(CHORDS[name][2]), note(CHORDS[name][3])
@@ -266,8 +263,8 @@ def bass_part(changes, vel=104):
             out.append(n(start, .5, root, vel + 8))
             continue
         nxt = note(CHORDS[changes[idx + 1][1]][2]) if idx + 1 < len(changes) else root
-        out += [n(start, .45, root, vel), n(start + .75, .2, root, vel - 16),
-                n(start + 1, .45, fifth, vel - 10), n(start + 1.5, .2, root, vel - 12),
+        out += [n(start, .3, root, vel), n(start + .5, .2, root, vel - 18), n(start + .75, .2, root + 12, vel - 6),
+                n(start + 1.25, .2, fifth, vel - 12), n(start + 1.5, .25, root, vel - 8),
                 n(start + 1.75, .2, nxt - 1, vel - 14)]
     return out
 
@@ -298,7 +295,7 @@ def swing(cue):
 def cue_logo():
     changes = [(0, "Fmaj7", 2), (2, "Dm7", 2), (4, "Gm7", 2), (6, "C7", 2)]
     final = [(8, "F69", 4)]
-    lead = hook(0, 102) + answer(4) + [n(8, 1.0, "F5", 108)]
+    lead = hook(0, 102) + answer(4) + [n(8, .6, "F5", 108)]
     drums = groove(0) + groove(4, fill=True) + final_stab(8)
     return dict(
         name="logo", title="Ville et Engagement (petite conversation) - logo", length=5.0, fade=0.5,
@@ -312,7 +309,7 @@ def cue_jingle():
     changes = [(0, "Fmaj7", 2), (2, "Dm7", 2), (4, "Gm7", 2), (6, "C7", 2),
                (8, "Fmaj7", 2), (10, "Dm7", 2), (12, "Gm7", 2), (14, "C7", 2)]
     final = [(16, "F69", 4)]
-    lead = hook(0, 100) + answer(4) + hook(8, 104) + climb(12) + [n(16, 1.0, "F5", 110)]
+    lead = hook(0, 100) + answer(4) + hook(8, 104) + climb(12) + [n(16, .6, "F5", 110)]
     drums = groove(0) + groove(4) + groove(8) + groove(12, fill=True) + final_stab(16)
     return dict(
         name="jingle", title="Ville et Engagement (petite conversation) - jingle", length=8.6, fade=0.4,
@@ -334,13 +331,65 @@ def cue_court():
     return cue
 
 
+# --------------------------------------------------------------------------
+# Trois virgules sonores (transitions de 2 à 3 s)
+# --------------------------------------------------------------------------
+def cue_virgule_motif():
+    """Virgule 1, « le motif » : la signature complète (Vil-le et en-ga-ge-MENT), puis l'accord pétillant."""
+    changes = [(0, "Fmaj7", 2), (2, "C7", 2)]
+    final = [(4, "F69", 4)]
+    return dict(
+        name="virgule-1-motif", title="Ville et Engagement (petite conversation) - virgule 1 : motif",
+        length=2.9, fade=0.4, markers=[(0, "Vil-le et en-ga-ge-ment"), (4, "Final")],
+        tracks={WHISTLE: hook(0, 102) + [n(4, .6, "F5", 108)],
+                GUITAR: guitar_part(changes + final), CLAV: clav_part(changes + final),
+                BASS: bass_part(changes + final), DRUMS: groove(0, fill=True) + final_stab(4)},
+        words=HOOK_WORDS)
+
+
+def cue_virgule_montee():
+    """Virgule 2, « la montée » : un arpège sifflé qui grimpe sur C7 et retombe sur le fa. Pour ouvrir une séquence."""
+    final = [(2, "F69", 4)]
+    run = [(0, "E4"), (.25, "G4"), (.5, "Bb4"), (.75, "C5"), (1, "E5"), (1.25, "G5")]
+    lead = [n(o, .2 if o < 1.25 else .45, p, 88 + 4 * i) for i, (o, p) in enumerate(run)] + [n(2, .6, "F5", 110)]
+    drums = [n(0, .25, KICK, 108), n(1, .25, SNAP, 90)] + [n(i * .25, .1, SHAKER, 66 if i % 2 == 0 else 48) for i in range(8)]
+    drums += [n(1 + i * .25, .25, SNARE, 70 + 10 * i) for i in range(4)] + final_stab(2)
+    bass = [n(0, .45, "C2", 104), n(.75, .2, "C2", 88), n(1, .45, "G2", 96), n(1.5, .2, "C3", 92),
+            n(1.75, .2, "E2", 90), n(2, .5, "F2", 112)]
+    return dict(
+        name="virgule-2-montee", title="Ville et Engagement (petite conversation) - virgule 2 : montee",
+        length=1.9, fade=0.4, markers=[(0, "Montee"), (2, "Final")],
+        tracks={WHISTLE: lead, GUITAR: guitar_part([(0, "C7", 2)] + final), CLAV: clav_part([(0, "C7", 1), (1, "C7", 1)] + final),
+                BASS: bass, DRUMS: drums})
+
+
+def cue_virgule_descente():
+    """Virgule 3, « la descente » : une phrase qui redescend et se pose en douceur sur le fa. Pour refermer une séquence."""
+    changes = [(0, "Gm7", 1), (1, "C7", 1)]
+    final = [(2, "F69", 4)]
+    phrase = [(0, .2, "Bb4", 96), (.25, .2, "A4", 88), (.5, .45, "G4", 94),
+              (1, .2, "C5", 92), (1.25, .2, "Bb4", 86), (1.5, .2, "G4", 88), (1.75, .2, "E4", 86), (2, .8, "F4", 98)]
+    lead = [n(o, d, p, v) for o, d, p, v in phrase]
+    drums = [n(0, .25, KICK, 96), n(1, .25, SNAP, 92), n(2, .25, KICK, 92), n(2, .25, SNAP, 90)]
+    drums += [n(i * .25, .1, SHAKER, 60 if i % 2 == 0 else 44) for i in range(8)]
+    bass = [n(0, .45, "G2", 100), n(.5, .2, "G2", 84), n(1, .45, "C2", 100), n(1.5, .2, "C2", 86),
+            n(1.75, .2, "E2", 88), n(2, .8, "F2", 104)]
+    return dict(
+        name="virgule-3-descente", title="Ville et Engagement (petite conversation) - virgule 3 : descente",
+        length=2.4, fade=0.9, markers=[(0, "Descente"), (2, "Pose")],
+        tracks={WHISTLE: lead, GUITAR: guitar_part(changes + final, 82), CLAV: clav_part(changes + final, 78),
+                BASS: bass, DRUMS: drums})
+
+
 def main():
     for d in ("midi", "stems", "maquettes"):
         os.makedirs(os.path.join(HERE, d), exist_ok=True)
-    for i, build in enumerate((cue_logo, cue_jingle, cue_court), 1):
+    cues = (cue_logo, cue_jingle, cue_court, cue_virgule_motif, cue_virgule_montee, cue_virgule_descente)
+    for i, build in enumerate(cues, 1):
         cue = swing(gen.dedupe(build()))
         hook_starts = sorted(s for s, *_ in cue["tracks"][WHISTLE])
-        words = {s: w for s, w in zip(hook_starts[:7], HOOK_WORDS)}  # paroles sur le premier énoncé du motif
+        # paroles sur le premier énoncé du motif (les virgules 2 et 3 n'en ont pas)
+        words = {s: w for s, w in zip(hook_starts[:7], cue.get("words", []))}
         base = f"{i:02d}_VilleEtEngagement_petite-conversation_{cue['name']}_{gen.BPM}bpm_F"
         mid_path = os.path.join(HERE, "midi", base + ".mid")
         gen.write_midi(cue, mid_path)

@@ -9,28 +9,43 @@ Aucune musique existante n'est reprise. Il n'y a **ni cloche, ni percussion mét
 | `01_…_logo_118bpm_F` | 5,0 s | Le motif, la réponse, puis l'accord final pétillant |
 | `02_…_jingle_118bpm_F` | 8,6 s | Le motif, la réponse, le motif, une réponse qui monte, puis l'accord final |
 | `03_…_jingle-court_118bpm_F` | 2,9 s | Le motif une fois, puis un fondu |
+| `04_…_virgule-1-motif_118bpm_F` | 2,9 s | **Virgule « motif »** : la signature complète, puis l'accord pétillant |
+| `05_…_virgule-2-montee_118bpm_F` | 1,9 s | **Virgule « montée »** : un arpège sifflé qui grimpe, puis l'accord. Pour **ouvrir** une séquence |
+| `06_…_virgule-3-descente_118bpm_F` | 2,4 s | **Virgule « descente »** : une phrase qui redescend et se pose en douceur. Pour **refermer** une séquence |
+
+## Les trois virgules
+
+Ce sont trois transitions courtes, avec les mêmes instruments, le même tempo et la même tonalité, pour
+rythmer l'épisode :
+
+1. **Motif** (2,9 s) : *Vil-le et en-ga-ge-MENT* en entier (Fmaj7 → C7), relance de caisse claire, puis
+   l'accord F6/9. C'est la virgule « signature », à placer entre deux grandes parties.
+2. **Montée** (1,9 s) : un arpège sifflé qui grimpe sur C7 (mi – sol – sib – do – mi – SOL), un
+   roulement de caisse claire, puis le fa. Elle est énergique, pour lancer une nouvelle question ou
+   une nouvelle rubrique.
+3. **Descente** (2,4 s) : sib – la – sol… do – sib – sol – mi, qui se pose sur un **fa grave tenu**,
+   avec peu de batterie. Elle est plus douce, pour refermer un moment ou laisser respirer.
 
 ## La mélodie (nouvelle)
 
-Elle est **sifflée** : c'est humain, léger, et ça évoque quelqu'un de détendu qui discute. Elle est
-**liée et posée** : peu de doubles croches, des notes qui durent jusqu'à la suivante, des appuis sur les
-temps et des intervalles serrés. Ses sept notes suivent le rythme du titre :
+Elle est **sifflée** : c'est humain, léger, et ça évoque quelqu'un de détendu qui discute. Ses sept
+notes, bavardes, suivent le rythme du titre dit vite :
 
 ```
 Vil – le – et – en – GA – ge – MENT
-la    do   do   ré   FA   mi   DO
+do    la   do   ré   FA   mi   do
 ```
 
-Une **réponse** (sib – la – sol… sib – do – mi) relance doucement vers le motif. Dans le jingle, la
-seconde réponse **monte** (sib – ré – FA…) vers le fa final, tenu.
+Une **réponse** (sib – la – sol… mi – sol – sib – do – MI) relance vers le motif. Dans le jingle, la
+seconde réponse **monte jusqu'au sol** et retombe sur le fa final.
 
 ## Le groove
 
-- **118 BPM**, funk léger, avec un soupçon de **swing**.
+- **118 BPM**, funk léger, avec un peu de **swing** sur les doubles croches.
 - Grille jazz-pop **Fmaj7 – Dm7 – Gm7 – C7**, puis un accord final **F6/9**, court et pétillant.
 - **Guitare funky** : accords secs sur les contretemps, grattés étouffés autour.
 - **Clavinet** : petites frappes syncopées.
-- **Basse funky** : fondamentale, quinte, et **approche chromatique** vers l'accord suivant (sans saut d'octave).
+- **Basse funky** : fondamentale, octave qui saute, quinte, et **approche chromatique** vers l'accord suivant.
 - **Batterie sèche + claquements de doigts** sur 2 et 4, **shaker** en doubles croches.
 
 ## Pistes (MIDI et stems)
