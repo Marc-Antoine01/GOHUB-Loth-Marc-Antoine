@@ -12,10 +12,11 @@ Aucune musique existante n'est reprise. Il n'y a **ni cloche, ni percussion mét
 | `04_…_virgule-1-motif_118bpm_F` | 2,9 s | **Virgule « motif »** : la signature complète, puis l'accord pétillant |
 | `05_…_virgule-2-montee_118bpm_F` | 1,9 s | **Virgule « montée »** : un arpège sifflé qui grimpe, puis l'accord. Pour **ouvrir** une séquence |
 | `06_…_virgule-3-descente_118bpm_F` | 2,4 s | **Virgule « descente »** : une phrase qui redescend et se pose en douceur. Pour **refermer** une séquence |
+| `07_…_virgule-4-conclusion_118bpm_F` | 6,0 s | **Virgule « conclusion »** : une longue descente qui ralentit et se pose sur un accord tenu. Pour **finir l'épisode** |
 
-## Les trois virgules
+## Les virgules
 
-Ce sont trois transitions courtes, avec les mêmes instruments, le même tempo et la même tonalité, pour
+Ce sont des transitions, avec les mêmes instruments, le même tempo et la même tonalité, pour
 rythmer l'épisode :
 
 1. **Motif** (2,9 s) : *Vil-le et en-ga-ge-MENT* en entier (Fmaj7 → C7), relance de caisse claire, puis
@@ -25,6 +26,10 @@ rythmer l'épisode :
    une nouvelle rubrique.
 3. **Descente** (2,4 s) : sib – la – sol… do – sib – sol – mi, qui se pose sur un **fa grave tenu**,
    avec peu de batterie. Elle est plus douce, pour refermer un moment ou laisser respirer.
+4. **Conclusion** (6,0 s) : c'est la descente en version longue, sur quatre accords qui descendent
+   (Bbmaj7 – Am7 – Gm7 – C7). Le sifflement part du **fa aigu** et redescend jusqu'au **fa grave**, avec
+   des notes de plus en plus longues (effet de ralenti). La batterie s'allège peu à peu, puis l'accord
+   final F6/9 est **tenu** et s'éteint en fondu. Elle sert à conclure l'épisode.
 
 ## La mélodie (nouvelle)
 

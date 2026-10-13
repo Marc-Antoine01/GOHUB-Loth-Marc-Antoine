@@ -9,7 +9,7 @@ Dans l'esprit des formats d'interview web décontractés (sans reprendre aucune 
   - batterie sèche, claquements de doigts, shaker ; fin sur un accord court et pétillant (F6/9).
 Aucune cloche, aucune percussion métallique, pas de chœur.
 
-Formats : logo (5 s), jingle (8,6 s), jingle court (2,9 s) et trois virgules (motif, montée, descente).
+Formats : logo (5 s), jingle (8,6 s), jingle court (2,9 s) et quatre virgules (motif, montée, descente, conclusion).
 
 Usage : python3 generate_small_talk.py
 """
@@ -57,6 +57,8 @@ CHORDS = {
     "Gm7": (["F4", "Bb4", "D5"], ["F3", "Bb3", "D4"], "G2", "D3"),
     "C7": (["E4", "G4", "Bb4"], ["E3", "G3", "Bb3"], "C2", "G2"),
     "F69": (["F4", "A4", "D5", "G5"], ["A3", "D4", "G4"], "F2", "C3"),
+    "Bbmaj7": (["D4", "F4", "A4"], ["D3", "F3", "A3"], "Bb1", "F2"),
+    "Am7": (["E4", "G4", "C5"], ["E3", "G3", "C4"], "A1", "E2"),
 }
 
 HOOK_WORDS = ["Vil", "le", "et", "en", "ga", "ge", "ment"]
@@ -381,10 +383,43 @@ def cue_virgule_descente():
                 BASS: bass, DRUMS: drums})
 
 
+def cue_virgule_conclusion():
+    """Virgule 4, « conclusion » : une longue descente (Bbmaj7 – Am7 – Gm7 – C7) qui ralentit et se pose sur fa."""
+    changes = [(0, "Bbmaj7", 2), (2, "Am7", 2), (4, "Gm7", 2), (6, "C7", 2)]
+    phrase = [  # du fa aigu au fa grave ; les valeurs s'allongent pour donner une impression de ralenti
+        (0, .2, "F5", 100), (.25, .2, "D5", 92), (.5, .45, "C5", 96), (1, .2, "D5", 90), (1.25, .2, "C5", 86), (1.5, .45, "A4", 92),
+        (2, .2, "E5", 94), (2.25, .2, "C5", 86), (2.5, .45, "A4", 90), (3, .2, "C5", 86), (3.25, .2, "A4", 82), (3.5, .45, "G4", 88),
+        (4, .45, "Bb4", 90), (4.5, .45, "A4", 86), (5, .9, "G4", 90),
+        (6, .45, "C5", 88), (6.5, .45, "Bb4", 84), (7, .45, "G4", 84), (7.5, .45, "E4", 82),
+        (8, 2.2, "F4", 96)]
+    lead = [n(o, d, p, v) for o, d, p, v in phrase]
+    # Batterie qui s'allège : groove léger, puis claquements seuls, puis un dernier appui doux
+    drums = [n(0, .25, KICK, 104), n(1.75, .25, KICK, 84), n(2, .25, KICK, 96), n(3.75, .25, KICK, 80)]
+    drums += [n(b, .25, SNAP, 96 - 3 * b) for b in (1, 3, 5, 7)] + [n(b, .25, SNARE, 80) for b in (1, 3)]
+    drums += [n(i * .25, .1, SHAKER, int((66 if i % 2 == 0 else 46) * (1 - i / 48))) for i in range(32)]
+    drums += [n(8, .25, KICK, 88), n(8, .25, SNAP, 86)]
+    bass = []
+    for idx, (start, name, _) in enumerate(changes):
+        root, fifth = note(CHORDS[name][2]), note(CHORDS[name][3])
+        nxt = note(CHORDS[changes[idx + 1][1]][2]) if idx + 1 < len(changes) else note("F2")
+        v = 102 - 4 * idx
+        bass += [n(start, .45, root, v), n(start + .75, .2, root, v - 16), n(start + 1, .45, fifth, v - 10),
+                 n(start + 1.5, .2, root, v - 14), n(start + 1.75, .2, nxt - 1 if nxt - 1 != root else nxt + 1, v - 16)]
+    bass.append(n(8, 2.2, "F2", 100))
+    final_guitar = [n(8 + i * .04, 2.2, p, 84) for i, p in enumerate(CHORDS["F69"][0])]  # accord final arpégé, tenu
+    final_clav = [n(8, 1.5, p, 70) for p in CHORDS["F69"][1]]
+    return dict(
+        name="virgule-4-conclusion", title="Ville et Engagement (petite conversation) - virgule 4 : conclusion",
+        length=6.0, fade=1.6, markers=[(0, "Descente"), (4, "Ralenti"), (8, "Pose finale")],
+        tracks={WHISTLE: lead, GUITAR: guitar_part(changes, 84) + final_guitar,
+                CLAV: clav_part(changes, 76) + final_clav, BASS: bass, DRUMS: drums})
+
+
 def main():
     for d in ("midi", "stems", "maquettes"):
         os.makedirs(os.path.join(HERE, d), exist_ok=True)
-    cues = (cue_logo, cue_jingle, cue_court, cue_virgule_motif, cue_virgule_montee, cue_virgule_descente)
+    cues = (cue_logo, cue_jingle, cue_court, cue_virgule_motif, cue_virgule_montee, cue_virgule_descente,
+            cue_virgule_conclusion)
     for i, build in enumerate(cues, 1):
         cue = swing(gen.dedupe(build()))
         hook_starts = sorted(s for s, *_ in cue["tracks"][WHISTLE])
